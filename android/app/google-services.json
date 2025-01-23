@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "566788792208",
+    "project_id": "shifushotlocal",
+    "storage_bucket": "shifushotlocal.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566788792208:android:bccb153909135412151d15",
+        "android_client_info": {
+          "package_name": "com.example.shifushotlocal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNkHkmy414NkXxkHid-zCpUDu87bqe8gE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

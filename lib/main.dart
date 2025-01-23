@@ -1,19 +1,28 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'firebase_options.dart'; // Assurez-vous que ce fichier est correctement généré
 
-void main() {
+Future<void> main() async {
+  // Ajoutez cette ligne pour initialiser les bindings
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialisez Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  const MainApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
+        appBar: AppBar(title: Text("Shifushot Local")),
+        body: Center(child: Text("Firebase Initialized!")),
       ),
     );
   }
