@@ -18,3 +18,18 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: jaro
+      fonts:
+        - asset: assets/fonts/Jaro-Regular-VariableFont_opsz.ttf
+    - family: afacad
+      fonts:
+        - asset: assets/fonts/Afacad-Regular.otf
+        - asset: assets/fonts/Afacad-Bold.otf
+        - asset: assets/fonts/Afacad-Italic.otf
+        - asset: assets/fonts/Afacad-Medium.otf
+        - asset: assets/fonts/Afacad-SemiBold.otf
+  assets:
+    - assets/images/logo.png
+    - assets/images/cheers.png
+    - assets/images/favicon.png
