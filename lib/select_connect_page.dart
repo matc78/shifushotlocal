@@ -77,6 +77,7 @@ class SelectConnectPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     // Redirection vers la page Créer un compte
+                    Navigator.pushNamed(context, '/createAccount');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.secondary,
