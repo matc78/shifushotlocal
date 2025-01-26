@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_theme.dart';
+import 'select_connect_page.dart';
+
 
 class DebutPage extends StatelessWidget {
   const DebutPage({super.key});
@@ -24,7 +26,7 @@ class DebutPage extends StatelessWidget {
             // Logo
             Image.asset(
               'assets/images/logo.png',
-             height: 150, // Ajustez la hauteur
+              height: 150, // Ajustez la hauteur
               width: 300, // Limitez la largeur 
               fit: BoxFit.contain,
             ),
@@ -35,7 +37,13 @@ class DebutPage extends StatelessWidget {
               width: 400,
               child: ElevatedButton(
                 onPressed: () {
-                  // Action du bouton
+                  // Navigation vers SelectConnectPage
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SelectConnectPage(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.buttonColor, // Couleur de fond du bouton
@@ -49,6 +57,7 @@ class DebutPage extends StatelessWidget {
                 ),
               ),
             ),
+
           ],
         ),
       ),
