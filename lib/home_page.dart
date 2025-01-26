@@ -26,12 +26,11 @@ class HomePage extends StatelessWidget {
                   ),
                   iconSize: 40.0,
                   onPressed: () {
-                    // Naviguer vers la page Profil
-                    Navigator.pushNamed(context, '/profil');
+                    // Naviguer vers la page UserProfilePage
+                    Navigator.pushNamed(context, '/user_profile_page');
                   },
                 ),
               ),
-
               // Logo et titre
               const SizedBox(height: 16.0),
               Center(

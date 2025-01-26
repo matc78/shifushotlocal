@@ -52,7 +52,7 @@ class LightModeTheme extends AppTheme {
     );
     bodyMedium =  TextStyle(
       fontFamily: 'afacad',
-      fontSize: 14,
+      fontSize: 18,
       fontWeight: FontWeight.normal,
       color: textPrimary,
     );
