@@ -358,10 +358,21 @@ class _FriendsPageState extends State<FriendsPage> {
 
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(
-                    child: Text(
-                      'Aucune demande en attente.',
-                      style: theme.bodyMedium.copyWith(color: theme.textSecondary),
-                      textAlign: TextAlign.center,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Text(
+                          'Aucune demande ? Brice est fier de toi : \nT’es encore plus seul que lui sur sa vague',
+                          style: theme.bodyMedium.copyWith(color: theme.textSecondary),
+                        ),
+                        const SizedBox(height: 10),
+                        Image.network(
+                          'https://mathsamoi.com/wp-content/uploads/2019/10/061-image-entrc3a9e-1.png?w=640',
+                          width: 200,
+                          height: 200,
+                          fit: BoxFit.contain,
+                        ),
+                      ],
                     ),
                   );
                 }
