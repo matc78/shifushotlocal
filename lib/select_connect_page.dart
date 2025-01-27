@@ -56,7 +56,7 @@ class SelectConnectPage extends StatelessWidget {
                   ),
                   child: Text(
                     'Connexion',
-                    style: theme.buttonText.copyWith(color: theme.background),
+                    style: theme.buttonText.copyWith(color: Colors.white),
                   ),
                 ),
               ),
@@ -87,7 +87,7 @@ class SelectConnectPage extends StatelessWidget {
                   ),
                   child: Text(
                     'Créer un compte',
-                    style: theme.buttonText.copyWith(color: theme.background),
+                    style: theme.buttonText.copyWith(color: Colors.white),
                   ),
                 ),
               ),

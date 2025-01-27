@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shifushotlocal/create_account_page.dart';
 import 'package:shifushotlocal/debut_page.dart';
 import 'package:shifushotlocal/connexion_page.dart'; // Importez la page de connexion
+import 'package:shifushotlocal/friends_page.dart';
 import 'package:shifushotlocal/home_page.dart';
 import 'package:shifushotlocal/user_profil_page.dart';
 import 'firebase_options.dart'; // Assurez-vous que ce fichier est correctement généré
@@ -30,9 +31,11 @@ class MainApp extends StatelessWidget {
       routes: {
         '/': (context) => const DebutPage(), // Page principale
         '/connexion': (context) => const ConnexionPage(), // Page de connexion
-        '/createAccount': (context) => CreateAccountPage(), // Page de création de compte
+        '/createAccount': (context) => const CreateAccountPage(), // Page de création de compte
         '/homepage': (context) => const HomePage(), // Assurez-vous que HomePage existe
         '/user_profile_page': (context) => const UserProfilePage(),
+        '/friends': (context) => const FriendsPage(),
+
       },
     );
   }

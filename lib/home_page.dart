@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shifushotlocal/friends_page.dart';
 import 'app_theme.dart';
 
 class HomePage extends StatelessWidget {
@@ -107,11 +108,16 @@ class HomePage extends StatelessWidget {
                 alignment: Alignment.bottomRight,
                 child: GestureDetector(
                   onTap: () {
-                    // Naviguer vers la page Amis
-                    Navigator.pushNamed(context, '/friends');
+                    // Naviguer vers la page FriendsPage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const FriendsPage(), // Assurez-vous que FriendsPage est importé.
+                      ),
+                    );
                   },
                   child: Image.asset(
-                    'assets/images/cheers.png',
+                    'assets/images/cheers.png', // Chemin de votre image
                     width: 60.0,
                     height: 60.0,
                     fit: BoxFit.contain,
