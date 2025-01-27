@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:shifushotlocal/add_friends_page.dart';
 import 'package:shifushotlocal/create_account_page.dart';
 import 'package:shifushotlocal/debut_page.dart';
 import 'package:shifushotlocal/connexion_page.dart'; // Importez la page de connexion
@@ -35,6 +36,8 @@ class MainApp extends StatelessWidget {
         '/homepage': (context) => const HomePage(), // Assurez-vous que HomePage existe
         '/user_profile_page': (context) => const UserProfilePage(),
         '/friends': (context) => const FriendsPage(),
+        '/addFriend': (context) => const AddFriendsPage(),
+
 
       },
     );

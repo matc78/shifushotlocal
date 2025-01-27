@@ -12,11 +12,14 @@ class FriendsPage extends StatefulWidget {
 
 class _FriendsPageState extends State<FriendsPage> {
   late Future<List<Map<String, dynamic>>> friendsFuture;
+  late Future<List<Map<String, dynamic>>> pendingApprovalsFuture;
+
 
   @override
   void initState() {
     super.initState();
     friendsFuture = fetchFriends();
+    pendingApprovalsFuture = fetchPendingApprovals();
   }
 
   Future<List<Map<String, dynamic>>> fetchFriends() async {
@@ -63,9 +66,61 @@ class _FriendsPageState extends State<FriendsPage> {
     return null;
   }
 
+   Future<List<Map<String, dynamic>>> fetchPendingApprovals() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return [];
+
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    final List<dynamic> pendingApprovalUids = userDoc.data()?['pending_approval'] ?? [];
+    if (pendingApprovalUids.isEmpty) return [];
+
+    final List<Map<String, dynamic>> pendingApprovalsData = [];
+    for (final uid in pendingApprovalUids) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+
+      if (userDoc.exists) {
+        pendingApprovalsData.add(userDoc.data() as Map<String, dynamic>);
+      }
+    }
+
+    return pendingApprovalsData;
+  }
+
+  Future<String?> fetchPendingApprovalUid(int index) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+
+    // Récupérer le document de l'utilisateur actuel
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    // Obtenir la liste des UID des pending approvals
+    final List<dynamic> pendingApprovalUids = userDoc.data()?['pending_approval'] ?? [];
+    if (index < pendingApprovalUids.length) {
+      return pendingApprovalUids[index]; // Retourner l'UID correspondant à l'index
+    }
+
+    return null; // Aucun UID trouvé pour cet index
+  }
+
   void refreshFriends() {
     setState(() {
       friendsFuture = fetchFriends();
+    });
+  }
+
+  void refreshPendingApprovals() {
+    setState(() {
+      pendingApprovalsFuture = fetchPendingApprovals();
     });
   }
 
@@ -183,8 +238,10 @@ class _FriendsPageState extends State<FriendsPage> {
                       ),
                       title: Text(friend['pseudo'] ?? 'Nom inconnu',
                           style: theme.bodyLarge),
-                      subtitle: Text(friend['email'] ?? 'Email inconnu',
-                          style: theme.bodyMedium),
+                      subtitle: Text(
+                        '${friend['surname'] ?? 'Nom inconnu'} ${friend['name'] ?? ''}',
+                        style: theme.bodyMedium,
+                      ),
                       trailing: IconButton(
                         icon: Icon(Icons.delete, color: theme.secondary),
                         onPressed: () async {
@@ -292,12 +349,126 @@ class _FriendsPageState extends State<FriendsPage> {
           children: [
             Text('Demande d\'amis', style: theme.titleLarge),
             const SizedBox(height: 10),
-            Center(
-              child: Text(
-                'Aucune demande en attente.',
-                style: theme.bodyMedium.copyWith(color: theme.textSecondary),
-                textAlign: TextAlign.center,
-              ),
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: pendingApprovalsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'Aucune demande en attente.',
+                      style: theme.bodyMedium.copyWith(color: theme.textSecondary),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }
+
+                final pendingList = snapshot.data!;
+
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: pendingList.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final pendingUser = pendingList[index];
+
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          pendingUser['photoUrl'] ??
+                              'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
+                        ),
+                      ),
+                      title: Text(pendingUser['pseudo'] ?? 'Nom inconnu',
+                          style: theme.bodyLarge),
+                      subtitle: Text(
+                        '${pendingUser['surname'] ?? 'Nom inconnu'} ${pendingUser['name'] ?? ''}',
+                        style: theme.bodyMedium,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.check, color: Colors.green),
+                            onPressed: () async {
+                            try {
+                              final currentUserUid = FirebaseAuth.instance.currentUser?.uid;
+                              final pendingUserUid = await fetchPendingApprovalUid(index);
+
+                              if (currentUserUid == null || pendingUserUid == null) {
+                                throw Exception("UID introuvable pour l'utilisateur ou la demande.");
+                              }
+
+                              // Ajouter aux amis
+                              await FirebaseFirestore.instance.collection('users').doc(currentUserUid).update({
+                                'friends': FieldValue.arrayUnion([pendingUserUid]),
+                                'pending_approval': FieldValue.arrayRemove([pendingUserUid]),
+                              });
+
+                              await FirebaseFirestore.instance.collection('users').doc(pendingUserUid).update({
+                                'friends': FieldValue.arrayUnion([currentUserUid]),
+                                'friend_requests': FieldValue.arrayRemove([currentUserUid]),
+                              });
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('${pendingUser['pseudo']} ajouté comme ami.')),
+                              );
+
+                              // Rafraîchir les données
+                              refreshFriends();
+                              refreshPendingApprovals();
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Erreur : $e')),
+                              );
+                            }
+                          },
+
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close, color: theme.secondary),
+                            onPressed: () async {
+                            try {
+                              final currentUserUid = FirebaseAuth.instance.currentUser?.uid;
+                              final pendingUserUid = await fetchPendingApprovalUid(index);
+
+                              if (currentUserUid == null || pendingUserUid == null) {
+                                throw Exception("UID introuvable pour l'utilisateur ou la demande.");
+                              }
+
+                              // Supprimer la demande
+                              await FirebaseFirestore.instance.collection('users').doc(currentUserUid).update({
+                                'pending_approval': FieldValue.arrayRemove([pendingUserUid]),
+                              });
+
+                              await FirebaseFirestore.instance.collection('users').doc(pendingUserUid).update({
+                                'friend_requests': FieldValue.arrayRemove([currentUserUid]),
+                              });
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Demande refusée.')),
+                              );
+
+                              // Rafraîchir les données
+                              refreshFriends();
+                              refreshPendingApprovals();
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Erreur : $e')),
+                              );
+                            }
+                          },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),
