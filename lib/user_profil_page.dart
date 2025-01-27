@@ -80,7 +80,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'PROFIL',
+                      userData!['pseudo'] ?? '',
                       style: theme.titleLarge,
                     ),
                     const SizedBox(height: 20),
@@ -94,13 +94,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         userData!['gender'] ?? 'Non spécifié', // Affiche une valeur par défaut
                       ),
                     _buildProfileField(
-                        theme, 'Pseudo', userData!['pseudo'] ?? ''),
-                    _buildProfileField(
                       theme,
                       'Anniversaire',
-                      userData!['birthdate'] ?? (userData!['birthdate']?.toDate() != null
+                      userData!['birthdate'] != null
+                          ? (userData!['birthdate'] is Timestamp // Vérifie si c'est un Timestamp
                               ? DateFormat('dd/MM/yyyy').format(userData!['birthdate'].toDate())
-                              : 'Non spécifié'),
+                              : userData!['birthdate'] // Si ce n'est pas un Timestamp, affiche tel quel
+                            )
+                          : 'Non spécifié', // Valeur par défaut si null
                     ),
                     _buildProfileField(
                       theme,

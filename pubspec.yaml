@@ -1,17 +1,18 @@
 name: shifushotlocal
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
   sdk: ^3.5.4
 
 dependencies:
-  firebase_core: ^3.10.1
+  cloud_firestore: ^5.6.2
   firebase_auth: ^5.4.1
+  firebase_core: ^3.10.1
+  firebase_storage: ^12.4.1
   flutter:
     sdk: flutter
-  cloud_firestore: ^5.6.2
   intl: ^0.20.2
 
 dev_dependencies:

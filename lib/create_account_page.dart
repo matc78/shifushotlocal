@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'app_theme.dart';
 
 class CreateAccountPage extends StatefulWidget {
@@ -78,11 +79,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       'name': _nameController.text.trim(),
       'surname': _surnameController.text.trim(),
       'gender': _selectedGender,
-      'birthdate': _dateController.text.trim(),
+      'birthdate': _dateController.text.isNotEmpty 
+          ? Timestamp.fromDate(DateFormat('dd/MM/yyyy').parse(_dateController.text.trim())) 
+          : null, // Si aucune date n'est saisie, enregistre null
       'createdAt': Timestamp.now(),
       'friends': [], // Liste vide pour les amis
       'pending_approval': [], // Liste vide pour les demandes en attente
       'friend_requests': [], // Liste vide pour les demandes reçues
+      'photoUrl': 'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg', // URL par défaut
     });
 
     ScaffoldMessenger.of(context).showSnackBar(

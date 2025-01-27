@@ -4,6 +4,7 @@ import 'package:shifushotlocal/add_friends_page.dart';
 import 'package:shifushotlocal/create_account_page.dart';
 import 'package:shifushotlocal/debut_page.dart';
 import 'package:shifushotlocal/connexion_page.dart'; // Importez la page de connexion
+import 'package:shifushotlocal/edit_profil_page.dart';
 import 'package:shifushotlocal/friends_page.dart';
 import 'package:shifushotlocal/home_page.dart';
 import 'package:shifushotlocal/user_profil_page.dart';
@@ -37,7 +38,7 @@ class MainApp extends StatelessWidget {
         '/user_profile_page': (context) => const UserProfilePage(),
         '/friends': (context) => const FriendsPage(),
         '/addFriend': (context) => const AddFriendsPage(),
-
+        '/editProfile': (context) => const EditProfilePage(),
 
       },
     );
