@@ -7,6 +7,8 @@ import 'package:shifushotlocal/connexion_page.dart'; // Importez la page de conn
 import 'package:shifushotlocal/edit_profil_page.dart';
 import 'package:shifushotlocal/friends_page.dart';
 import 'package:shifushotlocal/home_page.dart';
+import 'package:shifushotlocal/select_game.dart';
+import 'package:shifushotlocal/team_generator_page.dart';
 import 'package:shifushotlocal/user_profil_page.dart';
 import 'firebase_options.dart'; // Assurez-vous que ce fichier est correctement généré
 
@@ -39,6 +41,8 @@ class MainApp extends StatelessWidget {
         '/friends': (context) => const FriendsPage(),
         '/addFriend': (context) => const AddFriendsPage(),
         '/editProfile': (context) => const EditProfilePage(),
+        '/teamGenerator': (context) => const TeamGeneratorPage(),
+        '/select_game': (context) => const SelectGamePage(), // La page SelectGame
 
       },
     );

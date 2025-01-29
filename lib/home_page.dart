@@ -82,8 +82,8 @@ class HomePage extends StatelessWidget {
               // Bouton "jeux"
               ElevatedButton(
                 onPressed: () {
-                  // Naviguer vers la page Jeux
-                  Navigator.pushNamed(context, '/selectionjeu');
+                  // Naviguer vers la page SelectGamePage
+                  Navigator.pushNamed(context, '/select_game');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.primary,
