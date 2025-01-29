@@ -27,7 +27,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     if (user != null) {
       final DocumentSnapshot userDoc =
           await _firestore.collection('users').doc(user.uid).get();
-      if (userDoc.exists) {
+      if (userDoc.exists && mounted) { // Vérifie si le widget est monté
         setState(() {
           userData = userDoc.data() as Map<String, dynamic>?;
         });
