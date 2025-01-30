@@ -22,7 +22,7 @@ class SelectGamePage extends StatelessWidget {
         'route': '/killer',
       },
       {
-        'name': 'clicker',
+        'name': 'Clicker',
         'description': 'Une compétition de clique.',
         'image': 'https://img.icons8.com/?size=100&id=gjsnNuxwktgL&format=png&color=000000',
         'route': '/lobby_screen',
