@@ -27,12 +27,10 @@ class HomePage extends StatelessWidget {
                   ),
                   iconSize: 40.0,
                   onPressed: () {
-                    // Naviguer vers la page UserProfilePage
                     Navigator.pushNamed(context, '/user_profile_page');
                   },
                 ),
               ),
-              // Logo et titre
               const SizedBox(height: 16.0),
               Center(
                 child: Column(
@@ -51,10 +49,7 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ),
-
               const Spacer(),
-
-              // Bouton "Lancer une soirée"
               ElevatedButton(
                 onPressed: () {
                   // Naviguer vers la page Créer une soirée
@@ -75,13 +70,9 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30.0),
-
-              // Bouton "jeux"
               ElevatedButton(
                 onPressed: () {
-                  // Naviguer vers la page SelectGamePage
                   Navigator.pushNamed(context, '/select_game');
                 },
                 style: ElevatedButton.styleFrom(
@@ -93,30 +84,26 @@ class HomePage extends StatelessWidget {
                 ),
                 child: Text(
                   'jeux',
-                  style: theme.titleMedium.copyWith(  
+                  style: theme.titleMedium.copyWith(
                     color: Colors.white,
                     fontSize: 18.0,
                   ),
                 ),
               ),
-
               const Spacer(),
-
-              // Icone Cheers en bas à droite
               Align(
                 alignment: Alignment.bottomRight,
                 child: GestureDetector(
                   onTap: () {
-                    // Naviguer vers la page FriendsPage
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const FriendsPage(), // Assurez-vous que FriendsPage est importé.
+                        builder: (context) => const FriendsPage(),
                       ),
                     );
                   },
                   child: Image.asset(
-                    'assets/images/cheers.png', // Chemin de votre image
+                    'assets/images/cheers.png',
                     width: 60.0,
                     height: 60.0,
                     fit: BoxFit.contain,

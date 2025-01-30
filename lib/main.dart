@@ -1,10 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/Pages/jeu1.dart';
 import 'package:shifushotlocal/add_friends_page.dart';
 import 'package:shifushotlocal/create_account_page.dart';
 import 'package:shifushotlocal/debut_page.dart';
-import 'package:shifushotlocal/connexion_page.dart'; // Importez la page de connexion
+import 'package:shifushotlocal/connexion_page.dart';
 import 'package:shifushotlocal/edit_profil_page.dart';
 import 'package:shifushotlocal/friends_page.dart';
 import 'package:shifushotlocal/home_page.dart';
@@ -15,13 +16,10 @@ import 'package:shifushotlocal/select_game.dart';
 import 'package:shifushotlocal/team_generator_page.dart';
 import 'package:shifushotlocal/user_profil_page.dart';
 import 'package:shifushotlocal/Pages/lobby_screen.dart';
-import 'firebase_options.dart'; // Assurez-vous que ce fichier est correctement généré
+import 'firebase_options.dart';
 
 Future<void> main() async {
-  // Ajoutez cette ligne pour initialiser les bindings
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialisez Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -35,20 +33,19 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Supprime la bannière "Debug"
-      initialRoute: '/', // Route initiale
+      debugShowCheckedModeBanner: false,
+      home: const AuthWrapper(), // Utilisation d'un wrapper pour la navigation
       routes: {
-        '/': (context) => const DebutPage(), // Page principale
-        '/connexion': (context) => const ConnexionPage(), // Page de connexion
-        '/createAccount': (context) => const CreateAccountPage(), // Page de création de compte
-        '/homepage': (context) => const HomePage(), // Assurez-vous que HomePage existe
+        '/connexion': (context) => const ConnexionPage(),
+        '/createAccount': (context) => const CreateAccountPage(),
+        '/homepage': (context) => const HomePage(),
         '/user_profile_page': (context) => const UserProfilePage(),
         '/Pages/lobby_screen': (context) => const LobbyScreen(),
         '/friends': (context) => const FriendsPage(),
         '/addFriend': (context) => const AddFriendsPage(),
         '/editProfile': (context) => const EditProfilePage(),
         '/teamGenerator': (context) => const TeamGeneratorPage(),
-        '/select_game': (context) => const SelectGamePage(), // La page SelectGame
+        '/select_game': (context) => const SelectGamePage(),
         '/killer': (context) => const KillerPage(),
         '/killerActions': (context) => KillerActionsPage(
               players: ModalRoute.of(context)!.settings.arguments as List<String>,
@@ -62,6 +59,29 @@ class MainApp extends StatelessWidget {
           return Jeu1(players: players);
         },
         '/lobby_screen': (context) => const LobbyScreen(),
+      },
+    );
+  }
+}
+
+// Wrapper pour vérifier si l'utilisateur est connecté
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasData) {
+          // Si l'utilisateur est connecté, diriger vers la HomePage
+          return const HomePage();
+        } else {
+          // Sinon, diriger vers la page de connexion
+          return const DebutPage();
+        }
       },
     );
   }
