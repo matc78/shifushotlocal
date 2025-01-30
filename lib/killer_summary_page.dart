@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_theme.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 
 class KillerSummaryPage extends StatefulWidget {
   final Map<String, dynamic> playerData;
@@ -170,7 +172,10 @@ class _KillerSummaryPageState extends State<KillerSummaryPage> {
                                 onPressed: () => _checkPlayerAction(playerName),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.check, color: Colors.red),
+                                icon: const FaIcon(
+                                  FontAwesomeIcons.skullCrossbones,
+                                  color: Colors.red,
+                                ),
                                 onPressed: () => _markPlayerAsDead(playerName),
                               ),
                             ],

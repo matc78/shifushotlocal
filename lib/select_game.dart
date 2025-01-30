@@ -16,18 +16,6 @@ class SelectGamePage extends StatelessWidget {
         'route': '/teamGenerator',
       },
       {
-        'name': 'Devinez qui',
-        'description': 'Un jeu pour mieux se connaître.',
-        'image': 'https://img.icons8.com/fluency/96/question-mark.png',
-        'route': '/guessWho',
-      },
-      {
-        'name': 'Blind Test',
-        'description': 'Testez vos connaissances musicales.',
-        'image': 'https://img.icons8.com/fluency/96/microphone.png',
-        'route': '/blindTest',
-      },
-      {
         'name': 'Killer',
         'description': 'Un jeu d’assassin mystérieux.',
         'image': 'https://img.icons8.com/?size=100&id=20802&format=png&color=000000',
