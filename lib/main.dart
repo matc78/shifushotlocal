@@ -10,6 +10,7 @@ import 'package:shifushotlocal/home_page.dart';
 import 'package:shifushotlocal/select_game.dart';
 import 'package:shifushotlocal/team_generator_page.dart';
 import 'package:shifushotlocal/user_profil_page.dart';
+import 'package:shifushotlocal/Pages/lobby_screen.dart';
 import 'firebase_options.dart'; // Assurez-vous que ce fichier est correctement généré
 
 Future<void> main() async {
@@ -38,6 +39,7 @@ class MainApp extends StatelessWidget {
         '/createAccount': (context) => const CreateAccountPage(), // Page de création de compte
         '/homepage': (context) => const HomePage(), // Assurez-vous que HomePage existe
         '/user_profile_page': (context) => const UserProfilePage(),
+        '/Pages/lobby_screen': (context) => const LobbyScreen(),
         '/friends': (context) => const FriendsPage(),
         '/addFriend': (context) => const AddFriendsPage(),
         '/editProfile': (context) => const EditProfilePage(),
