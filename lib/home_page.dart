@@ -94,7 +94,7 @@ class HomePage extends StatelessWidget {
                 ),
                 child: Text(
                   'jeux',
-                  style: theme.titleMedium.copyWith(
+                  style: theme.titleMedium.copyWith(  
                     color: Colors.white,
                     fontSize: 18.0,
                   ),

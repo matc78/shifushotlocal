@@ -7,6 +7,9 @@ import 'package:shifushotlocal/connexion_page.dart'; // Importez la page de conn
 import 'package:shifushotlocal/edit_profil_page.dart';
 import 'package:shifushotlocal/friends_page.dart';
 import 'package:shifushotlocal/home_page.dart';
+import 'package:shifushotlocal/killer_actions_page.dart';
+import 'package:shifushotlocal/killer_page.dart';
+import 'package:shifushotlocal/killer_summary_page.dart';
 import 'package:shifushotlocal/select_game.dart';
 import 'package:shifushotlocal/team_generator_page.dart';
 import 'package:shifushotlocal/user_profil_page.dart';
@@ -45,7 +48,14 @@ class MainApp extends StatelessWidget {
         '/editProfile': (context) => const EditProfilePage(),
         '/teamGenerator': (context) => const TeamGeneratorPage(),
         '/select_game': (context) => const SelectGamePage(), // La page SelectGame
-
+        '/killer': (context) => const KillerPage(),
+        '/killerActions': (context) => KillerActionsPage(
+              players: ModalRoute.of(context)!.settings.arguments as List<String>,
+            ),
+        '/killerSummary': (context) {
+          final playerData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return KillerSummaryPage(playerData: playerData);
+        },
       },
     );
   }

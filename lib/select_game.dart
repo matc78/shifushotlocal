@@ -8,7 +8,6 @@ class SelectGamePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    // Exemple de jeux disponibles
     final List<Map<String, String>> games = [
       {
         'name': 'Créateur d\'équipes',
@@ -29,10 +28,10 @@ class SelectGamePage extends StatelessWidget {
         'route': '/blindTest',
       },
       {
-        'name': 'Jeu de rôles',
-        'description': 'Incarnez un personnage et amusez-vous.',
-        'image': 'https://img.icons8.com/fluency/96/actor.png',
-        'route': '/rolePlay',
+        'name': 'Killer',
+        'description': 'Un jeu d’assassin mystérieux.',
+        'image': 'https://img.icons8.com/?size=100&id=20802&format=png&color=000000',
+        'route': '/killer',
       },
     ];
 

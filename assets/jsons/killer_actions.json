@@ -1,0 +1,21 @@
+{
+    "hTOf": [
+        "Faire un high-five",
+        "Demander l'heure",
+        "Donner un surnom"
+    ],
+    "fTOh": [
+        "Faire un compliment",
+        "Demander un verre",
+        "Proposer une danse"
+    ],
+    "autre": [
+        "Faire une blague",
+        "Donner un objet",
+        "Réciter un poème",
+        "Faire un jeu de mots",
+        "Faire un dessin",
+        "Faire un tour de magie",
+        "Faire un compliment"
+    ]
+  }

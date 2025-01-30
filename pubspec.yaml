@@ -37,3 +37,4 @@ flutter:
     - assets/images/logo.png
     - assets/images/cheers.png
     - assets/images/favicon.png
+    - assets/jsons/killer_actions.json
