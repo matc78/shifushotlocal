@@ -33,6 +33,12 @@ class SelectGamePage extends StatelessWidget {
         'image': 'https://img.icons8.com/?size=100&id=20802&format=png&color=000000',
         'route': '/killer',
       },
+      {
+        'name': 'clicker',
+        'description': 'Une compétition de clique.',
+        'image': 'https://img.icons8.com/?size=100&id=gjsnNuxwktgL&format=png&color=000000',
+        'route': '/lobby_screen',
+      }
     ];
 
     return Scaffold(

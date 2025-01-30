@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shifushotlocal/app_theme.dart'; // Import your AppTheme
-import 'package:shifushotlocal/Pages/jeu1.dart';
+import 'package:shifushotlocal/app_theme.dart';
 
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
@@ -16,7 +15,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   void addPlayer() {
     if (_playerController.text.isNotEmpty) {
       setState(() {
-        players.add(_playerController.text);
+        players.add(_playerController.text.trim());
         _playerController.clear();
       });
     }
@@ -24,28 +23,33 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   void startGame() {
     if (players.isNotEmpty) {
-      Navigator.push(
+      Navigator.pushNamed(
         context,
-        MaterialPageRoute(
-          builder: (context) => Jeu1(players: players),
-        ),
+        '/jeu1', // Changez cette route si nécessaire
+        arguments: players,
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please add at least one player!")),
+        const SnackBar(content: Text("Veuillez ajouter au moins un joueur !")),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.of(context); // Use AppTheme
+    final theme = AppTheme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.background, // Set background color
+      backgroundColor: theme.background,
       appBar: AppBar(
-        title: const Text("Game Lobby"),
-        backgroundColor: theme.primary, // Set app bar color
+        title: Text(
+          "Lobby du jeu",
+          style: theme.titleMedium,
+        ),
+        backgroundColor: theme.background,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: theme.textPrimary), // Couleur des icônes
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -54,24 +58,32 @@ class _LobbyScreenState extends State<LobbyScreen> {
             TextField(
               controller: _playerController,
               decoration: InputDecoration(
-                labelText: "Enter Player Name",
-                labelStyle: TextStyle(color: theme.textPrimary), // Set text color
+                labelText: "Nom du joueur",
+                labelStyle: TextStyle(color: theme.textPrimary),
                 border: OutlineInputBorder(
-                  borderSide: BorderSide(color: theme.primary), // Set border color
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: theme.primary),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: theme.primary),
                 ),
               ),
-              style: TextStyle(color: theme.textPrimary), // Set input text color
+              style: TextStyle(color: theme.textPrimary),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: addPlayer,
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primary, // Set button color
+                backgroundColor: theme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 12.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: Text(
-                "Add Player",
-                style: theme.titleMedium.copyWith(color: Colors.white), // Set text color
+                "Ajouter un joueur",
+                style: theme.buttonText,
               ),
             ),
             const SizedBox(height: 20),
@@ -82,7 +94,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
                   return ListTile(
                     title: Text(
                       players[index],
-                      style: TextStyle(color: theme.textPrimary), // Set text color
+                      style: theme.bodyLarge,
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: theme.secondary),
+                      onPressed: () {
+                        setState(() {
+                          players.removeAt(index);
+                        });
+                      },
                     ),
                   );
                 },
@@ -91,12 +111,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
             ElevatedButton(
               onPressed: startGame,
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primary, // Set button color
+                backgroundColor: theme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 18.0),
                 minimumSize: const Size(double.infinity, 60),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: Text(
-                "Start Game",
+                "Commencer le jeu",
                 style: theme.titleMedium.copyWith(
                   color: Colors.white,
                   fontSize: 24.0,

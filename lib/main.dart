@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:shifushotlocal/Pages/jeu1.dart';
 import 'package:shifushotlocal/add_friends_page.dart';
 import 'package:shifushotlocal/create_account_page.dart';
 import 'package:shifushotlocal/debut_page.dart';
@@ -56,6 +57,11 @@ class MainApp extends StatelessWidget {
           final playerData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return KillerSummaryPage(playerData: playerData);
         },
+        '/jeu1': (context) {
+          final players = ModalRoute.of(context)!.settings.arguments as List<String>;
+          return Jeu1(players: players);
+        },
+        '/lobby_screen': (context) => const LobbyScreen(),
       },
     );
   }

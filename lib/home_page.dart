@@ -58,7 +58,6 @@ class HomePage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Naviguer vers la page Créer une soirée
-                  Navigator.pushNamed(context, '/Pages/lobby_screen');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.primary,

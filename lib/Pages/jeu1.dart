@@ -25,6 +25,13 @@ class _Jeu1State extends State<Jeu1> {
     scores = List.filled(widget.players.length, 0);
   }
 
+  @override
+  void dispose() {
+    // Annulez le timer pour éviter l'erreur
+    timer?.cancel();
+    super.dispose();
+  }
+
   void startGame() {
     setState(() {
       isGameActive = true;
@@ -33,6 +40,7 @@ class _Jeu1State extends State<Jeu1> {
     });
 
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return; // Vérifie si le widget est monté
       setState(() {
         timeLeft--;
       });
@@ -108,10 +116,16 @@ class _Jeu1State extends State<Jeu1> {
     final theme = AppTheme.of(context); // Use AppTheme
 
     return Scaffold(
-      backgroundColor: theme.background, // Set background color
+      backgroundColor: theme.background,
       appBar: AppBar(
-        title: const Text("Lancer Jeu 1"),
-        backgroundColor: theme.primary, // Set app bar color
+        title: Text(
+          "Le Clicker",
+          style: theme.titleMedium,
+        ),
+        backgroundColor: theme.background,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: theme.textPrimary), // Couleur des icônes
       ),
       body: Center(
         child: Column(
