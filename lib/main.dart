@@ -6,6 +6,7 @@ import 'package:shifushotlocal/add_friends_page.dart';
 import 'package:shifushotlocal/create_account_page.dart';
 import 'package:shifushotlocal/debut_page.dart';
 import 'package:shifushotlocal/connexion_page.dart';
+import 'package:shifushotlocal/dice_game_page.dart';
 import 'package:shifushotlocal/edit_profil_page.dart';
 import 'package:shifushotlocal/friends_page.dart';
 import 'package:shifushotlocal/home_page.dart';
@@ -59,6 +60,7 @@ class MainApp extends StatelessWidget {
           return Jeu1(players: players);
         },
         '/lobby_screen': (context) => const LobbyScreen(),
+        '/dice_game': (context) => const DiceGamePage(),
       },
     );
   }

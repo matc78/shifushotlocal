@@ -26,7 +26,13 @@ class SelectGamePage extends StatelessWidget {
         'description': 'Une compétition de clique.',
         'image': 'https://img.icons8.com/?size=100&id=gjsnNuxwktgL&format=png&color=000000',
         'route': '/lobby_screen',
-      }
+      },
+      {
+        'name': 'Bizkit !',
+        'description': 'Lancez les dés et suivez les règles amusantes !',
+        'image': 'https://img.icons8.com/?size=100&id=80024&format=png&color=000000',
+        'route': '/dice_game',
+      },
     ];
 
     return Scaffold(
