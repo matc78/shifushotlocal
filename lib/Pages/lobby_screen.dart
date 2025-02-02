@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/app_theme.dart';
 
@@ -11,7 +13,56 @@ class LobbyScreen extends StatefulWidget {
 class _LobbyScreenState extends State<LobbyScreen> {
   final List<String> players = [];
   final TextEditingController _playerController = TextEditingController();
+  late String gameName = 'Jeu'; // Le nom du jeu sélectionné
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      gameName = ModalRoute.of(context)?.settings.arguments as String? ?? 'Jeu';
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserSurname();
+  }
+
+  /// **Récupérer le nom de l'utilisateur connecté et l'ajouter en premier dans la liste**
+  Future<void> _fetchUserSurname() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        // Récupérer le document utilisateur dans Firestore
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (userDoc.exists) {
+          // Récupérer le champ 'surname'
+          final surname = userDoc.data()?['surname'] ?? "Moi";
+
+          setState(() {
+            players.add(surname); // Ajouter le surname à la liste des joueurs
+          });
+        } else {
+          // Si le document n'existe pas, utilisez une valeur par défaut
+          setState(() {
+            players.add("Moi");
+          });
+        }
+      } catch (e) {
+        print('Erreur lors de la récupération du surname : $e');
+        setState(() {
+          players.add("Moi");
+        });
+      }
+    }
+  }
+
+  /// **Ajouter un joueur (hors utilisateur connecté)**
   void addPlayer() {
     if (_playerController.text.isNotEmpty) {
       setState(() {
@@ -21,13 +72,25 @@ class _LobbyScreenState extends State<LobbyScreen> {
     }
   }
 
+  /// **Lancer le jeu avec la bonne route**
   void startGame() {
     if (players.isNotEmpty) {
-      Navigator.pushNamed(
-        context,
-        '/jeu1', // Changez cette route si nécessaire
-        arguments: players,
-      );
+      String route;
+      switch (gameName) {
+        case 'Bizkit !':
+          route = '/dice_game';
+          break;
+        case 'Jeu des papiers':
+          route = '/paper_game';
+          break;
+        case 'Clicker':
+          route = '/jeu1';
+          break;
+        default:
+          route = '/';
+      }
+
+      Navigator.pushNamed(context, route, arguments: players);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Veuillez ajouter au moins un joueur !")),
@@ -43,13 +106,13 @@ class _LobbyScreenState extends State<LobbyScreen> {
       backgroundColor: theme.background,
       appBar: AppBar(
         title: Text(
-          "Lobby du jeu",
+          "Lobby - $gameName",
           style: theme.titleMedium,
         ),
         backgroundColor: theme.background,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: theme.textPrimary), // Couleur des icônes
+        iconTheme: IconThemeData(color: theme.textPrimary),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -91,19 +154,23 @@ class _LobbyScreenState extends State<LobbyScreen> {
               child: ListView.builder(
                 itemCount: players.length,
                 itemBuilder: (context, index) {
+                  final bool isCurrentUser = index == 0; // L'utilisateur connecté est toujours le premier
+
                   return ListTile(
                     title: Text(
                       players[index],
                       style: theme.bodyLarge,
                     ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete, color: theme.secondary),
-                      onPressed: () {
-                        setState(() {
-                          players.removeAt(index);
-                        });
-                      },
-                    ),
+                    trailing: isCurrentUser
+                        ? null // Pas de suppression pour l'utilisateur connecté
+                        : IconButton(
+                            icon: Icon(Icons.delete, color: theme.secondary),
+                            onPressed: () {
+                              setState(() {
+                                players.removeAt(index);
+                              });
+                            },
+                          ),
                   );
                 },
               ),

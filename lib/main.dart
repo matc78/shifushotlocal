@@ -13,6 +13,7 @@ import 'package:shifushotlocal/home_page.dart';
 import 'package:shifushotlocal/killer_actions_page.dart';
 import 'package:shifushotlocal/killer_page.dart';
 import 'package:shifushotlocal/killer_summary_page.dart';
+import 'package:shifushotlocal/paper_game_page.dart';
 import 'package:shifushotlocal/select_game.dart';
 import 'package:shifushotlocal/team_generator_page.dart';
 import 'package:shifushotlocal/user_profil_page.dart';
@@ -59,8 +60,12 @@ class MainApp extends StatelessWidget {
           final players = ModalRoute.of(context)!.settings.arguments as List<String>;
           return Jeu1(players: players);
         },
-        '/lobby_screen': (context) => const LobbyScreen(),
         '/dice_game': (context) => const DiceGamePage(),
+        '/paper_game': (context) {
+          final players = ModalRoute.of(context)!.settings.arguments as List<String>;
+          return PaperGamePage(players: players);
+        },
+
       },
     );
   }

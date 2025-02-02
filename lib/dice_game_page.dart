@@ -502,25 +502,19 @@ void _addGeneralRule() {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 200,
-                      height: 200,
-                      child: Center(
-                        child: Icon(
-                          isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice1),
-                          size: 200, // Taille agrandie de l'icône
-                          color: theme.primary,
-                        ),
+                    Center(
+                      child: Icon(
+                        isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice1),
+                        size: 200, // Taille agrandie de l'icône
+                        color: theme.primary,
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Container(
-                      child: Center(
-                        child: Icon(
-                          isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice2),
-                          size: 200, // Taille agrandie de l'icône
-                          color: theme.primary,
-                        ),
+                    Center(
+                      child: Icon(
+                        isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice2),
+                        size: 200, // Taille agrandie de l'icône
+                        color: theme.primary,
                       ),
                     ),
                   ],

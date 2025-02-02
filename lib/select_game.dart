@@ -25,13 +25,19 @@ class SelectGamePage extends StatelessWidget {
         'name': 'Clicker',
         'description': 'Une compétition de clique.',
         'image': 'https://img.icons8.com/?size=100&id=gjsnNuxwktgL&format=png&color=000000',
-        'route': '/lobby_screen',
+        'route': '/Pages/lobby_screen',
       },
       {
         'name': 'Bizkit !',
         'description': 'Lancez les dés et suivez les règles amusantes !',
         'image': 'https://img.icons8.com/?size=100&id=80024&format=png&color=000000',
         'route': '/dice_game',
+      },
+      {
+        'name': 'Jeu des papiers',
+        'description': 'Un jeu de papier mystérieux.',
+        'image': 'https://img.icons8.com/?size=100&id=22033&format=png&color=000000',
+        'route': '/Pages/lobby_screen',
       },
     ];
 
@@ -67,7 +73,12 @@ class SelectGamePage extends StatelessWidget {
                 subtitle: Text(game['description']!, style: theme.bodyMedium),
                 trailing: Icon(Icons.arrow_forward, color: theme.textSecondary),
                 onTap: () {
-                  Navigator.pushNamed(context, game['route']!);
+                  // Passer le nom du jeu en argument
+                  Navigator.pushNamed(
+                    context,
+                    game['route']!,
+                    arguments: game['name'], 
+                  );
                 },
               ),
             );
