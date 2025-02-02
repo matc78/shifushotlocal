@@ -342,14 +342,27 @@ void _addGeneralRule() {
 }
 
   void rollDice() {
-    setState(() {
-      isRolling = true;
-    });
+  setState(() {
+    isRolling = true;
+  });
 
-    Timer(const Duration(milliseconds: 800), () {
+  int animationSteps = 15; // Nombre de frames pour l'animation (1.5 secondes à raison de ~10 changements par seconde)
+
+  void animateDice(int step) {
+    if (step < animationSteps) {
       setState(() {
-        dice1 = Random().nextInt(6) + 1; // Valeurs entre 1 et 6
+        // Affichage aléatoire pendant l'animation
+        dice1 = Random().nextInt(6) + 1; // Générer un chiffre aléatoire entre 1 et 6
         dice2 = Random().nextInt(6) + 1;
+      });
+
+      // Continuer l'animation avec un intervalle de 100 ms
+      Timer(const Duration(milliseconds: 100), () => animateDice(step + 1));
+    } else {
+      // Animation terminée, afficher les vraies valeurs
+      setState(() {
+        dice1 = Random().nextInt(6) + 1; // Générer le résultat final pour le premier dé
+        dice2 = Random().nextInt(6) + 1; // Générer le résultat final pour le deuxième dé
 
         final String key = dice1 <= dice2 ? '${dice1}_${dice2}' : '${dice2}_${dice1}';
 
@@ -361,10 +374,17 @@ void _addGeneralRule() {
         } else {
           resultMessage = 'Aucune règle trouvée';
         }
+
         isRolling = false;
       });
-    });
+    }
   }
+
+  // Lancer l'animation
+  animateDice(0);
+}
+
+
 
   void _showRulesExplanation() {
     final theme = AppTheme.of(context);
@@ -487,7 +507,7 @@ void _addGeneralRule() {
                       height: 200,
                       child: Center(
                         child: Icon(
-                          isRolling ? DiceIcons.dice0 : _getDiceIcon(dice1),
+                          isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice1),
                           size: 200, // Taille agrandie de l'icône
                           color: theme.primary,
                         ),
@@ -497,7 +517,7 @@ void _addGeneralRule() {
                     Container(
                       child: Center(
                         child: Icon(
-                          isRolling ? DiceIcons.dice0 : _getDiceIcon(dice2),
+                          isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice2),
                           size: 200, // Taille agrandie de l'icône
                           color: theme.primary,
                         ),
