@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:shifushotlocal/app_theme.dart'; // Import your AppTheme
+import 'package:shifushotlocal/app_theme.dart';
 
 class Jeu1 extends StatefulWidget {
   final List<String> players;
+  final List<String> remainingGames;
 
-  const Jeu1({super.key, required this.players});
+  const Jeu1({Key? key, required this.players, required this.remainingGames}) : super(key: key);
 
   @override
   _Jeu1State createState() => _Jeu1State();
@@ -27,7 +28,6 @@ class _Jeu1State extends State<Jeu1> {
 
   @override
   void dispose() {
-    // Annulez le timer pour éviter l'erreur
     timer?.cancel();
     super.dispose();
   }
@@ -40,7 +40,7 @@ class _Jeu1State extends State<Jeu1> {
     });
 
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) return; // Vérifie si le widget est monté
+      if (!mounted) return;
       setState(() {
         timeLeft--;
       });
@@ -74,6 +74,21 @@ class _Jeu1State extends State<Jeu1> {
     }
   }
 
+  void navigateToNextGame() {
+    if (widget.remainingGames.isNotEmpty) {
+      Navigator.pushNamed(
+        context,
+        widget.remainingGames.first, // Next game
+        arguments: {
+          'players': widget.players,
+          'remainingGames': widget.remainingGames.sublist(1), // Remaining games
+        },
+      );
+    } else {
+      Navigator.pushNamed(context, '/homepage'); // Navigate to homepage
+    }
+  }
+
   void showGameOverDialog() {
     String winner = widget.players[scores.indexOf(scores.reduce((a, b) => a > b ? a : b))];
 
@@ -89,20 +104,20 @@ class _Jeu1State extends State<Jeu1> {
             for (int i = 0; i < widget.players.length; i++)
               Text(
                 "${widget.players[i]}: ${scores[i]}",
-                style: TextStyle(color: AppTheme.of(context).textPrimary), // Set text color
+                style: TextStyle(color: AppTheme.of(context).textPrimary),
               ),
             const SizedBox(height: 20),
             Text(
               "Winner: $winner!",
-              style: TextStyle(color: AppTheme.of(context).textPrimary), // Set text color
+              style: TextStyle(color: AppTheme.of(context).textPrimary),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop(); // Go back to the lobby
+              Navigator.of(context).pop(); // Close dialog
+              navigateToNextGame(); // Navigate to the next game or homepage
             },
             child: const Text("OK"),
           ),
@@ -113,7 +128,7 @@ class _Jeu1State extends State<Jeu1> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.of(context); // Use AppTheme
+    final theme = AppTheme.of(context);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -125,7 +140,7 @@ class _Jeu1State extends State<Jeu1> {
         backgroundColor: theme.background,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: theme.textPrimary), // Couleur des icônes
+        iconTheme: IconThemeData(color: theme.textPrimary),
       ),
       body: Center(
         child: Column(
@@ -136,7 +151,7 @@ class _Jeu1State extends State<Jeu1> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: theme.textPrimary, // Set text color
+                color: theme.textPrimary,
               ),
             ),
             const SizedBox(height: 20),
@@ -145,7 +160,7 @@ class _Jeu1State extends State<Jeu1> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: theme.textPrimary, // Set text color
+                color: theme.textPrimary,
               ),
             ),
             const SizedBox(height: 20),
@@ -154,19 +169,19 @@ class _Jeu1State extends State<Jeu1> {
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
-                color: theme.textPrimary, // Set text color
+                color: theme.textPrimary,
               ),
             ),
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: isGameActive ? incrementScore : startGame,
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primary, // Set button color
+                backgroundColor: theme.primary,
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               ),
               child: Text(
                 buttonText,
-                style: const TextStyle(fontSize: 20, color: Colors.white), // Set text color
+                style: const TextStyle(fontSize: 20, color: Colors.white),
               ),
             ),
           ],

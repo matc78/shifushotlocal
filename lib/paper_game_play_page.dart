@@ -1,15 +1,18 @@
-// ignore_for_file: unused_import
-
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'dart:math';
 import 'package:shifushotlocal/app_theme.dart';
 
 class PaperGamePlayPage extends StatefulWidget {
   final List<Map<String, dynamic>> papers;
   final List<String> players;
+  final List<String> remainingGames;
 
-  const PaperGamePlayPage({Key? key, required this.papers, required this.players}) : super(key: key);
+  const PaperGamePlayPage({
+    Key? key,
+    required this.papers,
+    required this.players,
+    required this.remainingGames,
+  }) : super(key: key);
 
   @override
   _PaperGamePlayPageState createState() => _PaperGamePlayPageState();
@@ -18,7 +21,6 @@ class PaperGamePlayPage extends StatefulWidget {
 class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
   int currentPlayerIndex = 0;
   String displayedText = "Appuyez pour tirer un papier";
-  bool isDrawing = false;
   bool hasDrawn = false;
   Map<String, dynamic>? selectedPaper;
   Map<String, int> shotCounter = {};
@@ -27,9 +29,9 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
   @override
   void initState() {
     super.initState();
-    remainingPapers = List.from(widget.papers); // Copie des papiers pour éviter la modification de la liste d'origine
+    remainingPapers = List.from(widget.papers); // Copie des papiers
     for (var player in widget.players) {
-      shotCounter[player] = 0;
+      shotCounter[player] = 0; // Initialiser les shots à 0
     }
   }
 
@@ -39,7 +41,6 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
       return;
     }
 
-    // Sélection aléatoire d’un papier
     setState(() {
       int randomIndex = Random().nextInt(remainingPapers.length);
       selectedPaper = remainingPapers[randomIndex];
@@ -49,7 +50,6 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
       displayedText = "\"${selectedPaper!['text']}\"";
     });
   }
-
 
   void _acceptPaper() {
     _nextPlayer();
@@ -105,22 +105,67 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
 
   void _endGame() {
     final theme = AppTheme.of(context);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: theme.background,
-        title: Text("Fin du jeu", style: theme.titleMedium),
-        content: Text("Tous les papiers ont été joués.", style: theme.bodyLarge),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            child: Text("Retour à l'accueil", style: theme.buttonText.copyWith(color: theme.primary)),
+
+    if (widget.remainingGames.isNotEmpty) {
+      final nextRoute = widget.remainingGames.first;
+
+      if (nextRoute == '/homepage') {
+        // Fin de la partie : retour à la page d'accueil
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: theme.background,
+            title: Text("Fin de la soirée", style: theme.titleMedium),
+            content: Text("Tous les jeux ont été joués.", style: theme.bodyLarge),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+                child: Text("Retour à l'accueil", style: theme.buttonText.copyWith(color: theme.primary)),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      } else {
+        // Passer au prochain jeu
+        Navigator.pushNamed(
+          context,
+          nextRoute,
+          arguments: {
+            'players': widget.players,
+            'remainingGames': widget.remainingGames.sublist(1),
+          },
+        );
+      }
+    } else {
+      // Aucun jeu restant, annonce du vainqueur
+      final winner = shotCounter.entries.reduce((a, b) => a.value < b.value ? a : b).key;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: theme.background,
+          title: Text("Fin du jeu", style: theme.titleMedium),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Tous les papiers ont été joués.", style: theme.bodyLarge),
+              const SizedBox(height: 20),
+              Text("Le gagnant est : $winner !", style: theme.titleMedium),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: Text("Retour à l'accueil", style: theme.buttonText.copyWith(color: theme.primary)),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -149,16 +194,14 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Image d'arrière-plan
                   Transform.rotate(
-                    angle: -pi / 2, // Rotation de 90° en radians
+                    angle: -pi / 2,
                     child: Image.asset(
                       'assets/images/papier_dechire.png',
                       fit: BoxFit.cover,
-                      width: MediaQuery.of(context).size.width * 0.6, // Ajuste la largeur à 90% de l'écran
+                      width: MediaQuery.of(context).size.width * 0.6,
                     ),
                   ),
-                  // Texte superposé
                   Column(
                     children: [
                       Text(
@@ -179,7 +222,7 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
             const SizedBox(height: 30),
             if (!hasDrawn)
               ElevatedButton(
-                onPressed: isDrawing ? null : _drawPaper,
+                onPressed: _drawPaper,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 50),
@@ -202,21 +245,13 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
                     ),
                     child: Text("J'accepte", style: theme.buttonText),
                   ),
-                  Column(
-                    children: [
-                      Text(
-                        "Pénalité (Shots) : ${shotCounter[selectedPaper!['player'] ?? ''] ?? 0}",
-                        style: theme.bodyMedium.copyWith(color: theme.secondary),
-                      ),
-                      ElevatedButton(
-                        onPressed: _refusePaper,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.secondary,
-                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
-                        ),
-                        child: Text("Je refuse", style: theme.buttonText),
-                      ),
-                    ],
+                  ElevatedButton(
+                    onPressed: _refusePaper,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.secondary,
+                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                    ),
+                    child: Text("Je refuse", style: theme.buttonText),
                   ),
                 ],
               ),

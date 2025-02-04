@@ -5,7 +5,14 @@ import 'package:dice_icons/dice_icons.dart';
 import 'package:shifushotlocal/app_theme.dart';
 
 class DiceGamePage extends StatefulWidget {
-  const DiceGamePage({Key? key}) : super(key: key);
+  final List<String> players;
+  final List<String> remainingGames;
+
+  const DiceGamePage({
+    Key? key,
+    required this.players,
+    required this.remainingGames,
+  }) : super(key: key);
 
   @override
   _DiceGamePageState createState() => _DiceGamePageState();
@@ -471,9 +478,63 @@ void _addGeneralRule() {
     );
   }
 
+  void _endGame() {
+  if (widget.remainingGames.isNotEmpty && widget.remainingGames.first != '/homepage') {
+    // Jeux restants : passer au jeu suivant automatiquement
+    Navigator.pushNamed(
+      context,
+      widget.remainingGames.first,
+      arguments: {
+        'players': widget.players,
+        'remainingGames': widget.remainingGames.sublist(1),
+      },
+    );
+  } else {
+    // Plus de jeux (ou uniquement /homepage) : afficher un bouton pour terminer
+    showDialog(
+      context: context,
+      builder: (context) {
+        final theme = AppTheme.of(context);
+        return AlertDialog(
+          backgroundColor: theme.background,
+          title: Text(
+            "Fin de la partie",
+            style: theme.titleMedium,
+          ),
+          content: Text(
+            "Voulez-vous terminer le jeu et revenir à l'accueil ?",
+            style: theme.bodyMedium,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.popUntil(context, (route) => route.isFirst);
+              },
+              child: Text(
+                "Terminer",
+                style: theme.buttonText.copyWith(color: theme.primary),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fermer la boîte de dialogue
+              },
+              child: Text(
+                "Annuler",
+                style: theme.buttonText.copyWith(color: theme.secondary),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Bizkit !', style: theme.titleMedium),
@@ -483,7 +544,7 @@ void _addGeneralRule() {
           IconButton(
             icon: Icon(Icons.help_outline, color: theme.primary),
             onPressed: () {
-              _showRulesExplanation(); // Fonction pour afficher les explications
+              _showRulesExplanation();
             },
           ),
         ],
@@ -496,7 +557,6 @@ void _addGeneralRule() {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Dés affichés avec un fond blanc centré et agrandis
               Container(
                 alignment: Alignment.center,
                 child: Column(
@@ -505,7 +565,7 @@ void _addGeneralRule() {
                     Center(
                       child: Icon(
                         isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice1),
-                        size: 200, // Taille agrandie de l'icône
+                        size: 200,
                         color: theme.primary,
                       ),
                     ),
@@ -513,7 +573,7 @@ void _addGeneralRule() {
                     Center(
                       child: Icon(
                         isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice2),
-                        size: 200, // Taille agrandie de l'icône
+                        size: 200,
                         color: theme.primary,
                       ),
                     ),
@@ -546,7 +606,7 @@ void _addGeneralRule() {
               ElevatedButton(
                 onPressed: _showTemporaryRules,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.textSecondary,
+                  backgroundColor: theme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -557,13 +617,44 @@ void _addGeneralRule() {
                   style: theme.buttonText,
                 ),
               ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: widget.remainingGames.isEmpty || widget.remainingGames.first == '/homepage'
+                    ? () {
+                        // Retour à l'accueil
+                        Navigator.popUntil(context, (route) => route.isFirst);
+                      }
+                    : () {
+                        // Passer au jeu suivant
+                        Navigator.pushNamed(
+                          context,
+                          widget.remainingGames.first,
+                          arguments: {
+                            'players': widget.players,
+                            'remainingGames': widget.remainingGames.sublist(1),
+                          },
+                        );
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.secondary,
+                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  widget.remainingGames.isEmpty || widget.remainingGames.first == '/homepage'
+                      ? 'Retour à l\'accueil'
+                      : 'Passer au jeu suivant',
+                  style: theme.buttonText.copyWith(fontSize: 16),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
-
   IconData _getDiceIcon(int diceValue) {
     switch (diceValue) {
       case 1:

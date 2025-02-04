@@ -1,13 +1,16 @@
-// ignore_for_file: unused_import
-
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/app_theme.dart';
 import 'package:shifushotlocal/paper_game_play_page.dart';
 
 class PaperGamePage extends StatefulWidget {
   final List<String> players;
+  final List<String> remainingGames;
 
-  const PaperGamePage({Key? key, required this.players}) : super(key: key);
+  const PaperGamePage({
+    Key? key,
+    required this.players,
+    this.remainingGames = const [], // Liste vide par défaut
+  }) : super(key: key);
 
   @override
   _PaperGamePageState createState() => _PaperGamePageState();
@@ -41,7 +44,11 @@ class _PaperGamePageState extends State<PaperGamePage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PaperGamePlayPage(papers: papers, players: widget.players),
+          builder: (context) => PaperGamePlayPage(
+            papers: papers,
+            players: widget.players,
+            remainingGames: widget.remainingGames, // Passer les jeux restants
+          ),
         ),
       );
     } else {
@@ -98,7 +105,7 @@ class _PaperGamePageState extends State<PaperGamePage> {
             TextField(
               controller: paperController,
               decoration: InputDecoration(
-                labelText: 'Écrire une vérité ou une action pour le joueur',
+                labelText: 'Écrire une vérité ou une action',
                 labelStyle: TextStyle(color: theme.textPrimary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -120,32 +127,26 @@ class _PaperGamePageState extends State<PaperGamePage> {
               child: Text("Ajouter le papier", style: theme.buttonText),
             ),
             const SizedBox(height: 16),
-
-            // 📌 Ajout du compteur de papiers
             Text(
               "Nombre de papiers ajoutés : ${papers.length}",
               style: theme.bodyLarge.copyWith(fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 16),
-
-            // 📌 Prend l'espace restant pour bien positionner le bouton "Commencer le jeu" en bas
             Expanded(
               child: Center(
                 child: Image.asset(
-                  'assets/images/logo.png', // 🖼️ Ajout du logo
-                  width: 250, // Ajuste la taille selon tes préférences
+                  'assets/images/logo.png',
+                  width: 250,
                   height: 150,
                   fit: BoxFit.contain,
                 ),
               ),
             ),
-            // 📌 Bouton "Commencer le jeu" bien en bas et plus grand
             Padding(
-              padding: const EdgeInsets.only(bottom: 20.0), // Espace en bas
+              padding: const EdgeInsets.only(bottom: 20.0),
               child: SizedBox(
-                width: double.infinity, // Largeur max
-                height: 70, // Plus grand bouton
+                width: double.infinity,
+                height: 70,
                 child: ElevatedButton(
                   onPressed: _startGame,
                   style: ElevatedButton.styleFrom(
@@ -156,7 +157,7 @@ class _PaperGamePageState extends State<PaperGamePage> {
                   ),
                   child: Text(
                     "Commencer le jeu",
-                    style: theme.buttonText.copyWith(fontSize: 24), // Texte plus grand
+                    style: theme.buttonText.copyWith(fontSize: 24),
                   ),
                 ),
               ),
