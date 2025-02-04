@@ -31,7 +31,7 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
     super.initState();
     remainingPapers = List.from(widget.papers); // Copie des papiers
     for (var player in widget.players) {
-      shotCounter[player] = 0; // Initialiser les shots à 0
+      shotCounter[player] = 0; // Initialiser les FU à 0
     }
   }
 
@@ -73,7 +73,7 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
           backgroundColor: theme.background,
           title: Text("Refus !", style: theme.titleMedium),
           content: Text(
-            "$targetPlayer doit boire ${shotCounter[targetPlayer]} shot(s) !",
+            "$targetPlayer doit boire ${shotCounter[targetPlayer]} FU(s) !",
             style: theme.bodyLarge,
           ),
           actions: [

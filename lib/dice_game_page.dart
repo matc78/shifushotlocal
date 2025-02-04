@@ -25,12 +25,12 @@ class _DiceGamePageState extends State<DiceGamePage> {
   String resultMessage = '';
 
   final Map<String, String> rules = {
-    '1_1': '\nDonner un shot',
-    '2_2': '\nDonner 2 gorgées',
-    '3_3': '\nDonner un surnom,\nSe mettre en couple,\nDonner 3 gorgées',
+    '1_1': '\nDonner un FU',
+    '2_2': '\nDonner 2 SHI',
+    '3_3': '\nDonner un surnom,\nSe mettre en couple,\nDonner 3 SHI',
     '4_4': '\nDouble prison\nThème ou mini-jeux',
-    '5_5': '\nDonner 5 gorgées',
-    '6_6': '\nInventer une règle\nDonner 6 gorgées',
+    '5_5': '\nDonner 5 SHI',
+    '6_6': '\nInventer une règle\nDonner 6 SHI',
     '1_2': '\nPas de règle',
     '1_3': '\nPas de règle',
     '1_4': '\nPrison\nJeu du clap',
@@ -409,15 +409,15 @@ void _addGeneralRule() {
                   style: theme.bodyMedium,
                   children: const [
                     TextSpan(text: 'Double 1 :', style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: ' Donner un shot\n\n'),
+                    TextSpan(text: ' Donner un FU\n\n'),
                     TextSpan(text: 'Tous les doubles :', style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: ' Donner le nombre de gorgées correspondant\n\n'),
+                    TextSpan(text: ' Donner le nombre de SHI correspondant\n\n'),
                     TextSpan(text: '11 et 12 :', style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(text: ' Inventer une règle\n\n'),
                     TextSpan(text: 'Si un 4 dans la combinaison :', style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
-                          ' Le premier joueur ayant lancé un 4 devient prisonnier et doit boire une gorgée à chaque fois qu’un 4 est lancé par un autre joueur.\n'
+                          ' Le premier joueur ayant lancé un 4 devient prisonnier et doit boire une SHI à chaque fois qu’un 4 est lancé par un autre joueur.\n'
                           'Il ne peut y avoir qu’un seul prisonnier et pour sortir, il faut qu’il fasse un autre 4.\n\n',
                     ),
                     TextSpan(text: 'Double 4 :', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -436,12 +436,12 @@ void _addGeneralRule() {
                       text:
                           ' Le jeu du doigt. Chaque joueur doit mettre son doigt sur une bouteille, et chacun son tour, ils diront : 1, 2, 3... un chiffre qu’ils pensent être '
                           'le nombre de doigts restant sur la bouteille.\n'
-                          'Si un joueur devine le bon nombre, il peut enlever son doigt. Cela continue jusqu’au dernier joueur restant qui devra prendre un shot.\n\n',
+                          'Si un joueur devine le bon nombre, il peut enlever son doigt. Cela continue jusqu’au dernier joueur restant qui devra prendre un FU.\n\n',
                     ),
                     TextSpan(text: '7 :', style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
-                          ' Le dernier qui dira "Bizkit !" avec le pouce sur le front devra prendre 5 gorgées.\n\n',
+                          ' Le dernier qui dira "Bizkit !" avec le pouce sur le front devra prendre 5 SHI.\n\n',
                     ),
                     TextSpan(text: '5 :', style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
@@ -451,12 +451,12 @@ void _addGeneralRule() {
                           '1 clap pour passer au prochain joueur dans le même sens,\n'
                           '2 claps pour changer de sens,\n'
                           '3 claps pour passer le prochain joueur en gardant le sens.\n'
-                          '3 gorgées pour celui qui se trompe.\n\n',
+                          '3 SHI pour celui qui se trompe.\n\n',
                     ),
                     TextSpan(text: '6 :', style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
-                          ' Donner un surnom à un joueur. Tout le monde devra l’appeler par ce surnom sinon celui qui se trompe prend 1 gorgée.\n'
+                          ' Donner un surnom à un joueur. Tout le monde devra l’appeler par ce surnom sinon celui qui se trompe prend 1 SHI.\n'
                           'Se mettre en couple avec un joueur et donc boire tout pareil que lui. Il ne peut y avoir qu’un seul couple, donc le couple s’arrête au prochain 6.\n',
                     ),
                   ],
