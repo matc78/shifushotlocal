@@ -114,9 +114,14 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   /// Commencer le jeu ou une soirée
   void startGame() {
-    if (players.isEmpty) {
+    if (players.length < 3) {
+      // Vérifier si le nombre total de joueurs est inférieur à 3
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Veuillez ajouter au moins un joueur !")),
+        const SnackBar(
+          content: Text(
+            "Veuillez ajouter au moins deux autres joueurs avant de commencer !",
+          ),
+        ),
       );
       return;
     }
@@ -166,13 +171,20 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     Wrap(
                       spacing: 8,
                       children: remainingGames
-                          .map((game) => Chip(
-                                label: Text(
-                                  game,
-                                  style: theme.bodyMedium,
-                                ),
-                                backgroundColor: theme.primary.withOpacity(0.1),
-                              ))
+                          .map((route) {
+                            // Rechercher le nom du jeu à partir de la route
+                            String gameName = gameRoutes.entries
+                                .firstWhere((entry) => entry.value == route, orElse: () => const MapEntry('Inconnu', ''))
+                                .key;
+
+                            return Chip(
+                              label: Text(
+                                gameName,
+                                style: theme.bodyMedium,
+                              ),
+                              backgroundColor: theme.primary.withOpacity(0.1),
+                            );
+                          })
                           .toList(),
                     ),
                   ],
