@@ -1,4 +1,4 @@
-package com.example.shifushotlocal
+package com.lazyking.shifushot
 
 import io.flutter.embedding.android.FlutterActivity
 

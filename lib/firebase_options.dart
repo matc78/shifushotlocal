@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '566788792208',
     projectId: 'shifushotlocal',
     storageBucket: 'shifushotlocal.firebasestorage.app',
-    iosBundleId: 'com.example.shifushotlocal',
+    iosBundleId: 'com.lazyking.shifushot',
   );
 }
