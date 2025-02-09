@@ -5,6 +5,12 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin" // Flutter Gradle Plugin
 }
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.example.shifushotlocal"
     compileSdk = 34 // Replace `flutter.compileSdkVersion` with actual value if undefined
@@ -20,18 +26,28 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.shifushotlocal" // Unique Application ID
+        applicationId = "com.lazyking.shifushot" // Unique Application ID
         minSdk = 23 // Replace `flutter.minSdkVersion` with actual value
         targetSdk = 34 // Replace `flutter.targetSdkVersion` with actual value
         versionCode = 1
         versionName = "1.0"
     }
 
+    signingConfigs {
+        release {
+            keyAlias = keystoreProperties['keyAlias']
+            keyPassword = keystoreProperties['keyPassword']
+            storeFile = keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword = keystoreProperties['storePassword']
+        }
+    }
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug // Replace with your signing config
-            minifyEnabled false
-            shrinkResources false
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now,
+            // so `flutter run --release` works.
+            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.release
         }
     }
 }
