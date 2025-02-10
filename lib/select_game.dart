@@ -39,6 +39,12 @@ class SelectGamePage extends StatelessWidget {
         'image': 'https://img.icons8.com/?size=100&id=22033&format=png&color=000000',
         'route': '/Pages/lobby_screen',
       },
+      {
+        'name': 'L\'horloge',
+        'description': 'Parier sur votre chance.',
+        'image': 'https://img.icons8.com/?size=100&id=34&format=png&color=000000',
+        'route': '/Pages/lobby_screen',
+      },
     ];
 
     return Scaffold(

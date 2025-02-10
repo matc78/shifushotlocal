@@ -16,6 +16,8 @@ dependencies:
     sdk: flutter
   font_awesome_flutter: ^10.8.0
   intl: ^0.20.2
+  playing_cards: ^0.4.1+11
+  playing_cards_layouts: ^1.0.1
 
 dev_dependencies:
   flutter_lints: ^4.0.0
@@ -43,3 +45,4 @@ flutter:
     - assets/jsons/papers.json
     - assets/images/papier_dechire.png
     - assets/images/feedback_icon.png
+    - assets/images/tapis_de_jeu.png

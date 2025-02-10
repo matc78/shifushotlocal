@@ -22,7 +22,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     'Clicker': '/jeu1',
     'Bizkit !': '/dice_game',
     'Jeu des papiers': '/paper_game',
-  };
+    'L\'horloge': '/clock_game',
+    };
 
    @override
   void didChangeDependencies() {

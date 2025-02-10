@@ -58,6 +58,34 @@ class _PaperGamePageState extends State<PaperGamePage> {
     }
   }
 
+  void _showRulesExplanation() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Règles du jeu"),
+        content: const Text(
+          "Chaque joueur peut écrire autant de papiers qu'il le souhaite, contenant des défis ou des actions à réaliser.\n\n"
+          "- En fonction du nombre de papiers ajoutés par les joueurs, des papiers mystères créés par l'équipe Shifushot seront ajoutés aléatoirement.\n"
+          "- Lors de son tour, un joueur tire un papier au hasard et la cible doit décider s'il accepte ou refuse le défi.\n"
+          "- Si le joueur accepte, il réalise l'action écrite sur le papier.\n"
+          "- Si le joueur refuse, il doit boire 1 FU (shot) et passer son tour.\n"
+          "- Certains papiers peuvent désigner un autre joueur comme cible.\n\n"
+          "Le jeu continue jusqu'à ce que tous les papiers aient été joués.\n\n"
+          "Attention !!! Prenons un exemple : cible = celui qui pioche   action = fais une bise.\n"
+          "On aura donc tour de 'Michel' : fais une bise à 'Michel' et donc c'est impossible.\n"
+          "il faudrait changer la cible par un joueur et mettre comme défi : fais une bise à michel\n",
+          textAlign: TextAlign.justify,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Compris !"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
@@ -70,6 +98,12 @@ class _PaperGamePageState extends State<PaperGamePage> {
         elevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: theme.textPrimary),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.help_outline, color: theme.primary),
+            onPressed: _showRulesExplanation,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -78,7 +112,7 @@ class _PaperGamePageState extends State<PaperGamePage> {
             DropdownButtonFormField<String>(
               value: selectedPlayer,
               decoration: InputDecoration(
-                labelText: 'Choisir un joueur',
+                labelText: 'Choisir la cible du défi',
                 labelStyle: TextStyle(color: theme.textPrimary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),

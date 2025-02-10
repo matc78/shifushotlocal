@@ -11,7 +11,7 @@ class PartyScreen extends StatefulWidget {
 class _PartyScreenState extends State<PartyScreen> {
   final List<String> moods = ['Hardcore', 'Chill', 'Découverte'];
   String selectedMood = 'Chill';
-  final List<String> games = ['/paper_game', '/jeu1', '/dice_game'];
+  final List<String> games = ['/paper_game', '/jeu1', '/dice_game', '/clock-game'];
 
   void startParty() {
     games.shuffle(); // Shuffle the games randomly

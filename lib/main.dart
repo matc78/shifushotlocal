@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/Pages/jeu1.dart';
 import 'package:shifushotlocal/add_friends_page.dart';
+import 'package:shifushotlocal/clock_game_page.dart';
 import 'package:shifushotlocal/create_account_page.dart';
 import 'package:shifushotlocal/debut_page.dart';
 import 'package:shifushotlocal/connexion_page.dart';
@@ -96,6 +97,7 @@ class MainApp extends StatelessWidget {
         },
         '/party_screen': (context) => const PartyScreen(),
         '/feedback_page': (context) => const FeedbackPage(),
+        '/clock_game': (context) => const ClockGameScreen(),
       },
     );
   }
