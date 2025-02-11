@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/Pages/games/clicker/jeu1.dart';
 import 'package:shifushotlocal/Pages/friends/add_friends_page.dart';
+import 'package:shifushotlocal/Pages/games/features/card_drawer.dart';
 import 'package:shifushotlocal/Pages/games/horloge/clock_game_page.dart';
 import 'package:shifushotlocal/Pages/connexion/create_account_page.dart';
 import 'package:shifushotlocal/Pages/connexion/debut_page.dart';
@@ -18,7 +19,7 @@ import 'package:shifushotlocal/Pages/games/killer/killer_summary_page.dart';
 import 'package:shifushotlocal/Pages/games/paper/paper_game_page.dart';
 import 'package:shifushotlocal/Pages/party_screen.dart';
 import 'package:shifushotlocal/Pages/games/select_game.dart';
-import 'package:shifushotlocal/Pages/features/team_generator_page.dart';
+import 'package:shifushotlocal/Pages/games/features/team_generator_page.dart';
 import 'package:shifushotlocal/Pages/profil/user_profil_page.dart';
 import 'package:shifushotlocal/Pages/games/lobby_screen.dart';
 import 'firebase_options.dart';
@@ -98,6 +99,7 @@ class MainApp extends StatelessWidget {
         '/party_screen': (context) => const PartyScreen(),
         '/feedback_page': (context) => const FeedbackPage(),
         '/clock_game': (context) => const ClockGameScreen(),
+        '/cardDrawer': (context) => const CardDrawerPage(),
       },
     );
   }

@@ -51,6 +51,12 @@ class SelectGamePage extends StatelessWidget {
         'image': 'https://img.icons8.com/fluency/96/group.png',
         'route': '/teamGenerator',
       },
+      {
+        'name': 'Tireur de cartes',
+        'description': 'Tirer des cartes aléatoires avec ou sans Joker.',
+        'image': 'https://img.icons8.com/?size=100&id=16427&format=png&color=000000',
+        'route': '/cardDrawer', // Assurez-vous que cette route est bien enregistrée dans `main.dart`
+      },
     ];
 
     return Scaffold(
