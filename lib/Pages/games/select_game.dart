@@ -8,13 +8,7 @@ class SelectGamePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    final List<Map<String, String>> games = [
-      {
-        'name': 'Créateur d\'équipes',
-        'description': 'Générer des équipes de manière aléatoire.',
-        'image': 'https://img.icons8.com/fluency/96/group.png',
-        'route': '/teamGenerator',
-      },
+    final List<Map<String, String>> jeuxEnLocal = [
       {
         'name': 'Killer',
         'description': 'Un jeu d’assassin mystérieux.',
@@ -47,6 +41,18 @@ class SelectGamePage extends StatelessWidget {
       },
     ];
 
+    // ignore: unused_local_variable
+    final List<Map<String, String>> jeuxEnLigne = []; // Pour le moment, vide
+
+    final List<Map<String, String>> fonctionnalites = [
+      {
+        'name': 'Créateur d\'équipes',
+        'description': 'Générer des équipes de manière aléatoire.',
+        'image': 'https://img.icons8.com/fluency/96/group.png',
+        'route': '/teamGenerator',
+      },
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Sélectionnez un jeu', style: theme.titleMedium),
@@ -55,42 +61,82 @@ class SelectGamePage extends StatelessWidget {
         centerTitle: true,
       ),
       backgroundColor: theme.background,
-      body: Padding(
+      body: SingleChildScrollView(  // Permet à toute la page d'être scrollable
         padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: games.length,
-          itemBuilder: (context, index) {
-            final game = games[index];
-            return Card(
-              elevation: 4,
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 🔹 Jeux en Local
+            Text(
+              "🎮 Jeux en Local",
+              style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            ...jeuxEnLocal.map((game) => GameCard(game: game, theme: theme, context: context)).toList(),
+
+            const SizedBox(height: 20),
+
+            // 🔹 Jeux en Ligne (Prochainement)
+            Text(
+              "🌐 Jeux en Ligne",
+              style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(game['image']!),
-                  radius: 30,
-                ),
-                title: Text(
-                  game['name']!,
-                  style: theme.bodyLarge.copyWith(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(game['description']!, style: theme.bodyMedium),
-                trailing: Icon(Icons.arrow_forward, color: theme.textSecondary),
-                onTap: () {
-                  // Passer le nom du jeu en argument
-                  Navigator.pushNamed(
-                    context,
-                    game['route']!,
-                    arguments: game['name'], 
-                  );
-                },
+              child: Text(
+                "🚀 Prochainement",
+                style: theme.bodyLarge.copyWith(color: Colors.black54, fontStyle: FontStyle.italic),
               ),
-            );
-          },
+            ),
+
+            const SizedBox(height: 20),
+
+            // 🔹 Fonctionnalités
+            Text(
+              "⚙️ Fonctionnalités",
+              style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            ...fonctionnalites.map((feature) => GameCard(game: feature, theme: theme, context: context)).toList(),
+          ],
         ),
       ),
     );
   }
+}
+
+// 🔹 Widget pour une carte de jeu
+Widget GameCard({required Map<String, String> game, required AppTheme theme, required BuildContext context}) {
+  return Card(
+    elevation: 4,
+    margin: const EdgeInsets.symmetric(vertical: 8),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(game['image']!),
+        radius: 30,
+      ),
+      title: Text(
+        game['name']!,
+        style: theme.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(game['description']!, style: theme.bodyMedium),
+      trailing: Icon(Icons.arrow_forward, color: theme.textSecondary),
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          game['route']!,
+          arguments: game['name'], 
+        );
+      },
+    ),
+  );
 }
