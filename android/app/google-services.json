@@ -8,31 +8,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:566788792208:android:bccb153909135412151d15",
-        "android_client_info": {
-          "package_name": "com.lazyking.shifushot"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCNkHkmy414NkXxkHid-zCpUDu87bqe8gE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:566788792208:android:6fb0f9cde1c592e9151d15",
         "android_client_info": {
           "package_name": "com.lazyking.shifushot"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "566788792208-8momhc02o8ra7c2c7nchkt0ddahrldbp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lazyking.shifushot",
+            "certificate_hash": "44b29788d6fcfa6551cbda50339fa66a92b790a1"
+          }
+        },
+        {
+          "client_id": "566788792208-qpast0i3k64gulv057pirptdi472qcmi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCNkHkmy414NkXxkHid-zCpUDu87bqe8gE"
@@ -40,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "566788792208-qpast0i3k64gulv057pirptdi472qcmi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "566788792208-u2t977hvrthv0qvk9ho637gavp87qsvc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.shifushotlocal"
+              }
+            }
+          ]
         }
       }
     }

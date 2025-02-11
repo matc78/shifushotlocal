@@ -15,6 +15,7 @@ dependencies:
   flutter:
     sdk: flutter
   font_awesome_flutter: ^10.8.0
+  google_sign_in: ^6.2.2
   intl: ^0.20.2
   playing_cards: ^0.4.1+11
   playing_cards_layouts: ^1.0.1
