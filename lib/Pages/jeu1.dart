@@ -16,7 +16,8 @@ class _Jeu1State extends State<Jeu1> {
   int currentPlayerIndex = 0;
   List<int> scores = [];
   bool isGameActive = false;
-  String buttonText = "Start Game";
+  bool showNextButton = false;
+  bool showStartButton = true; // Affiche le bouton "C’EST PARTI !" au début
   Timer? timer;
   int timeLeft = 10;
 
@@ -34,11 +35,14 @@ class _Jeu1State extends State<Jeu1> {
 
   void startGame() {
     setState(() {
-      isGameActive = true;
+      isGameActive = false;
+      showNextButton = false;
+      showStartButton = true; // Réaffiche "C’EST PARTI !"
       timeLeft = 10;
-      buttonText = "Tap Me!";
     });
+  }
 
+  void startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() {
@@ -53,17 +57,24 @@ class _Jeu1State extends State<Jeu1> {
   }
 
   void incrementScore() {
-    if (isGameActive) {
-      setState(() {
-        scores[currentPlayerIndex]++;
-      });
-    }
+    if (!isGameActive) return;
+    setState(() {
+      scores[currentPlayerIndex]++;
+    });
+  }
+
+  void startClickingPhase() {
+    setState(() {
+      isGameActive = true;
+      showStartButton = false;
+    });
+    startTimer(); // Démarre le timer
   }
 
   void endTurn() {
     setState(() {
       isGameActive = false;
-      buttonText = "Next Player";
+      showNextButton = true;
     });
 
     if (currentPlayerIndex < widget.players.length - 1) {
@@ -78,14 +89,14 @@ class _Jeu1State extends State<Jeu1> {
     if (widget.remainingGames.isNotEmpty) {
       Navigator.pushNamed(
         context,
-        widget.remainingGames.first, // Next game
+        widget.remainingGames.first,
         arguments: {
           'players': widget.players,
-          'remainingGames': widget.remainingGames.sublist(1), // Remaining games
+          'remainingGames': widget.remainingGames.sublist(1),
         },
       );
     } else {
-      Navigator.pushNamed(context, '/homepage'); // Navigate to homepage
+      Navigator.pushNamed(context, '/homepage');
     }
   }
 
@@ -108,7 +119,7 @@ class _Jeu1State extends State<Jeu1> {
               ),
             const SizedBox(height: 20),
             Text(
-              "Winner: $winner!",
+              "Gagnant : $winner!",
               style: TextStyle(color: AppTheme.of(context).textPrimary),
             ),
           ],
@@ -116,8 +127,8 @@ class _Jeu1State extends State<Jeu1> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Close dialog
-              navigateToNextGame(); // Navigate to the next game or homepage
+              Navigator.of(context).pop();
+              navigateToNextGame();
             },
             child: const Text("OK"),
           ),
@@ -142,50 +153,101 @@ class _Jeu1State extends State<Jeu1> {
         centerTitle: true,
         iconTheme: IconThemeData(color: theme.textPrimary),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Current Player: ${widget.players[currentPlayerIndex]}",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: theme.textPrimary,
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Tour de ${widget.players[currentPlayerIndex]}",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Temps restant : $timeLeft",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Score: ${scores[currentPlayerIndex]}",
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+
+                  // Bouton "C'EST PARTI !" au début
+                  if (showStartButton)
+                    ElevatedButton(
+                      onPressed: startClickingPhase,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text(
+                        "C'EST PARTI !",
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                    ),
+
+                  // Bouton "Tap Me!" pendant le jeu
+                  if (!showStartButton && !showNextButton)
+                    ElevatedButton(
+                      onPressed: incrementScore,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.primary,
+                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text(
+                        "TAPE MOI !!\nMAIS TAPE PLUS VITE !!\nP****N J'ADORE ÇA !!",
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                    ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
-            Text(
-              "Time Left: $timeLeft",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: theme.textPrimary,
+          ),
+
+          // Bouton "Next Player" en bas
+          if (showNextButton)
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    showNextButton = false;
+                    startGame();
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.secondary,
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                ),
+                child: const Text(
+                  "Prochain Joueur",
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
               ),
             ),
-            const SizedBox(height: 20),
-            Text(
-              "Score: ${scores[currentPlayerIndex]}",
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: theme.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: isGameActive ? incrementScore : startGame,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-              ),
-              child: Text(
-                buttonText,
-                style: const TextStyle(fontSize: 20, color: Colors.white),
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
