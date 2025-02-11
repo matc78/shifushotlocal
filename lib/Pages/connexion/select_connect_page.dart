@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app_theme.dart';
+import '../../theme/app_theme.dart';
 import 'connexion_page.dart';
 
 class SelectConnectPage extends StatelessWidget {

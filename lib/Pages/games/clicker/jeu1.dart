@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:shifushotlocal/app_theme.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
 
 class Jeu1 extends StatefulWidget {
   final List<String> players;

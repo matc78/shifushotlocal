@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:shifushotlocal/app_theme.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
 
 class PaperGamePlayPage extends StatefulWidget {
   final List<Map<String, dynamic>> papers;

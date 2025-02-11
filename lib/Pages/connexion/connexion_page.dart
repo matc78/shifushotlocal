@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'app_theme.dart';
-import 'home_page.dart'; // Assurez-vous que le chemin est correct
+import '../../theme/app_theme.dart';
+import '../home_page.dart'; // Assurez-vous que le chemin est correct
 
 
 class ConnexionPage extends StatefulWidget {

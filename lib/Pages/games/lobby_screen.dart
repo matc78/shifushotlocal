@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shifushotlocal/app_theme.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
 
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});

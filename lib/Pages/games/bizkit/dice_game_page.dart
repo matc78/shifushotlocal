@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:dice_icons/dice_icons.dart';
-import 'package:shifushotlocal/app_theme.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
 
 class DiceGamePage extends StatefulWidget {
   final List<String> players;

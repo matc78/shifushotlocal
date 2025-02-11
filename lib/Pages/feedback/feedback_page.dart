@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'app_theme.dart';
+import '../../theme/app_theme.dart';
 import 'package:intl/intl.dart';
 
 class FeedbackPage extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:playing_cards/playing_cards.dart';
-import 'app_theme.dart';
+import '../../../theme/app_theme.dart';
 
 class ClockGameScreen extends StatefulWidget {
   const ClockGameScreen({Key? key}) : super(key: key);
