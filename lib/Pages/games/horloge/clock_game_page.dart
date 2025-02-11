@@ -284,17 +284,20 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "C'est le tour de ${players[currentPlayerIndex]}",
-                    style: theme.titleLarge,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Compteur : $gorgees gorgée(s), $shots shot(s)",
-                    style: theme.bodyLarge,
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "C'est le tour de ${players[currentPlayerIndex]}",
+                        style: theme.titleLarge,
+                      ),
+                      const SizedBox(height: 4), // Réduit l'espace entre les deux textes
+                      Text(
+                        "Compteur : $gorgees gorgée(s), $shots shot(s)",
+                        style: theme.bodyLarge,
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
