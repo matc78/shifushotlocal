@@ -133,7 +133,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
               _buildTextField(theme, 'Pseudo', _pseudoController),
               _buildTextField(theme, 'Nom', _nameController),
               _buildTextField(theme, 'Prénom', _surnameController),
-              _buildDateField(theme),
               _buildGenderDropdown(theme),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -168,39 +167,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildDateField(AppTheme theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: _birthdateController,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: 'Date de naissance',
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          suffixIcon: const Icon(Icons.calendar_today),
-        ),
-        onTap: () async {
-          final DateTime? pickedDate = await showDatePicker(
-            context: context,
-            initialDate: _birthdateController.text.isNotEmpty
-                ? DateFormat('dd/MM/yyyy').parse(_birthdateController.text)
-                : DateTime(2000),
-            firstDate: DateTime(1900),
-            lastDate: DateTime.now(),
-          );
-          if (pickedDate != null) {
-            setState(() {
-              _birthdateController.text =
-                  DateFormat('dd/MM/yyyy').format(pickedDate);
-            });
-          }
-        },
       ),
     );
   }

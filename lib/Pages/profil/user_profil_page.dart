@@ -95,16 +95,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       ),
                     _buildProfileField(
                       theme,
-                      'Anniversaire',
-                      userData!['birthdate'] != null
-                          ? (userData!['birthdate'] is Timestamp // Vérifie si c'est un Timestamp
-                              ? DateFormat('dd/MM/yyyy').format(userData!['birthdate'].toDate())
-                              : userData!['birthdate'] // Si ce n'est pas un Timestamp, affiche tel quel
-                            )
-                          : 'Non spécifié', // Valeur par défaut si null
-                    ),
-                    _buildProfileField(
-                      theme,
                       'Date d\'inscription',
                       userData!['createdAt'] != null
                           ? DateFormat('dd/MM/yyyy').format(userData!['createdAt'].toDate())
