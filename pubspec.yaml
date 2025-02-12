@@ -14,6 +14,7 @@ dependencies:
   firebase_storage: ^12.4.1
   flutter:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.3
   font_awesome_flutter: ^10.8.0
   google_sign_in: ^6.2.2
   image_picker: ^1.1.2
@@ -48,3 +49,14 @@ flutter:
     - assets/images/papier_dechire.png
     - assets/images/feedback_icon.png
     - assets/images/tapis_de_jeu.png
+    - assets/images/app_icon.png 
+    - assets/images/logo_icon.png 
+    - assets/images/icon2.png
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon2.png"
+  adaptive_icon_background: "#FAEADC"  # Fond pour Android 8.0+
+  adaptive_icon_foreground: "assets/images/icon2.png"
