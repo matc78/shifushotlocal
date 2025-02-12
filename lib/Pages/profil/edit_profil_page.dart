@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../theme/app_theme.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -14,14 +16,16 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final ImagePicker _picker = ImagePicker();
 
   final TextEditingController _pseudoController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
-  final TextEditingController _birthdateController = TextEditingController();
 
   String? _gender;
   String? _photoUrl;
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -35,63 +39,65 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final DocumentSnapshot userDoc =
           await _firestore.collection('users').doc(user.uid).get();
       if (userDoc.exists) {
-        final data = userDoc.data() as Map<String, dynamic>;
+        final data = userDoc.data() as Map<String, dynamic>?;
 
         setState(() {
-          _pseudoController.text = data['pseudo'] ?? '';
-          _nameController.text = data['name'] ?? '';
-          _surnameController.text = data['surname'] ?? '';
-          _birthdateController.text = data['birthdate'] != null
-              ? DateFormat('dd/MM/yyyy').format(data['birthdate'].toDate())
-              : '';
-          _gender = data['gender'] ?? 'Autre';
-          _photoUrl = data['photoUrl'];
+          _pseudoController.text = data?['pseudo'] ?? '';
+          _nameController.text = data?['name'] ?? '';
+          _surnameController.text = data?['surname'] ?? '';
+          _gender = data?['gender'] ?? 'Autre';
+          _photoUrl = data?['photoUrl'];
         });
       }
     }
   }
 
-  Future<void> _saveProfile() async {
-    final User? user = _auth.currentUser;
-    if (user == null) return;
-
+  Future<void> _pickAndUploadImage() async {
     try {
-      final birthdate = _birthdateController.text.isNotEmpty
-          ? Timestamp.fromDate(
-              DateFormat('dd/MM/yyyy').parse(_birthdateController.text),
-            )
-          : null;
+      final User? user = _auth.currentUser;
+      if (user == null) return;
 
-      await _firestore.collection('users').doc(user.uid).update({
-        'pseudo': _pseudoController.text,
-        'name': _nameController.text,
-        'surname': _surnameController.text,
-        'birthdate': birthdate,
-        'gender': _gender,
-        'photoUrl': _photoUrl,
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) return;
+
+      File imageFile = File(pickedFile.path);
+
+      setState(() {
+        _isUploading = true;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Profil mis à jour avec succès.',
-            style: AppTheme.of(context).bodyMedium.copyWith(color: Colors.white),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
+      Reference ref = _storage.ref().child('profile_picture/${user.uid}.jpg');
+      UploadTask uploadTask = ref.putFile(imageFile);
+      TaskSnapshot snapshot = await uploadTask;
 
-      Navigator.pop(context); // Retourner à la page précédente
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Erreur lors de la mise à jour : $e',
-            style: AppTheme.of(context).bodyMedium.copyWith(color: Colors.white),
+      if (snapshot.state == TaskState.success) {
+        String newPhotoUrl = await snapshot.ref.getDownloadURL();
+
+        await _firestore.collection('users').doc(user.uid).update({
+          'photoUrl': newPhotoUrl,
+        });
+
+        setState(() {
+          _photoUrl = newPhotoUrl;
+          _isUploading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Photo de profil mise à jour avec succès !"),
+            backgroundColor: Colors.green,
           ),
-          backgroundColor: Colors.red,
-        ),
+        );
+      }
+    } catch (e) {
+      print("❌ Erreur lors de l'upload : $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erreur lors de l'upload : $e"), backgroundColor: Colors.red),
       );
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
     }
   }
 
@@ -107,7 +113,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: theme.textPrimary),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, _photoUrl != null),
         ),
       ),
       backgroundColor: theme.background,
@@ -118,30 +124,57 @@ class _EditProfilePageState extends State<EditProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               GestureDetector(
-                onTap: () {
-                  // Logic to upload or select a new profile picture
-                },
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundImage: NetworkImage(
-                    _photoUrl ?? 'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
-                  ),
-                  child: const Icon(Icons.edit, size: 30, color: Colors.white),
+                onTap: _pickAndUploadImage,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    ClipOval(
+                      child: ColorFiltered(
+                        colorFilter: ColorFilter.mode(
+                          Colors.black.withOpacity(0.3),
+                          BlendMode.darken,
+                        ),
+                        child: Image.network(
+                          _photoUrl ??
+                              "https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg",
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+
+                    if (_isUploading)
+                      const CircularProgressIndicator(),
+
+                    Positioned(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                        padding: const EdgeInsets.all(10),
+                        child: const Icon(Icons.edit, size: 30, color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 50),
+
               _buildTextField(theme, 'Pseudo', _pseudoController),
               _buildTextField(theme, 'Nom', _nameController),
               _buildTextField(theme, 'Prénom', _surnameController),
-              _buildGenderDropdown(theme),
-              const SizedBox(height: 20),
+
+              _buildDropdownField(theme, 'Genre', _gender, ['Homme', 'Femme', 'Autre']),
+
+              const SizedBox(height: 100),
+
               ElevatedButton(
-                onPressed: _saveProfile,
+                onPressed: () => Navigator.pop(context, true),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.secondary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Text('Enregistrer', style: theme.buttonText),
               ),
@@ -152,52 +185,48 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildTextField(AppTheme theme, String label,
-      TextEditingController controller,
-      {String? hintText, TextInputType keyboardType = TextInputType.text}) {
+  Widget _buildTextField(AppTheme theme, String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         controller: controller,
-        keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
-          hintText: hintText,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
   }
 
-  Widget _buildGenderDropdown(AppTheme theme) {
+  Widget _buildDropdownField(AppTheme theme, String label, String? value, List<String> items, {double height = 60.0}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Genre', style: theme.bodyMedium),
-          DropdownButton<String>(
-            value: _gender,
-            items: ['Homme', 'Femme', 'Autre'].map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value, style: theme.bodyMedium),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                _gender = newValue!;
-              });
-            },
-            isExpanded: true,
-            underline: Container(
-              height: 1,
-              color: theme.textSecondary,
+      child: SizedBox(
+        height: height, // 🔹 Définir la hauteur
+        child: InputDecorator(
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16), // Ajuste l'intérieur du champ
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              items: items.map((String item) {
+                return DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(item, style: theme.bodyMedium),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _gender = newValue;
+                });
+              },
             ),
           ),
-        ],
+        ),
       ),
     );
   }

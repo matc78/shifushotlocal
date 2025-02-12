@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:shifushotlocal/Pages/profil/edit_profil_page.dart';
 import '../../theme/app_theme.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -35,6 +36,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+  Future<void> _navigateToEditProfile() async {
+    final bool? updated = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (context) => const EditProfilePage()),
+    );
+
+    if (updated == true) {
+      _fetchUserData(); // 🔄 Rafraîchir les données utilisateur immédiatement après mise à jour
+    }
+  }
+
+
+
   void _logout() async {
     await _auth.signOut();
     Navigator.pushReplacementNamed(context, '/');
@@ -56,7 +70,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.edit, color: theme.textPrimary),
-            onPressed: () => Navigator.pushNamed(context, '/editProfile'),
+            onPressed: _navigateToEditProfile, // 🔹 Appelle la nouvelle fonction
           ),
         ],
       ),
