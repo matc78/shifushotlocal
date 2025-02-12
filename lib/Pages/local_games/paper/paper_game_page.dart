@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
-import 'package:shifushotlocal/Pages/games/paper/paper_game_play_page.dart';
+import 'package:shifushotlocal/Pages/local_games/paper/paper_game_play_page.dart';
 
 class PaperGamePage extends StatefulWidget {
   final List<String> players;
