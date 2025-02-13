@@ -9,6 +9,7 @@ import 'package:shifushotlocal/Pages/connexion/create_account_page.dart';
 import 'package:shifushotlocal/Pages/connexion/debut_page.dart';
 import 'package:shifushotlocal/Pages/connexion/connexion_page.dart';
 import 'package:shifushotlocal/Pages/local_games/bizkit/dice_game_page.dart';
+import 'package:shifushotlocal/Pages/online_games/lobby_screen_online.dart';
 import 'package:shifushotlocal/Pages/profil/edit_profil_page.dart';
 import 'package:shifushotlocal/Pages/feedback/feedback_page.dart';
 import 'package:shifushotlocal/Pages/friends/friends_page.dart';
@@ -100,6 +101,7 @@ class MainApp extends StatelessWidget {
         '/feedback_page': (context) => const FeedbackPage(),
         '/clock_game': (context) => const ClockGameScreen(),
         '/cardDrawer': (context) => const CardDrawerPage(),
+        '/online_lobby': (context) => const OnlineLobbyScreen(),
       },
     );
   }

@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "shifushotlocal",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "shifushotlocal (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "shifushotlocal (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Android Emulator 5554",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "emulator-5554"
+        },
+        {
+            "name": "Android Emulator 5556",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "emulator-5556"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Run on Both Android Emulators",
+            "configurations": ["Android Emulator 5554", "Android Emulator 5556"]
+        }
+    ]
+}

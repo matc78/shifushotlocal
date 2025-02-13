@@ -41,8 +41,14 @@ class SelectGamePage extends StatelessWidget {
       },
     ];
 
-    // ignore: unused_local_variable
-    final List<Map<String, String>> jeuxEnLigne = []; // Pour le moment, vide
+    final List<Map<String, String>> jeuxEnLigne = [
+      {
+        'name': 'Fake Online Game', // 🔹 Faux jeu pour tester
+        'description': 'Test de jeu en ligne.',
+        'image': 'https://img.icons8.com/?size=100&id=34&format=png&color=000000',
+        'route': '/online_lobby',
+      },
+    ];
 
     final List<Map<String, String>> fonctionnalites = [
       {
@@ -55,7 +61,7 @@ class SelectGamePage extends StatelessWidget {
         'name': 'Tireur de cartes',
         'description': 'Tirer des cartes aléatoires avec ou sans Joker.',
         'image': 'https://img.icons8.com/?size=100&id=16427&format=png&color=000000',
-        'route': '/cardDrawer', // Assurez-vous que cette route est bien enregistrée dans `main.dart`
+        'route': '/cardDrawer',
       },
     ];
 
@@ -67,7 +73,7 @@ class SelectGamePage extends StatelessWidget {
         centerTitle: true,
       ),
       backgroundColor: theme.background,
-      body: SingleChildScrollView(  // Permet à toute la page d'être scrollable
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,24 +88,13 @@ class SelectGamePage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 🔹 Jeux en Ligne (Prochainement)
+            // 🔹 Jeux en Ligne (avec un faux jeu pour test)
             Text(
               "🌐 Jeux en Ligne",
               style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(12),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                "🚀 Prochainement",
-                style: theme.bodyLarge.copyWith(color: Colors.black54, fontStyle: FontStyle.italic),
-              ),
-            ),
+            ...jeuxEnLigne.map((game) => GameCard(game: game, theme: theme, context: context)).toList(),
 
             const SizedBox(height: 20),
 
@@ -140,7 +135,7 @@ Widget GameCard({required Map<String, String> game, required AppTheme theme, req
         Navigator.pushNamed(
           context,
           game['route']!,
-          arguments: game['name'], 
+          arguments: game['name'],
         );
       },
     ),
