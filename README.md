@@ -52,16 +52,25 @@ lib/
 │   │   ├── friends_page.dart
 │   ├── local_games/
 │   │   ├── bizkit/
+│   │   │  ├── dice_game_page.dart
 │   │   ├── clicker/
+│   │   │  ├── jeu1.dart
 │   │   ├── horloge/
+│   │   │  ├── clock_game_page.dart
 │   │   ├── killer/
+│   │   │  ├── killer_actions_page.dart
+│   │   │  ├── killer_page.dart
+│   │   │  ├── killer_summary_page.dart
 │   │   ├── paper/
-│── online_games/
-│   ├── lobby_screen_online.dart
-│   ├── lobby_waiting_screen.dart
-│── profil/
-│   ├── edit_profil_page.dart
-│   ├── user_profil_page.dart
+│   │   │  ├── paper_game_page.dart
+│   │   │  ├── paper_game_play_page.dart
+│   │   │  ├── add_friends_page.dart
+│   │── online_games/
+│   │   ├── lobby_waiting_screen.dart
+│   │   ├── lobby_screen_online.dart
+│   │── profil/
+│   │   ├── edit_profil_page.dart
+│   │   ├── user_profil_page.dart
 │── theme/
 │   ├── app_theme.dart
 │── main.dart
@@ -108,4 +117,3 @@ Le projet inclut plusieurs assets :
 
 ---
 
-Avec cette documentation, tout développeur reprenant le projet pourra rapidement comprendre son fonctionnement et l’installer correctement.
