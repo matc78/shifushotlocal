@@ -288,12 +288,12 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     print("📩 Vote pour éliminer : $targetPlayerId");
 
     String voterName = playerNames[userId] ?? "Inconnu";
-    String targetName = playerNames[targetPlayerId] ?? "Inconnu";
+    //String targetName = playerNames[targetPlayerId] ?? "Inconnu";
 
     await _firestore.collection('lobbies').doc(widget.lobbyId).update({
       'votes.$targetPlayerId': FieldValue.increment(1),
       'hasVoted.$userId': true,
-      'voteMessages': FieldValue.arrayUnion(["$voterName a voté pour $targetName"]),
+      'voteMessages': FieldValue.arrayUnion(["$voterName a voté"]),
     });
 
     setState(() {
