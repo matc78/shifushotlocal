@@ -6,7 +6,7 @@ class Jeu1 extends StatefulWidget {
   final List<String> players;
   final List<String> remainingGames;
 
-  const Jeu1({Key? key, required this.players, required this.remainingGames}) : super(key: key);
+  const Jeu1({super.key, required this.players, required this.remainingGames});
 
   @override
   _Jeu1State createState() => _Jeu1State();

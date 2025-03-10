@@ -47,6 +47,7 @@ flutter:
     - assets/images/favicon.png
     - assets/jsons/killer_actions.json
     - assets/jsons/papers.json
+    - assets/jsons/debate.json
     - assets/images/papier_dechire.png
     - assets/images/feedback_icon.png
     - assets/images/tapis_de_jeu.png

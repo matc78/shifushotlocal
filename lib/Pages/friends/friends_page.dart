@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../theme/app_theme.dart';
 
 class FriendsPage extends StatefulWidget {
-  const FriendsPage({Key? key}) : super(key: key);
+  const FriendsPage({super.key});
 
   @override
   State<FriendsPage> createState() => _FriendsPageState();
@@ -404,7 +404,7 @@ class _FriendsPageState extends State<FriendsPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.check, color: Colors.green),
+                            icon: const Icon(Icons.check, color: Colors.green),
                             onPressed: () async {
                             try {
                               final currentUserUid = FirebaseAuth.instance.currentUser?.uid;
@@ -461,7 +461,7 @@ class _FriendsPageState extends State<FriendsPage> {
                               });
 
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Demande refusée.')),
+                                const SnackBar(content: Text('Demande refusée.')),
                               );
 
                               // Rafraîchir les données

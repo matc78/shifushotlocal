@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../theme/app_theme.dart';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
+  const EditProfilePage({super.key});
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -207,7 +207,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           decoration: InputDecoration(
             labelText: label,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16), // Ajuste l'intérieur du champ
+            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16), // Ajuste l'intérieur du champ
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(

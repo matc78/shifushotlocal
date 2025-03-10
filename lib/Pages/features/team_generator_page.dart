@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../theme/app_theme.dart';
 
 class TeamGeneratorPage extends StatefulWidget {
-  const TeamGeneratorPage({Key? key}) : super(key: key);
+  const TeamGeneratorPage({super.key});
 
   @override
   State<TeamGeneratorPage> createState() => _TeamGeneratorPageState();

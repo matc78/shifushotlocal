@@ -6,7 +6,7 @@ import 'package:shifushotlocal/Pages/profil/edit_profil_page.dart';
 import '../../theme/app_theme.dart';
 
 class UserProfilePage extends StatefulWidget {
-  const UserProfilePage({Key? key}) : super(key: key);
+  const UserProfilePage({super.key});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();

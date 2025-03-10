@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 class SelectGamePage extends StatelessWidget {
-  const SelectGamePage({Key? key}) : super(key: key);
+  const SelectGamePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +43,9 @@ class SelectGamePage extends StatelessWidget {
 
     final List<Map<String, String>> jeuxEnLigne = [
       {
-        'name': 'Fake Online Game', // 🔹 Faux jeu pour tester
-        'description': 'Test de jeu en ligne.',
-        'image': 'https://img.icons8.com/?size=100&id=34&format=png&color=000000',
+        'name': 'Jeu du débat', // 🔹 Faux jeu pour tester
+        'description': 'Jeu de bluff et de stratégie.',
+        'image': 'https://img.icons8.com/?size=100&id=rGBIEi57JpPS&format=png&color=000000',
         'route': '/online_lobby',
       },
     ];
@@ -84,7 +84,7 @@ class SelectGamePage extends StatelessWidget {
               style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...jeuxEnLocal.map((game) => GameCard(game: game, theme: theme, context: context)).toList(),
+            ...jeuxEnLocal.map((game) => GameCard(game: game, theme: theme, context: context)),
 
             const SizedBox(height: 20),
 
@@ -94,7 +94,7 @@ class SelectGamePage extends StatelessWidget {
               style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...jeuxEnLigne.map((game) => GameCard(game: game, theme: theme, context: context)).toList(),
+            ...jeuxEnLigne.map((game) => GameCard(game: game, theme: theme, context: context)),
 
             const SizedBox(height: 20),
 
@@ -104,7 +104,7 @@ class SelectGamePage extends StatelessWidget {
               style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...fonctionnalites.map((feature) => GameCard(game: feature, theme: theme, context: context)).toList(),
+            ...fonctionnalites.map((feature) => GameCard(game: feature, theme: theme, context: context)),
           ],
         ),
       ),

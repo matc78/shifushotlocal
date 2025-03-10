@@ -1,13 +1,16 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 
 class LobbyWaitingScreen extends StatefulWidget {
   final String lobbyId;
   final bool isHost;
+  final String gameRoute; // 🔹 Ajout de la route du jeu
 
-  const LobbyWaitingScreen({Key? key, required this.lobbyId, required this.isHost}) : super(key: key);
+  const LobbyWaitingScreen({super.key, required this.lobbyId, required this.isHost, required this.gameRoute});
 
   @override
   _LobbyWaitingScreenState createState() => _LobbyWaitingScreenState();
@@ -19,6 +22,7 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
   Map<String, String> playerNames = {}; // Stockage des prénoms
   late String userId;
   late bool isHost;
+  late StreamSubscription<DocumentSnapshot> _lobbySubscription;
 
   @override
   void initState() {
@@ -28,21 +32,31 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
     _listenForPlayers();
   }
 
-  @override
+ @override
   void dispose() {
-    _leaveLobby(); // Supprime le joueur du lobby s'il quitte l'écran
+    _lobbySubscription.cancel(); // 🔹 Arrêter le listener Firebase
+    if (mounted) {
+      _leaveLobby(onlyIfNotStarted: true); // 🔹 Vérifie si la partie est lancée avant de quitter
+    }
     super.dispose();
   }
 
+
   /// 🔹 **Écoute des mises à jour des joueurs en temps réel**
   void _listenForPlayers() {
-    _firestore.collection('lobbies').doc(widget.lobbyId).snapshots().listen((snapshot) async {
-      if (!snapshot.exists) return;
+    _lobbySubscription = _firestore.collection('lobbies').doc(widget.lobbyId).snapshots().listen((snapshot) async {
+      if (!mounted) return; // 🔹 Vérifier que le widget est toujours actif
+
+      if (!snapshot.exists) {
+        if (mounted) {
+          Navigator.pop(context); // 🔹 Quitter l'écran si le lobby est supprimé
+        }
+        return;
+      }
 
       List<dynamic> playerIds = snapshot['players'] ?? [];
       String hostId = snapshot['hostId'] ?? "";
 
-      // Vérifier si le lobby est vide et doit être supprimé
       if (playerIds.isEmpty) {
         await _firestore.collection('lobbies').doc(widget.lobbyId).delete();
         if (mounted) {
@@ -51,14 +65,12 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
         return;
       }
 
-      // Vérifier si l'hôte a changé
       if (hostId == userId) {
         setState(() {
           isHost = true;
         });
       }
 
-      // Mettre à jour les noms des joueurs
       Map<String, String> updatedPlayerNames = {};
       for (String playerId in playerIds) {
         var userDoc = await _firestore.collection('users').doc(playerId).get();
@@ -75,40 +87,107 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
     });
   }
 
+
   /// 🔹 **Lancer la partie (uniquement pour l’hôte)**
   Future<void> _startGame() async {
-    await _firestore.collection('lobbies').doc(widget.lobbyId).update({
-      'isStarted': true,
-    });
+    print("🟢 Tentative de démarrage du jeu...");
+
+    final DocumentReference lobbyRef = _firestore.collection('lobbies').doc(widget.lobbyId);
+    final DocumentSnapshot lobbyDoc = await lobbyRef.get();
+
+    if (!lobbyDoc.exists) {
+      print("❌ Erreur : Le lobby n'existe pas.");
+      return;
+    }
+
+    List<dynamic> players = lobbyDoc['players'] ?? [];
+    final theme = AppTheme.of(context);
+    // 🔹 Vérification du nombre de joueurs
+    if (players.length < 2) {
+      print("⚠️ Impossible de démarrer : il faut au moins 2 joueurs !");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Il faut au moins 2 joueurs pour commencer la partie !", style: theme.bodyLarge),
+          duration: Duration(seconds: 2),
+          backgroundColor: theme.secondary,
+        ),
+      );
+      return;
+    }
+
+    print("✅ Lobby trouvé, récupération des joueurs...");
+    String gameRoute = widget.gameRoute;
+
+    // 🔹 Marquer la partie comme commencée
+    try {
+      await lobbyRef.update({'isStarted': true});
+      print("✅ Partie marquée comme commencée.");
+    } catch (e) {
+      print("❌ Erreur lors de la mise à jour du statut de la partie : $e");
+      return;
+    }
+
+    // 🔹 Rediriger tous les joueurs
+    for (String player in players) {
+      try {
+        await _firestore.collection('users').doc(player).update({
+          'currentGame': {
+            'lobbyId': widget.lobbyId,
+            'gameRoute': gameRoute
+          },
+        });
+        print("✅ Joueur $player mis à jour avec le jeu en cours.");
+      } catch (e) {
+        print("❌ Erreur lors de la mise à jour du joueur $player : $e");
+      }
+    }
+
+    // 🔹 Redirection immédiate de l'hôte
+    if (mounted) {
+      print("🚀 Redirection de l'hôte vers $gameRoute");
+      Navigator.pushReplacementNamed(
+        context,
+        gameRoute,
+        arguments: {'lobbyId': widget.lobbyId, 'players': players},
+      );
+    }
+
+    print("🎉 Jeu lancé avec succès !");
   }
 
+
   /// 🔹 **Un joueur quitte le lobby**
-  Future<void> _leaveLobby() async {
-    final User? user = _auth.currentUser;
-    if (user == null) return;
+  Future<void> _leaveLobby({bool onlyIfNotStarted = false}) async {
+  final User? user = _auth.currentUser;
+  if (user == null) return;
 
-    DocumentReference lobbyRef = _firestore.collection('lobbies').doc(widget.lobbyId);
-    DocumentSnapshot lobbyDoc = await lobbyRef.get();
+  DocumentReference lobbyRef = _firestore.collection('lobbies').doc(widget.lobbyId);
+  DocumentSnapshot lobbyDoc = await lobbyRef.get();
 
-    if (lobbyDoc.exists) {
-      List<dynamic> players = List.from(lobbyDoc['players']);
-      players.remove(user.uid);
+  if (lobbyDoc.exists) {
+    bool isStarted = lobbyDoc['isStarted'] ?? false;
 
-      if (players.isEmpty) {
-        await lobbyRef.delete(); // Supprimer le lobby si personne dedans
+    // 🔹 Ne pas supprimer les joueurs si la partie est commencée
+    if (onlyIfNotStarted && isStarted) return;
+
+    List<dynamic> players = List.from(lobbyDoc['players']);
+    players.remove(user.uid);
+
+    if (players.isEmpty) {
+      await lobbyRef.delete(); // Supprimer le lobby si personne dedans
+    } else {
+      if (user.uid == lobbyDoc['hostId']) {
+        await lobbyRef.update({
+          'players': players,
+          'hostId': players.first, // Transférer le rôle d'hôte
+        });
       } else {
-        if (user.uid == lobbyDoc['hostId']) {
-          // 🔹 Transférer l'hôte si c'était l'hôte qui partait
-          await lobbyRef.update({
-            'players': players,
-            'hostId': players.first, // Nouveau hôte
-          });
-        } else {
-          await lobbyRef.update({'players': players});
-        }
+        await lobbyRef.update({'players': players});
       }
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -151,10 +230,16 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
 
             if (isStarted) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.pushReplacementNamed(context, '/gamePage', arguments: players);
+                Navigator.pushReplacementNamed(
+                  context,
+                  widget.gameRoute,
+                  arguments: {
+                    'lobbyId': widget.lobbyId,  // ✅ Pass the correct lobby ID
+                    'players': players,
+                  },
+                );
               });
             }
-
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -165,6 +250,22 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
                       "Code du Lobby :\n ${widget.lobbyId}",
                       style: theme.bodyLarge.copyWith(fontSize: 35),
                       textAlign: TextAlign.center,
+                    ),
+                    SizedBox(width: 10), // 🔹 Espacement entre le texte et le bouton
+
+                    // 🔹 Bouton de copie
+                    IconButton(
+                      icon: Icon(Icons.content_copy, color: theme.primary, size: 20), // ✅ Icône de copie
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: widget.lobbyId)); // ✅ Copie dans le presse-papier
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: theme.background,
+                            content: Text("Code copié !", style: theme.bodyLarge), // ✅ Confirmation
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 50),
                     Text(
@@ -180,22 +281,22 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
                           style: theme.bodyLarge.copyWith(fontSize: 24),
                         ),
                       );
-                    }).toList(),
+                    }),
                     const SizedBox(height: 30),
                     isHost
-                        ? ElevatedButton(
-                            onPressed: _startGame,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.primary,
-                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            ),
-                            child: Text("Démarrer la Partie", style: theme.buttonText),
-                          )
-                        : Text(
-                            "En attente de l'hôte...",
-                            style: theme.bodyLarge.copyWith(fontStyle: FontStyle.italic),
+                      ? ElevatedButton(
+                          onPressed: players.length < 2 ? null : _startGame, // ✅ Désactive si moins de 2 joueurs
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: players.length < 2 ? Colors.grey : theme.primary, // ✅ Grise le bouton
+                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
+                          child: Text("Démarrer la Partie", style: theme.buttonText),
+                        )
+                      : Text(
+                          "En attente de l'hôte...",
+                          style: theme.bodyLarge.copyWith(fontStyle: FontStyle.italic),
+                        ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {

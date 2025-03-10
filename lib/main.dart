@@ -10,6 +10,8 @@ import 'package:shifushotlocal/Pages/connexion/debut_page.dart';
 import 'package:shifushotlocal/Pages/connexion/connexion_page.dart';
 import 'package:shifushotlocal/Pages/local_games/bizkit/dice_game_page.dart';
 import 'package:shifushotlocal/Pages/online_games/lobby_screen_online.dart';
+import 'package:shifushotlocal/Pages/online_games/lobby_waiting_screen.dart';
+import 'package:shifushotlocal/Pages/online_games/debate_game.dart';
 import 'package:shifushotlocal/Pages/profil/edit_profil_page.dart';
 import 'package:shifushotlocal/Pages/feedback/feedback_page.dart';
 import 'package:shifushotlocal/Pages/friends/friends_page.dart';
@@ -41,7 +43,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const AuthWrapper(), // Utilisation d'un wrapper pour la navigation
+      home: const AuthWrapper(), // Vérification de l'authentification
       routes: {
         '/connexion': (context) => const ConnexionPage(),
         '/createAccount': (context) => const CreateAccountPage(),
@@ -54,14 +56,17 @@ class MainApp extends StatelessWidget {
         '/teamGenerator': (context) => const TeamGeneratorPage(),
         '/select_game': (context) => const SelectGamePage(),
         '/killer': (context) => const KillerPage(),
+        
         '/killerActions': (context) {
           final players = ModalRoute.of(context)!.settings.arguments as List<String>;
           return KillerActionsPage(players: players);
         },
+        
         '/killerSummary': (context) {
           final playerData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return KillerSummaryPage(playerData: playerData);
         },
+        
         '/jeu1': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return Jeu1(
@@ -69,47 +74,72 @@ class MainApp extends StatelessWidget {
             remainingGames: args['remainingGames'] as List<String>,
           );
         },
+        
         '/dice_game': (context) {
           final args = ModalRoute.of(context)!.settings.arguments;
-
           if (args is String) {
-            // Mode "Jeu" : aucun remainingGames, juste un seul joueur et retour à la page d'accueil
-            return DiceGamePage(
-              players: [args], // Passer le nom du joueur
-              remainingGames: ['/homepage'], // Redirection vers l'accueil après
-            );
+            return DiceGamePage(players: [args], remainingGames: const ['/homepage']);
           } else if (args is Map<String, dynamic>) {
-            // Mode "Soirée" : récupération des joueurs et des jeux restants
             return DiceGamePage(
               players: args['players'] as List<String>,
               remainingGames: args['remainingGames'] as List<String>,
             );
           } else {
-            // Gestion d'erreurs (aucun argument valide)
             return const Scaffold(
               body: Center(child: Text("Erreur : Arguments invalides.")),
             );
           }
         },
+        
         '/paper_game': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          final players = args['players'] as List<String>;
-          final remainingGames = args['remainingGames'] as List<String>;
-          return PaperGamePage(players: players, remainingGames: remainingGames);
+          return PaperGamePage(
+            players: args['players'] as List<String>,
+            remainingGames: args['remainingGames'] as List<String>,
+          );
         },
+        
         '/party_screen': (context) => const PartyScreen(),
         '/feedback_page': (context) => const FeedbackPage(),
         '/clock_game': (context) => const ClockGameScreen(),
         '/cardDrawer': (context) => const CardDrawerPage(),
-        '/online_lobby': (context) => const OnlineLobbyScreen(),
+
+        // 🔹 **Jeux en ligne**
+        '/online_lobby': (context) {
+          final gameName = ModalRoute.of(context)!.settings.arguments as String?;
+          return gameName != null
+              ? OnlineLobbyScreen(gameName: gameName)
+              : const OnlineLobbyScreen(gameName: "Jeu inconnu");
+        },
+
+        '/lobby_waiting': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return LobbyWaitingScreen(
+            lobbyId: args['lobbyId'] as String,
+            isHost: args['isHost'] as bool,
+            gameRoute: args['gameRoute'] as String,
+          );
+        },
+
+        '/debate_game': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments;
+
+          if (args is Map<String, dynamic> && args.containsKey('lobbyId')) {
+            return DebateGameScreen(lobbyId: args['lobbyId'] as String);
+          } else {
+            return const Scaffold(
+              body: Center(child: Text("Erreur : Aucun lobbyId fourni")),
+            );
+          }
+        },
       },
     );
   }
 }
 
-// Wrapper pour vérifier si l'utilisateur est connecté
+// 🔹 **Vérification de l'authentification**
 class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({Key? key}) : super(key: key);
+  const AuthWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -119,10 +149,8 @@ class AuthWrapper extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData) {
-          // Si l'utilisateur est connecté, diriger vers la HomePage
           return const HomePage();
         } else {
-          // Sinon, diriger vers la page de connexion
           return const DebutPage();
         }
       },

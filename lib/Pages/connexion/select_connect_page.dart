@@ -3,7 +3,7 @@ import '../../theme/app_theme.dart';
 import 'connexion_page.dart';
 
 class SelectConnectPage extends StatelessWidget {
-  const SelectConnectPage({Key? key}) : super(key: key);
+  const SelectConnectPage({super.key});
 
   @override
   Widget build(BuildContext context) {

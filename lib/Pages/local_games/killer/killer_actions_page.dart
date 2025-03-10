@@ -6,7 +6,7 @@ import '../../../theme/app_theme.dart';
 class KillerActionsPage extends StatefulWidget {
   final List<String> players;
 
-  const KillerActionsPage({Key? key, required this.players}) : super(key: key);
+  const KillerActionsPage({super.key, required this.players});
 
   @override
   State<KillerActionsPage> createState() => _KillerActionsPageState();

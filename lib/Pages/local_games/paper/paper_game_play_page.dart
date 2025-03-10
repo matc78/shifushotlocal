@@ -8,11 +8,11 @@ class PaperGamePlayPage extends StatefulWidget {
   final List<String> remainingGames;
 
   const PaperGamePlayPage({
-    Key? key,
+    super.key,
     required this.papers,
     required this.players,
     required this.remainingGames,
-  }) : super(key: key);
+  });
 
   @override
   _PaperGamePlayPageState createState() => _PaperGamePlayPageState();

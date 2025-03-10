@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../theme/app_theme.dart';
 
 class AddFriendsPage extends StatefulWidget {
-  const AddFriendsPage({Key? key}) : super(key: key);
+  const AddFriendsPage({super.key});
 
   @override
   State<AddFriendsPage> createState() => _AddFriendsPageState();
@@ -65,7 +65,7 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
       querySnapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('pseudo', isGreaterThanOrEqualTo: query)
-          .where('pseudo', isLessThanOrEqualTo: query + '\uf8ff')
+          .where('pseudo', isLessThanOrEqualTo: '$query\uf8ff')
           .where(FieldPath.documentId, isNotEqualTo: currentUser.uid)
           .get();
     }

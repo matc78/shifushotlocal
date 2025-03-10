@@ -6,7 +6,7 @@ import '../../theme/app_theme.dart';
 import '../home_page.dart'; // Assurez-vous que le chemin est correct
 
 class ConnexionPage extends StatefulWidget {
-  const ConnexionPage({Key? key}) : super(key: key);
+  const ConnexionPage({super.key});
 
   @override
   State<ConnexionPage> createState() => _ConnexionPageState();

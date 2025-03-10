@@ -4,7 +4,7 @@ import 'package:playing_cards/playing_cards.dart';
 import '../../../theme/app_theme.dart';
 
 class ClockGameScreen extends StatefulWidget {
-  const ClockGameScreen({Key? key}) : super(key: key);
+  const ClockGameScreen({super.key});
 
   @override
   State<ClockGameScreen> createState() => _ClockGameScreenState();

@@ -5,7 +5,7 @@ import '../../theme/app_theme.dart';
 import 'package:intl/intl.dart';
 
 class FeedbackPage extends StatelessWidget {
-  const FeedbackPage({Key? key}) : super(key: key);
+  const FeedbackPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -283,8 +283,7 @@ class FeedbackPage extends StatelessWidget {
 class FeedbackDetailPage extends StatelessWidget {
   final QueryDocumentSnapshot feedback;
 
-  const FeedbackDetailPage({Key? key, required this.feedback})
-      : super(key: key);
+  const FeedbackDetailPage({super.key, required this.feedback});
 
   @override
   Widget build(BuildContext context) {

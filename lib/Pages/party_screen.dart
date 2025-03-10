@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 
 class PartyScreen extends StatefulWidget {
-  const PartyScreen({Key? key}) : super(key: key);
+  const PartyScreen({super.key});
 
   @override
   _PartyScreenState createState() => _PartyScreenState();

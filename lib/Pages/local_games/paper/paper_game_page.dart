@@ -7,10 +7,10 @@ class PaperGamePage extends StatefulWidget {
   final List<String> remainingGames;
 
   const PaperGamePage({
-    Key? key,
+    super.key,
     required this.players,
     this.remainingGames = const [], // Liste vide par défaut
-  }) : super(key: key);
+  });
 
   @override
   _PaperGamePageState createState() => _PaperGamePageState();

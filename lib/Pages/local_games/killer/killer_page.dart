@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../theme/app_theme.dart';
 
 class KillerPage extends StatefulWidget {
-  const KillerPage({Key? key}) : super(key: key);
+  const KillerPage({super.key});
 
   @override
   State<KillerPage> createState() => _KillerPageState();

@@ -4,7 +4,7 @@ import 'dart:math';
 import '../../theme/app_theme.dart';
 
 class CardDrawerPage extends StatefulWidget {
-  const CardDrawerPage({Key? key}) : super(key: key);
+  const CardDrawerPage({super.key});
 
   @override
   _CardDrawerPageState createState() => _CardDrawerPageState();

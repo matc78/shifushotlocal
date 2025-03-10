@@ -9,10 +9,10 @@ class DiceGamePage extends StatefulWidget {
   final List<String> remainingGames;
 
   const DiceGamePage({
-    Key? key,
+    super.key,
     required this.players,
     required this.remainingGames,
-  }) : super(key: key);
+  });
 
   @override
   _DiceGamePageState createState() => _DiceGamePageState();
@@ -371,7 +371,7 @@ void _addGeneralRule() {
         dice1 = Random().nextInt(6) + 1; // Générer le résultat final pour le premier dé
         dice2 = Random().nextInt(6) + 1; // Générer le résultat final pour le deuxième dé
 
-        final String key = dice1 <= dice2 ? '${dice1}_${dice2}' : '${dice2}_${dice1}';
+        final String key = dice1 <= dice2 ? '${dice1}_$dice2' : '${dice2}_$dice1';
 
         if (rules.containsKey(key)) {
           if (rules[key]!.contains('Inventer une règle')) {

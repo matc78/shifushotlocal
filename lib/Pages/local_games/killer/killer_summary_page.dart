@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class KillerSummaryPage extends StatefulWidget {
   final Map<String, dynamic> playerData;
 
-  const KillerSummaryPage({Key? key, required this.playerData}) : super(key: key);
+  const KillerSummaryPage({super.key, required this.playerData});
 
   @override
   State<KillerSummaryPage> createState() => _KillerSummaryPageState();
@@ -46,7 +46,7 @@ class _KillerSummaryPageState extends State<KillerSummaryPage> {
       builder: (_) => AlertDialog(
         title: Text('Détails de l\'action', style: theme.titleMedium),
         content: Text(
-          '${playerName} doit faire :\n\nAction : ${playerData[playerName]['action']}\nCible : ${playerData[playerName]['target']}',
+          '$playerName doit faire :\n\nAction : ${playerData[playerName]['action']}\nCible : ${playerData[playerName]['target']}',
           style: theme.bodyMedium,
         ),
         actions: [
