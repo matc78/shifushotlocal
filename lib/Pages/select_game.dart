@@ -63,6 +63,12 @@ class SelectGamePage extends StatelessWidget {
         'image': 'https://img.icons8.com/?size=100&id=16427&format=png&color=000000',
         'route': '/cardDrawer',
       },
+      {
+        'name': 'Cartes pyramide',
+        'description': '4 cartes pour jouer à la pyramide.',
+        'image': 'https://img.icons8.com/?size=100&id=QJJ60v6ChwhS&format=png&color=000000',
+        'route': '/pyramid_card',
+      },
     ];
 
     return Scaffold(

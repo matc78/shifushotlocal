@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shifushotlocal/Pages/features/pyramid_card.dart';
 import 'package:shifushotlocal/Pages/local_games/clicker/jeu1.dart';
 import 'package:shifushotlocal/Pages/friends/add_friends_page.dart';
 import 'package:shifushotlocal/Pages/features/card_drawer.dart';
@@ -29,6 +31,14 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 🔹 Force l'orientation en mode portrait
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown, 
+  ]); // Fin de l'orientation
+
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -132,6 +142,7 @@ class MainApp extends StatelessWidget {
             );
           }
         },
+        '/pyramid_card': (context) => const PyramidCardPage(),
       },
     );
   }
