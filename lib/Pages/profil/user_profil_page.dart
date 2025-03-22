@@ -124,8 +124,108 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ListTile(
                       title: Text('Les notifs', style: theme.bodyMedium),
                       trailing: const Icon(Icons.arrow_forward),
-                      onTap: () =>
-                          Navigator.pushNamed(context, '/notifications'),
+                      onTap: () async {
+                        final user = FirebaseAuth.instance.currentUser;
+                        if (user == null) return;
+
+                        showDialog(
+  context: context,
+  builder: (context) {
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const CircularProgressIndicator();
+
+        final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+        final notif = (data['notifications'] as Map<String, dynamic>? ?? {});
+        bool global = notif['enabled'] ?? false;
+        bool friendRequests = notif['friend_requests'] ?? false;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            Future<void> updateNotif(String key, bool value) async {
+              final uid = FirebaseAuth.instance.currentUser!.uid;
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .update({'notifications.$key': value});
+            }
+
+            Future<void> toggleAll(bool value) async {
+              setState(() {
+                global = value;
+                friendRequests = value;
+              });
+              final uid = FirebaseAuth.instance.currentUser!.uid;
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .update({
+                'notifications.enabled': value,
+                'notifications.friend_requests': value,
+              });
+            }
+
+            Future<void> toggleOne(String key, bool value) async {
+              setState(() {
+                if (key == 'friend_requests') {
+                  friendRequests = value;
+                }
+              });
+
+              await updateNotif(key, value);
+
+              // Vérifie si tous sont activés => active le global automatiquement
+              final allEnabled = [friendRequests].every((v) => v == true);
+              await updateNotif('enabled', allEnabled);
+              setState(() => global = allEnabled);
+            }
+
+            return AlertDialog(
+              title: const Text("Préférences de notification"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("🔔 Toutes les notifications"),
+                      Switch(
+                        value: global,
+                        onChanged: (value) => toggleAll(value),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("👥 Demandes d'amis"),
+                      Switch(
+                        value: friendRequests,
+                        onChanged: (value) => toggleOne('friend_requests', value),
+                      ),
+                    ],
+                  ),
+                  // 🔜 Tu pourras facilement ajouter d’autres types ici
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Fermer"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  },
+);
+                      },
                     ),
                     const Divider(height: 32),
                     ElevatedButton(

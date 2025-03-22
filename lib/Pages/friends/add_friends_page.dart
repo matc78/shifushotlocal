@@ -109,18 +109,23 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
     if (currentUser == null) return;
 
     try {
+      // 🔹 Données de l'utilisateur actuel
       final currentUserDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser.uid)
           .get();
       final senderName = currentUserDoc.data()?['pseudo'] ?? "Un utilisateur";
 
+      // 🔹 Données du destinataire
       final friendDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(friendUid)
           .get();
-      final friendToken = friendDoc.data()?['fcmToken'];
+      final friendData = friendDoc.data() ?? {};
+      final friendToken = friendData['fcmToken'];
+      final notifPrefs = friendData['notifications'] as Map<String, dynamic>?;
 
+      // 🔹 Ajouter dans pending et friend_requests
       await FirebaseFirestore.instance.collection('users').doc(friendUid).update({
         'pending_approval': FieldValue.arrayUnion([currentUser.uid]),
       });
@@ -131,8 +136,14 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
 
       print("friend token : $friendToken et senderName : $senderName");
 
-      if (friendToken != null) {
+      // ✅ Vérifier si le destinataire a activé les notifs
+      final wantsFriendRequestNotif =
+          (notifPrefs?['enabled'] ?? false) && (notifPrefs?['friend_requests'] ?? false);
+
+      if (friendToken != null && wantsFriendRequestNotif) {
         await sendPushNotification(friendToken, senderName);
+      } else {
+        print("🔕 Le destinataire a désactivé les notifications de demandes d'ami.");
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
