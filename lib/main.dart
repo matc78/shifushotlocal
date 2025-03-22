@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shifushotlocal/Pages/features/pyramid_card.dart';
 import 'package:shifushotlocal/Pages/local_games/clicker/jeu1.dart';
 import 'package:shifushotlocal/Pages/friends/add_friends_page.dart';
@@ -29,21 +31,85 @@ import 'package:shifushotlocal/Pages/profil/user_profil_page.dart';
 import 'package:shifushotlocal/Pages/local_games/lobby_screen.dart';
 import 'firebase_options.dart';
 
+// Définir une clé de navigation globale
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 🔹 Force l'orientation en mode portrait
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown, 
-  ]); // Fin de l'orientation
+    DeviceOrientation.portraitDown,
+  ]);
 
-
+  // Initialiser Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Initialiser Firebase Messaging
+  await initializeFirebaseMessaging();
+
   runApp(const MainApp());
+}
+
+// Fonction pour initialiser Firebase Messaging
+Future<void> initializeFirebaseMessaging() async {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
+  // Demander l'autorisation pour les notifications (iOS)
+  // ignore: unused_local_variable
+  NotificationSettings settings = await _firebaseMessaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  // Récupérer le token FCM
+  String? token = await _firebaseMessaging.getToken();
+  if (token != null) {
+    print("FCM Token: $token");
+
+    // Stocker le token dans Firestore
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'fcmToken': token});
+    }
+  }
+
+  // Écouter les nouveaux tokens (au cas où il change)
+  _firebaseMessaging.onTokenRefresh.listen((newToken) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'fcmToken': newToken});
+    }
+  });
+
+  // Configurer la gestion des notifications en premier plan
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Notification reçue: ${message.notification?.title}');
+    // Afficher une alerte ou mettre à jour l'UI
+    showDialog(
+      context: navigatorKey.currentContext!, // Utilisez une clé de navigation si nécessaire
+      builder: (context) => AlertDialog(
+        title: Text(message.notification?.title ?? 'Notification'),
+        content: Text(message.notification?.body ?? 'Nouveau message'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  });
 }
 
 class MainApp extends StatelessWidget {
@@ -53,6 +119,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey, // Utiliser la clé de navigation globale
       home: const AuthWrapper(), // Vérification de l'authentification
       routes: {
         '/connexion': (context) => const ConnexionPage(),

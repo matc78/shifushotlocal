@@ -3,6 +3,7 @@ plugins {
     id "kotlin-android"
     id "com.google.gms.google-services" // FlutterFire Configuration
     id "dev.flutter.flutter-gradle-plugin" // Flutter Gradle Plugin
+    id "org.jetbrains.kotlin.android" version "2.1.0" apply false
 }
 
 def keystoreProperties = new Properties()

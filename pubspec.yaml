@@ -8,17 +8,21 @@ environment:
 
 dependencies:
   cloud_firestore: ^5.6.2
+  cloud_functions: ^5.3.4
   dice_icons: ^0.1.7
+  firebase_admin: ^0.3.0+1
   firebase_auth: ^5.4.1
   firebase_core: ^3.10.1
+  firebase_messaging: ^15.2.4
   firebase_storage: ^12.4.1
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.14.3
   font_awesome_flutter: ^10.8.0
   google_sign_in: ^6.2.2
+  http: ^1.3.0
   image_picker: ^1.1.2
-  intl: ^0.20.2
+  intl: ^0.19.0
   playing_cards: ^0.4.1+11
   playing_cards_layouts: ^1.0.1
   uuid: ^4.5.1
