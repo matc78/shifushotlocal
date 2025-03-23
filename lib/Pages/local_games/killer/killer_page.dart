@@ -53,9 +53,9 @@ class _KillerPageState extends State<KillerPage> {
 }
 
   void startGame() {
-    if (players.length < 3) {
+    if (players.length < 4) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ajoutez au moins 3 joueurs.')),
+        const SnackBar(content: Text('Ajoutez au moins 4 joueurs.')),
       );
       return;
     }

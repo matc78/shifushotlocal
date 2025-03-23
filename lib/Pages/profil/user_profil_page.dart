@@ -47,6 +47,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+  String _formatGameName(String rawKey) {
+    // Tu peux personnaliser ça selon le nom utilisé dans Firestore
+    switch (rawKey) {
+      case 'clicker_game':
+        return 'Le Clicker';
+      case 'dice_game':
+        return 'Bizkit !';
+      case 'paper_game':
+        return 'Jeu des papiers';
+      case 'clock_game':
+        return 'L\'Horloge';
+      default:
+        return rawKey.replaceAll('_', ' ').capitalize();
+    }
+  }
+
+
 
 
   void _logout() async {
@@ -115,12 +132,36 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           : '',
                     ),
                     const Divider(height: 32),
-                    ListTile(
-                      title: Text('Mes stats et records',
-                          style: theme.bodyMedium),
-                      trailing: const Icon(Icons.arrow_forward),
-                      onTap: () => Navigator.pushNamed(context, '/stats'),
-                    ),
+                    if (userData!['high_scores'] != null && userData!['high_scores'] is Map) ...[
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '🏆 Mes stats et records',
+                          style: theme.titleMedium,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ...userData!['high_scores'].entries.map<Widget>((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _formatGameName(entry.key),
+                                style: theme.bodyMedium,
+                              ),
+                              Text(
+                                entry.value.toString(),
+                                style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      const Divider(height: 32),
+                    ],
                     ListTile(
                       title: Text('Les notifs', style: theme.bodyMedium),
                       trailing: const Icon(Icons.arrow_forward),
@@ -337,3 +378,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 }
+
+extension StringCasingExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1);
+  }
+}
+

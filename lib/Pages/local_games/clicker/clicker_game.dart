@@ -1,23 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:shifushotlocal/theme/app_theme.dart';
 
-class Jeu1 extends StatefulWidget {
+class ClickerGame extends StatefulWidget {
   final List<String> players;
   final List<String> remainingGames;
 
-  const Jeu1({super.key, required this.players, required this.remainingGames});
+  const ClickerGame({super.key, required this.players, required this.remainingGames});
 
   @override
-  _Jeu1State createState() => _Jeu1State();
+  _ClickerGameState createState() => _ClickerGameState();
 }
 
-class _Jeu1State extends State<Jeu1> {
+class _ClickerGameState extends State<ClickerGame> {
   int currentPlayerIndex = 0;
   List<int> scores = [];
   bool isGameActive = false;
   bool showNextButton = false;
-  bool showStartButton = true; // Affiche le bouton "C’EST PARTI !" au début
+  bool showStartButton = true;
   Timer? timer;
   int timeLeft = 10;
 
@@ -37,7 +39,7 @@ class _Jeu1State extends State<Jeu1> {
     setState(() {
       isGameActive = false;
       showNextButton = false;
-      showStartButton = true; // Réaffiche "C’EST PARTI !"
+      showStartButton = true;
       timeLeft = 10;
     });
   }
@@ -68,7 +70,7 @@ class _Jeu1State extends State<Jeu1> {
       isGameActive = true;
       showStartButton = false;
     });
-    startTimer(); // Démarre le timer
+    startTimer();
   }
 
   void endTurn() {
@@ -100,27 +102,66 @@ class _Jeu1State extends State<Jeu1> {
     }
   }
 
-  void showGameOverDialog() {
+  void showGameOverDialog() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final int currentScore = scores[0];
+
+    if (uid != null) {
+      final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
+      try {
+        final doc = await docRef.get();
+        final data = doc.data() ?? {};
+        final highScores = Map<String, dynamic>.from(data['high_scores'] ?? {});
+        final int existingScore = (highScores['clicker_game'] ?? 0) as int;
+
+        if (currentScore > existingScore) {
+          highScores['clicker_game'] = currentScore;
+          await docRef.update({'high_scores': highScores});
+          print("🎉 Nouveau record personnel : $currentScore");
+        } else {
+          print("ℹ️ Score actuel : $currentScore (record : $existingScore)");
+        }
+      } catch (e) {
+        print("❌ Erreur mise à jour du high score : $e");
+      }
+    }
+
     String winner = widget.players[scores.indexOf(scores.reduce((a, b) => a > b ? a : b))];
+
+    await Future.delayed(const Duration(seconds: 1));
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text("Game Over!"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("Final Scores:"),
+            Text(
+              "Final Scores:",
+              style: TextStyle(
+                fontSize: 20, 
+                color: AppTheme.of(context).textPrimary,
+              ),
+            ),
             const SizedBox(height: 10),
             for (int i = 0; i < widget.players.length; i++)
               Text(
                 "${widget.players[i]}: ${scores[i]}",
-                style: TextStyle(color: AppTheme.of(context).textPrimary),
+                style: TextStyle(
+                  fontSize: 20, 
+                  color: AppTheme.of(context).textPrimary,
+                ),
               ),
             const SizedBox(height: 20),
             Text(
               "Gagnant : $winner!",
-              style: TextStyle(color: AppTheme.of(context).textPrimary),
+              style: TextStyle(
+                fontSize: 24, 
+                fontWeight: FontWeight.bold,
+                color: AppTheme.of(context).textPrimary,
+              ),
             ),
           ],
         ),
@@ -128,14 +169,37 @@ class _Jeu1State extends State<Jeu1> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              navigateToNextGame();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ClickerGame(
+                    players: widget.players,
+                    remainingGames: widget.remainingGames,
+                  ),
+                ),
+              );
             },
-            child: const Text("OK"),
+            child: const Text("Rejouer avec les mêmes joueurs"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushReplacementNamed(context, '/Pages/lobby_screen');
+            },
+            child: const Text("Changer les joueurs"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushReplacementNamed(context, '/homepage');
+            },
+            child: const Text("Retour à l'accueil"),
           ),
         ],
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -187,8 +251,6 @@ class _Jeu1State extends State<Jeu1> {
                     ),
                   ),
                   const SizedBox(height: 40),
-
-                  // Bouton "C'EST PARTI !" au début
                   if (showStartButton)
                     ElevatedButton(
                       onPressed: startClickingPhase,
@@ -204,8 +266,6 @@ class _Jeu1State extends State<Jeu1> {
                         style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                     ),
-
-                  // Bouton "Tap Me!" pendant le jeu
                   if (!showStartButton && !showNextButton)
                     ElevatedButton(
                       onPressed: incrementScore,
@@ -225,9 +285,7 @@ class _Jeu1State extends State<Jeu1> {
               ),
             ),
           ),
-
-          // Bouton "Next Player" en bas
-          if (showNextButton)
+          if (showNextButton && currentPlayerIndex < widget.players.length - 1)
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: ElevatedButton(
