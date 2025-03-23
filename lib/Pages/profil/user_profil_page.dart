@@ -116,9 +116,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     const SizedBox(height: 20),
                     _buildProfileField(theme, 'Email', userData!['email']),
-                    _buildProfileField(theme, 'Nom', userData!['name'] ?? ''),
-                    _buildProfileField(
-                        theme, 'Prénom', userData!['surname'] ?? ''),
+                    _buildProfileField(theme, 'Nom', userData!['surname'] ?? ''),
+                    _buildProfileField(theme, 'Prénom', userData!['name'] ?? ''),
                     _buildProfileField(
                         theme,
                         'Genre',
@@ -138,7 +137,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           '🏆 Mes stats et records',
-                          style: theme.titleMedium,
+                          style: theme.titleMedium.copyWith(fontSize: 22),
+                        ),
+                      ),
+
+                      // 🔹 Section Scores par jeu
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '🎮 Jeux',
+                          style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -160,6 +169,102 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                         );
                       }).toList(),
+
+                      // 🔹 Section Amis harcelés
+                      const SizedBox(height: 24),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '📤 ShiFuShot envoyés',
+                          style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .collection('shifushot_notifs')
+                            .orderBy('count', descending: true)
+                            .limit(5)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) return const SizedBox();
+
+                          final docs = snapshot.data!.docs;
+                          if (docs.isEmpty) return const SizedBox();
+
+                          return Column(
+                            children: docs.map((doc) {
+                              final data = doc.data() as Map<String, dynamic>;
+                              final pseudo = data['name'] ?? 'Inconnu';
+                              final count = data['count'] ?? 0;
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(pseudo, style: theme.bodyMedium),
+                                    Text(
+                                      '$count demandes',
+                                      style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+
+                      // 🔹 Section Amis qui te harcèlent le plus
+                      const SizedBox(height: 24),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '📥 ShiFuShot reçus',
+                          style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      FutureBuilder<QuerySnapshot>(
+                        future: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .collection('shifushot_notifs_received') // ← à adapter si besoin
+                            .orderBy('count', descending: true)
+                            .limit(3)
+                            .get(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) return const SizedBox();
+
+                          final docs = snapshot.data!.docs;
+                          if (docs.isEmpty) {
+                            return Text("Aucun harcèlement détecté 👼", style: theme.bodyMedium);
+                          }
+
+                          return Column(
+                            children: docs.map((doc) {
+                              final data = doc.data() as Map<String, dynamic>;
+                              final name = data['name'] ?? 'Inconnu';
+                              final count = data['count'] ?? 0;
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(name, style: theme.bodyMedium),
+                                    Text('$count demandes', style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+
                       const Divider(height: 32),
                     ],
                     ListTile(
@@ -170,102 +275,113 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         if (user == null) return;
 
                         showDialog(
-  context: context,
-  builder: (context) {
-    return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const CircularProgressIndicator();
+                          context: context,
+                          builder: (context) {
+                            return StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) return const CircularProgressIndicator();
 
-        final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
-        final notif = (data['notifications'] as Map<String, dynamic>? ?? {});
-        bool global = notif['enabled'] ?? false;
-        bool friendRequests = notif['friend_requests'] ?? false;
+                                final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+                                final notif = (data['notifications'] as Map<String, dynamic>? ?? {});
+                                bool global = notif['enabled'] ?? false;
+                                bool friendRequests = notif['friend_requests'] ?? false;
+                                bool shifushotRequests = notif['shifushot_requests'] ?? false;
 
-        return StatefulBuilder(
-          builder: (context, setState) {
-            Future<void> updateNotif(String key, bool value) async {
-              final uid = FirebaseAuth.instance.currentUser!.uid;
-              await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(uid)
-                  .update({'notifications.$key': value});
-            }
+                                return StatefulBuilder(
+                                  builder: (context, setState) {
+                                    Future<void> updateNotif(String key, bool value) async {
+                                      final uid = FirebaseAuth.instance.currentUser!.uid;
+                                      await FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(uid)
+                                          .update({'notifications.$key': value});
+                                    }
 
-            Future<void> toggleAll(bool value) async {
-              setState(() {
-                global = value;
-                friendRequests = value;
-              });
-              final uid = FirebaseAuth.instance.currentUser!.uid;
-              await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(uid)
-                  .update({
-                'notifications.enabled': value,
-                'notifications.friend_requests': value,
-              });
-            }
+                                    Future<void> toggleAll(bool value) async {
+                                      setState(() {
+                                        global = value;
+                                        friendRequests = value;
+                                        shifushotRequests = value;
+                                      });
+                                      final uid = FirebaseAuth.instance.currentUser!.uid;
+                                      await FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(uid)
+                                          .update({
+                                        'notifications.enabled': value,
+                                        'notifications.friend_requests': value,
+                                        'notifications.shifushot_requests': value,
+                                      });
+                                    }
 
-            Future<void> toggleOne(String key, bool value) async {
-              setState(() {
-                if (key == 'friend_requests') {
-                  friendRequests = value;
-                }
-              });
+                                    Future<void> toggleOne(String key, bool value) async {
+                                      setState(() {
+                                        if (key == 'friend_requests') friendRequests = value;
+                                        if (key == 'shifushot_requests') shifushotRequests = value;
+                                      });
 
-              await updateNotif(key, value);
+                                      await updateNotif(key, value);
 
-              // Vérifie si tous sont activés => active le global automatiquement
-              final allEnabled = [friendRequests].every((v) => v == true);
-              await updateNotif('enabled', allEnabled);
-              setState(() => global = allEnabled);
-            }
+                                      // Synchronise le switch global automatiquement
+                                      final allEnabled = [friendRequests, shifushotRequests].every((v) => v == true);
+                                      await updateNotif('enabled', allEnabled);
+                                      setState(() => global = allEnabled);
+                                    }
 
-            return AlertDialog(
-              title: const Text("Préférences de notification"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("🔔 Toutes les notifications"),
-                      Switch(
-                        value: global,
-                        onChanged: (value) => toggleAll(value),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("👥 Demandes d'amis"),
-                      Switch(
-                        value: friendRequests,
-                        onChanged: (value) => toggleOne('friend_requests', value),
-                      ),
-                    ],
-                  ),
-                  // 🔜 Tu pourras facilement ajouter d’autres types ici
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Fermer"),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  },
-);
+                                    return AlertDialog(
+                                      title: const Text("Préférences de notification"),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text("🔔 Toutes les notifications"),
+                                              Switch(
+                                                value: global,
+                                                onChanged: (value) => toggleAll(value),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text("👥 Demandes d'amis"),
+                                              Switch(
+                                                value: friendRequests,
+                                                onChanged: (value) => toggleOne('friend_requests', value),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text("🥤 Invitations Shifushot"),
+                                              Switch(
+                                                value: shifushotRequests,
+                                                onChanged: (value) => toggleOne('shifushot_requests', value),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text("Fermer"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        );
                       },
                     ),
                     const Divider(height: 32),

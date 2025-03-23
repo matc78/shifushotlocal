@@ -69,6 +69,12 @@ class SelectGamePage extends StatelessWidget {
         'image': 'https://img.icons8.com/?size=100&id=QJJ60v6ChwhS&format=png&color=000000',
         'route': '/pyramid_card',
       },
+      {
+        'name': 'ShifuShot',
+        'description': 'Envoyer une notif de shifushot',
+        'image': 'https://img.icons8.com/?size=100&id=LkjR8vZ077vb&format=png&color=000000',
+        'route': '/shifushot_request',
+      },
     ];
 
     return Scaffold(

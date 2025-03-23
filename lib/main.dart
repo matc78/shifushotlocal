@@ -29,6 +29,7 @@ import 'package:shifushotlocal/Pages/select_game.dart';
 import 'package:shifushotlocal/Pages/features/team_generator_page.dart';
 import 'package:shifushotlocal/Pages/profil/user_profil_page.dart';
 import 'package:shifushotlocal/Pages/local_games/lobby_screen.dart';
+import 'package:shifushotlocal/Pages/features/shifushot_request_page.dart';
 import 'firebase_options.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -143,6 +144,7 @@ class MainApp extends StatelessWidget {
           }
         },
         '/pyramid_card': (_) => const PyramidCardPage(),
+        '/shifushot_request': (context) => const ShifushotRequestPage(),
       },
     );
   }
