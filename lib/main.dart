@@ -41,7 +41,6 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await initializeFirebaseMessaging();
   runApp(const MainApp());
 }
 
@@ -152,6 +151,7 @@ class MainApp extends StatelessWidget {
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
@@ -160,6 +160,8 @@ class AuthWrapper extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData) {
+          // 🔥 Initialiser FCM après connexion
+          initializeFirebaseMessaging(); // ✅ Maintenant ici
           return const HomePage();
         } else {
           return const DebutPage();
