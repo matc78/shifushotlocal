@@ -438,7 +438,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               // Rediriger vers la page de connexion après suppression
                               Navigator.pushNamedAndRemoveUntil(
                                 context,
-                                '/connexion', // Assurez-vous que cette route existe dans votre application
+                                '/debutpage', // Assurez-vous que cette route existe dans votre application
                                 (route) => false,
                               );
                             }

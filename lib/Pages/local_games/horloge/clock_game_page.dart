@@ -18,7 +18,7 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
       GlobalKey<ScaffoldMessengerState>();
 
   List<String> players = [];
-  List<String> remainingGames = [];
+  List<dynamic> remainingGames = [];
   int currentPlayerIndex = 0;
   int gorgees = 0;
   int shots = 0;

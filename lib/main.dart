@@ -47,27 +47,59 @@ Future<void> main() async {
 Future<void> initializeFirebaseMessaging() async {
   final fcm = FirebaseMessaging.instance;
   await fcm.requestPermission(alert: true, badge: true, sound: true);
+  
   final user = FirebaseAuth.instance.currentUser;
   final token = await fcm.getToken();
+
   if (user != null && token != null) {
-    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({'fcmToken': token});
+    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+    final doc = await userRef.get();
+    if (!doc.exists) {
+      // Crée un document minimal si inexistant
+      await userRef.set({
+        'name': user.displayName ?? '',
+        'email': user.email ?? '',
+        'photoUrl': user.photoURL ?? '',
+        'fcmToken': token,
+        'notifications': {
+          'enabled': true,
+          'friend_requests': true,
+          'shifushot_requests': true,
+        },
+        'friends': [],
+        'friend_requests': [],
+        'pending_approval': [],
+      });
+    } else {
+      // Sinon, juste mettre à jour le token
+      await userRef.update({'fcmToken': token});
+    }
   }
+
   fcm.onTokenRefresh.listen((newToken) async {
+    final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({'fcmToken': newToken});
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+        'fcmToken': newToken,
+      });
     }
   });
+
   FirebaseMessaging.onMessage.listen((message) {
     showDialog(
       context: navigatorKey.currentContext!,
       builder: (_) => AlertDialog(
         title: Text(message.notification?.title ?? 'Notification'),
         content: Text(message.notification?.body ?? 'Nouveau message'),
-        actions: [TextButton(onPressed: () => Navigator.pop(_), child: const Text("OK"))],
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(_), child: const Text("OK")),
+        ],
       ),
     );
   });
 }
+
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -78,6 +110,7 @@ class MainApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       home: const AuthWrapper(),
       routes: {
+        '/debutpage': (_) => const DebutPage(),
         '/connexion': (_) => const ConnexionPage(),
         '/createAccount': (_) => const CreateAccountPage(),
         '/homepage': (_) => const HomePage(),
