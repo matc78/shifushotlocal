@@ -241,7 +241,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
                           final docs = snapshot.data!.docs;
                           if (docs.isEmpty) {
-                            return Text("Aucun harcèlement détecté 👼", style: theme.bodyMedium);
+                            return Text("Va chercher des potes", style: theme.bodyMedium);
                           }
 
                           return Column(

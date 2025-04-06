@@ -22,11 +22,13 @@ class _ClickerGameState extends State<ClickerGame> {
   bool showStartButton = true;
   Timer? timer;
   int timeLeft = 10;
+  int highScore = 0;
 
   @override
   void initState() {
     super.initState();
     scores = List.filled(widget.players.length, 0);
+    fetchHighScore();
   }
 
   @override
@@ -56,6 +58,23 @@ class _ClickerGameState extends State<ClickerGame> {
         endTurn();
       }
     });
+  }
+
+  Future<void> fetchHighScore() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
+      try {
+        final doc = await docRef.get();
+        final data = doc.data() ?? {};
+        final highScores = Map<String, dynamic>.from(data['high_scores'] ?? {});
+        setState(() {
+          highScore = (highScores['clicker_game'] ?? 0) as int;
+        });
+      } catch (e) {
+        print("❌ Erreur récupération du high score : $e");
+      }
+    }
   }
 
   void incrementScore() {
@@ -225,7 +244,7 @@ class _ClickerGameState extends State<ClickerGame> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Tour de ${widget.players[currentPlayerIndex]}",
+                    widget.players[currentPlayerIndex],
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -233,6 +252,15 @@ class _ClickerGameState extends State<ClickerGame> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  Text(
+                    'High Score personnel : $highScore',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: theme.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   Text(
                     "Temps restant : $timeLeft",
                     style: TextStyle(
