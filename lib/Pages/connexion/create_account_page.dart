@@ -75,19 +75,29 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       await userCredential.user?.sendEmailVerification();
 
       // Sauvegarde des informations de l'utilisateur dans Firestore
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
-        'email': email,
-        'pseudo': pseudo,
-        'name': _nameController.text.trim(),
-        'surname': _surnameController.text.trim(),
-        'gender': _selectedGender,
-        'createdAt': Timestamp.now(),
-        'emailVerified': false, // Ajout d'un champ pour suivre la vérification de l'email
-        'friends': [],
-        'pending_approval': [],
-        'friend_requests': [],
-        'photoUrl': 'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
-      });
+      final user = userCredential.user;
+        if (user == null) {
+          throw Exception("Erreur : utilisateur non authentifié.");
+        }
+
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'email': email,
+          'pseudo': pseudo,
+          'name': _nameController.text.trim(),
+          'surname': _surnameController.text.trim(),
+          'gender': _selectedGender,
+          'createdAt': Timestamp.now(),
+          'emailVerified': false,
+          'friends': [],
+          'pending_approval': [],
+          'friend_requests': [],
+          'photoUrl': 'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
+          'notifications': {
+            'enabled': true,
+            'friend_requests': true,
+            'shifushot_requests': true,
+          }
+        });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Compte créé avec succès ! Un email de vérification a été envoyé.")),
@@ -160,6 +170,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           'friends': [],
           'pending_approval': [],
           'friend_requests': [],
+          'notifications': {
+            'enabled': true,
+            'friend_requests': true,
+            'shifushot_requests': true,
+          }
         });
 
         ScaffoldMessenger.of(context).showSnackBar(

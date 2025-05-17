@@ -111,6 +111,11 @@ class _ConnexionPageState extends State<ConnexionPage> {
           'friends': [],
           'pending_approval': [],
           'friend_requests': [],
+          'notifications': {
+            'enabled': true,
+            'friend_requests': true,
+            'shifushot_requests': true,
+          }
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
