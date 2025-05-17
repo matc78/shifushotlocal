@@ -32,10 +32,16 @@ class SoundCategorySelectionPage extends StatelessWidget {
           final category = categories.keys.elementAt(index);
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: theme.secondary,
+            color: Colors.white,
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
-              leading: Icon(Icons.music_note, color: theme.textSecondary),
+              leading: Image.network(
+                'https://img.icons8.com/?size=100&id=FaFhLHDGUZAA&format=png&color=000000',
+                width: 32,
+                height: 32,
+                color: theme.textSecondary, // facultatif si tu veux le teinter
+                errorBuilder: (context, error, stackTrace) => Icon(Icons.error, color: theme.textSecondary),
+              ),
               title: Text(category, style: theme.titleMedium),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {

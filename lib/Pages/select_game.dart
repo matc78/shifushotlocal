@@ -78,7 +78,7 @@ class SelectGamePage extends StatelessWidget {
       {
         'name': 'Sonothèque',
         'description': 'banque de sons',
-        'image': 'https://img.icons8.com/?size=100&id=LkjR8vZ077vb&format=png&color=000000',
+        'image': 'https://img.icons8.com/?size=100&id=41562&format=png&color=000000',
         'route': '/select_sound',
       }
     ];
