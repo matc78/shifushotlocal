@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shifushotlocal/Pages/features/pyramid_card.dart';
 import 'package:shifushotlocal/Pages/features/sound_category_selection_page.dart';
+import 'package:shifushotlocal/Pages/features/twelve_bars_page.dart';
 import 'package:shifushotlocal/Pages/local_games/clicker/clicker_game.dart';
 import 'package:shifushotlocal/Pages/friends/add_friends_page.dart';
 import 'package:shifushotlocal/Pages/features/card_drawer.dart';
@@ -179,6 +180,7 @@ class MainApp extends StatelessWidget {
         '/pyramid_card': (_) => const PyramidCardPage(),
         '/shifushot_request': (context) => const ShifushotRequestPage(),
         '/select_sound': (context) => SoundCategorySelectionPage(),
+        '/twelve_bars': (context) => const TwelveBarsPage(),
       },
     );
   }

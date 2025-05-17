@@ -80,6 +80,12 @@ class SelectGamePage extends StatelessWidget {
         'description': 'banque de sons',
         'image': 'https://img.icons8.com/?size=100&id=41562&format=png&color=000000',
         'route': '/select_sound',
+      },
+      {
+        'name': 'Les 12 bars',
+        'description': 'Prêt à relever le défi ?',
+        'image': 'https://img.icons8.com/?size=100&id=97404&format=png&color=000000',
+        'route': '/twelve_bars',
       }
     ];
 
