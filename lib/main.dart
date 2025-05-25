@@ -15,6 +15,7 @@ import 'package:shifushotlocal/Pages/connexion/create_account_page.dart';
 import 'package:shifushotlocal/Pages/connexion/debut_page.dart';
 import 'package:shifushotlocal/Pages/connexion/connexion_page.dart';
 import 'package:shifushotlocal/Pages/local_games/bizkit/dice_game_page.dart';
+import 'package:shifushotlocal/Pages/local_games/reflex/reflex_game.dart';
 import 'package:shifushotlocal/Pages/online_games/lobby_screen_online.dart';
 import 'package:shifushotlocal/Pages/online_games/lobby_waiting_screen.dart';
 import 'package:shifushotlocal/Pages/online_games/debate_game.dart';
@@ -175,6 +176,7 @@ class MainApp extends StatelessWidget {
         '/shifushot_request': (context) => const ShifushotRequestPage(),
         '/select_sound': (context) => SoundCategorySelectionPage(),
         '/twelve_bars': (context) => const TwelveBarsPage(),
+        '/reflex_game': (context) => const ReflexGamePage(),
       },
     );
   }

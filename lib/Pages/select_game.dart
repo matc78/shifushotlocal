@@ -39,6 +39,12 @@ class SelectGamePage extends StatelessWidget {
         'image': 'https://img.icons8.com/?size=100&id=34&format=png&color=000000',
         'route': '/Pages/lobby_screen',
       },
+      {
+        'name': 'Test de réflexes',
+        'description': 'Un jeu pour tester vos réflexes.',
+        'image': 'https://img.icons8.com/?size=100&id=61096&format=png&color=000000',
+        'route': '/reflex_game',
+      },
     ];
 
     final List<Map<String, String>> jeuxEnLigne = [
