@@ -53,12 +53,9 @@ class HomePage extends StatelessWidget {
                   ),
                   const Spacer(),
                   ElevatedButton(
-                    onPressed: () {
-                      // Naviguer vers la page Créer une soirée
-                      Navigator.pushNamed(context, '/party_screen');
-                    },
+                    onPressed: null, // Désactivé
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primary,
+                      backgroundColor: const Color.fromARGB(255, 0, 0, 0), // Bouton grisé
                       padding: const EdgeInsets.symmetric(vertical: 18.0),
                       minimumSize: const Size(300, 60),
                       shape: RoundedRectangleBorder(
@@ -66,9 +63,9 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Lancer une soirée',
+                      'Soon !',
                       style: theme.titleMedium.copyWith(
-                        color: Colors.white,
+                        color: theme.secondary, // Texte rouge
                         fontSize: 24.0,
                       ),
                     ),
