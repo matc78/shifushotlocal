@@ -97,6 +97,13 @@ class SelectGamePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: theme.textPrimary,
+          onPressed: () {
+            Navigator.pushNamedAndRemoveUntil(context, '/homepage', (route) => false);
+          },
+        ),
         title: Text('Sélectionnez un jeu', style: theme.titleMedium),
         backgroundColor: theme.background,
         elevation: 0,
