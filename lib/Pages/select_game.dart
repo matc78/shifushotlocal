@@ -19,7 +19,7 @@ class SelectGamePage extends StatelessWidget {
         'name': 'Clicker',
         'description': 'Une compétition de clique.',
         'image': 'https://img.icons8.com/?size=100&id=gjsnNuxwktgL&format=png&color=000000',
-        'route': '/Pages/lobby_screen',
+        'route': '/clicker_game',
       },
       {
         'name': 'Bizkit !',

@@ -126,13 +126,7 @@ class MainApp extends StatelessWidget {
         '/killer': (_) => const KillerPage(),
         '/killerActions': (context) => KillerActionsPage(players: ModalRoute.of(context)!.settings.arguments as List<String>),
         '/killerSummary': (context) => KillerSummaryPage(playerData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
-        '/clicker_game': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return ClickerGame(
-            players: List<String>.from(args['players']),
-            remainingGames: List<String>.from(args['remainingGames']),
-          );
-        },
+        '/clicker_game': (_) => const ClickerGame(),
         '/dice_game': (context) {
           final args = ModalRoute.of(context)!.settings.arguments;
           if (args is String) {

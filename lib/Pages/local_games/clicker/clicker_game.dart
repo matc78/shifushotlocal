@@ -5,20 +5,16 @@ import 'dart:async';
 import 'package:shifushotlocal/theme/app_theme.dart';
 
 class ClickerGame extends StatefulWidget {
-  final List<String> players;
-  final List<String> remainingGames;
-
-  const ClickerGame({super.key, required this.players, required this.remainingGames});
+  const ClickerGame({super.key});
 
   @override
   _ClickerGameState createState() => _ClickerGameState();
 }
 
 class _ClickerGameState extends State<ClickerGame> {
-  int currentPlayerIndex = 0;
-  List<int> scores = [];
+  String playerName = "Moi";
+  int score = 0;
   bool isGameActive = false;
-  bool showNextButton = false;
   bool showStartButton = true;
   Timer? timer;
   int timeLeft = 10;
@@ -27,8 +23,7 @@ class _ClickerGameState extends State<ClickerGame> {
   @override
   void initState() {
     super.initState();
-    scores = List.filled(widget.players.length, 0);
-    fetchHighScore();
+    fetchUserData();
   }
 
   @override
@@ -37,13 +32,24 @@ class _ClickerGameState extends State<ClickerGame> {
     super.dispose();
   }
 
-  void startGame() {
-    setState(() {
-      isGameActive = false;
-      showNextButton = false;
-      showStartButton = true;
-      timeLeft = 10;
-    });
+  Future<void> fetchUserData() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
+      try {
+        final doc = await docRef.get();
+        final data = doc.data() ?? {};
+        final highScores = Map<String, dynamic>.from(data['high_scores'] ?? {});
+        final userName = data['name'] ?? "Moi";
+        
+        setState(() {
+          playerName = userName;
+          highScore = (highScores['clicker_game'] ?? 0) as int;
+        });
+      } catch (e) {
+        print("❌ Erreur récupération des données : $e");
+      }
+    }
   }
 
   void startTimer() {
@@ -55,32 +61,15 @@ class _ClickerGameState extends State<ClickerGame> {
 
       if (timeLeft <= 0) {
         timer.cancel();
-        endTurn();
+        endGame();
       }
     });
-  }
-
-  Future<void> fetchHighScore() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
-      try {
-        final doc = await docRef.get();
-        final data = doc.data() ?? {};
-        final highScores = Map<String, dynamic>.from(data['high_scores'] ?? {});
-        setState(() {
-          highScore = (highScores['clicker_game'] ?? 0) as int;
-        });
-      } catch (e) {
-        print("❌ Erreur récupération du high score : $e");
-      }
-    }
   }
 
   void incrementScore() {
     if (!isGameActive) return;
     setState(() {
-      scores[currentPlayerIndex]++;
+      score++;
     });
   }
 
@@ -88,43 +77,23 @@ class _ClickerGameState extends State<ClickerGame> {
     setState(() {
       isGameActive = true;
       showStartButton = false;
+      score = 0;
+      timeLeft = 10;
     });
     startTimer();
   }
 
-  void endTurn() {
+  void endGame() {
     setState(() {
       isGameActive = false;
-      showNextButton = true;
     });
-
-    if (currentPlayerIndex < widget.players.length - 1) {
-      currentPlayerIndex++;
-      timeLeft = 10;
-    } else {
-      showGameOverDialog();
-    }
-  }
-
-  void navigateToNextGame() {
-    if (widget.remainingGames.isNotEmpty) {
-      Navigator.pushNamed(
-        context,
-        widget.remainingGames.first,
-        arguments: {
-          'players': widget.players,
-          'remainingGames': widget.remainingGames.sublist(1),
-        },
-      );
-    } else {
-      Navigator.pushNamed(context, '/homepage');
-    }
+    showGameOverDialog();
   }
 
   void showGameOverDialog() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
-    final int currentScore = scores[0];
 
+    // Mise à jour du high score si nécessaire
     if (uid != null) {
       final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
       try {
@@ -133,92 +102,126 @@ class _ClickerGameState extends State<ClickerGame> {
         final highScores = Map<String, dynamic>.from(data['high_scores'] ?? {});
         final int existingScore = (highScores['clicker_game'] ?? 0) as int;
 
-        if (currentScore > existingScore) {
-          highScores['clicker_game'] = currentScore;
+        if (score > existingScore) {
+          highScores['clicker_game'] = score;
           await docRef.update({'high_scores': highScores});
-          print("🎉 Nouveau record personnel : $currentScore");
+          setState(() {
+            highScore = score;
+          });
+          print("🎉 Nouveau record personnel : $score");
         } else {
-          print("ℹ️ Score actuel : $currentScore (record : $existingScore)");
+          print("ℹ️ Score actuel : $score (record : $existingScore)");
         }
       } catch (e) {
         print("❌ Erreur mise à jour du high score : $e");
       }
     }
 
-    String winner = widget.players[scores.indexOf(scores.reduce((a, b) => a > b ? a : b))];
-
     await Future.delayed(const Duration(seconds: 1));
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text("Game Over!"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Final Scores:",
-              style: TextStyle(
-                fontSize: 20, 
-                color: AppTheme.of(context).textPrimary,
-              ),
+      builder: (context) {
+        final theme = AppTheme.of(context); // Place ici dans le builder
+        return AlertDialog(
+          title: const Text(
+            "Game Over!",
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 28,
             ),
-            const SizedBox(height: 10),
-            for (int i = 0; i < widget.players.length; i++)
+            textAlign: TextAlign.center,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               Text(
-                "${widget.players[i]}: ${scores[i]}",
+                "Score final :",
                 style: TextStyle(
-                  fontSize: 20, 
-                  color: AppTheme.of(context).textPrimary,
+                  fontSize: 20,
+                  color: theme.textPrimary,
                 ),
               ),
-            const SizedBox(height: 20),
-            Text(
-              "Gagnant : $winner!",
-              style: TextStyle(
-                fontSize: 24, 
-                fontWeight: FontWeight.bold,
-                color: AppTheme.of(context).textPrimary,
+              const SizedBox(height: 10),
+              Text(
+                "$score",
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: theme.primary,
+                ),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ClickerGame(
-                    players: widget.players,
-                    remainingGames: widget.remainingGames,
+              const SizedBox(height: 10),
+              Text(
+                "Record personnel : $highScore",
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (score == highScore && score > 0)
+                const Text(
+                  "🎉 Nouveau record personnel !",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 20, 233, 27),
                   ),
                 ),
-              );
-            },
-            child: const Text("Rejouer avec les mêmes joueurs"),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.pushReplacementNamed(context, '/Pages/lobby_screen');
-            },
-            child: const Text("Changer les joueurs"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.pushReplacementNamed(context, '/homepage');
-            },
-            child: const Text("Retour à l'accueil"),
-          ),
-        ],
-      ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            Column(
+              children: [
+                SizedBox(
+                  width: 180,
+                  height: 60,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ClickerGame()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primary, // 🎨 couleur du thème
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    ),
+                    child: const Text("Rejouer"),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: 180,
+                  height: 60,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.pushReplacementNamed(context, '/homepage');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.secondary, // 🎨 couleur secondaire du thème
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    ),
+                    child: const Text("Accueil"),
+                  ),
+                ),
+              ],
+            )
+          ],
+        );
+      },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -244,7 +247,7 @@ class _ClickerGameState extends State<ClickerGame> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    widget.players[currentPlayerIndex],
+                    playerName,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -271,7 +274,7 @@ class _ClickerGameState extends State<ClickerGame> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    "Score: ${scores[currentPlayerIndex]}",
+                    "Score: $score",
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -294,12 +297,12 @@ class _ClickerGameState extends State<ClickerGame> {
                         style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                     ),
-                  if (!showStartButton && !showNextButton)
+                  if (!showStartButton)
                     ElevatedButton(
                       onPressed: incrementScore,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primary,
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 150),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -313,26 +316,6 @@ class _ClickerGameState extends State<ClickerGame> {
               ),
             ),
           ),
-          if (showNextButton && currentPlayerIndex < widget.players.length - 1)
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    showNextButton = false;
-                    startGame();
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.secondary,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                ),
-                child: const Text(
-                  "Prochain Joueur",
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
-              ),
-            ),
         ],
       ),
     );
