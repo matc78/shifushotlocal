@@ -14,7 +14,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.lazyking.shifushot"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = "23.1.7779620" 
 
     compileOptions {
