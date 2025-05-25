@@ -10,6 +10,9 @@ import 'package:shifushotlocal/Pages/features/twelve_bars_page.dart';
 import 'package:shifushotlocal/Pages/local_games/clicker/clicker_game.dart';
 import 'package:shifushotlocal/Pages/friends/add_friends_page.dart';
 import 'package:shifushotlocal/Pages/features/card_drawer.dart';
+import 'package:shifushotlocal/Pages/local_games/follow_line/follow_line_precision_easy_game.dart';
+import 'package:shifushotlocal/Pages/local_games/follow_line/follow_line_selection.dart';
+import 'package:shifushotlocal/Pages/local_games/follow_line/follow_line_speed_easy_game.dart';
 import 'package:shifushotlocal/Pages/local_games/horloge/clock_game_page.dart';
 import 'package:shifushotlocal/Pages/connexion/create_account_page.dart';
 import 'package:shifushotlocal/Pages/connexion/debut_page.dart';
@@ -177,6 +180,9 @@ class MainApp extends StatelessWidget {
         '/select_sound': (context) => SoundCategorySelectionPage(),
         '/twelve_bars': (context) => const TwelveBarsPage(),
         '/reflex_game': (context) => const ReflexGamePage(),
+        '/follow_line': (context) => const FollowLineModeSelector(),
+        '/follow_line_speed_easy': (context) => const FollowLineSpeedEasy(),
+        '/follow_line_precision_easy': (context) => const FollowLinePrecisionEasy(),
       },
     );
   }

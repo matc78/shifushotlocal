@@ -45,6 +45,12 @@ class SelectGamePage extends StatelessWidget {
         'image': 'https://img.icons8.com/?size=100&id=61096&format=png&color=000000',
         'route': '/reflex_game',
       },
+      {
+        'name': 'Suit la ligne',
+        'description': 'Un jeu de rapidité et de concentration.',
+        'image': 'https://img.icons8.com/?size=100&id=87064&format=png&color=000000',
+        'route': '/follow_line',
+      },
     ];
 
     final List<Map<String, String>> jeuxEnLigne = [
