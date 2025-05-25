@@ -10,6 +10,7 @@ dependencies:
   audioplayers: ^6.4.0
   cloud_firestore: ^5.6.2
   cloud_functions: ^5.3.4
+  confetti: ^0.8.0
   dice_icons: ^0.1.7
   firebase_admin: ^0.3.0+1
   firebase_auth: ^5.4.1
