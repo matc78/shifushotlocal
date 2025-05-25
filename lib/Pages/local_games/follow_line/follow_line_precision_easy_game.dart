@@ -85,7 +85,7 @@ class _FollowLinePrecisionEasyState extends State<FollowLinePrecisionEasy> {
     for (final metric in pathMetrics) {
       for (double i = 0; i < metric.length; i += 5) {
         final pos = metric.getTangentForOffset(i)!.position;
-        if ((point - pos).distance <= 30) return true;
+        if ((point - pos).distance <= 23) return true;
       }
     }
     return false;
