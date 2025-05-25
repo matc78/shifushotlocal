@@ -67,6 +67,21 @@ flutter:
     - assets/audios/pet/pet3.mp3
     - assets/audios/pet/pet4.mp3
     - assets/audios/pet/petponey1.mp3
+    - assets/audios/pet_crosnier/PetCrosnier1.mp3
+    - assets/audios/pet_crosnier/PetCrosnier2.mp3
+    - assets/audios/pet_crosnier/PetCrosnier3.mp3
+    - assets/audios/pet_crosnier/PetCrosnier4.mp3
+    - assets/audios/pet_crosnier/PetCrosnier5.mp3
+    - assets/audios/pet_crosnier/PetCrosnier6.mp3
+    - assets/audios/pet_crosnier/PetCrosnier7.mp3
+    - assets/audios/pet_crosnier/PetCrosnier8.mp3
+    - assets/audios/pet_crosnier/PetCrosnier9.mp3
+    - assets/audios/pet_crosnier/PetCrosnier10.mp3
+    - assets/audios/pet_crosnier/PetCrosnier11.mp3
+    - assets/audios/pet_crosnier/PetCrosnier12.mp3
+    - assets/audios/pet_crosnier/PetCrosnier13.mp3
+    - assets/audios/pet_crosnier/PetCrosnier14.mp3
+    - assets/audios/pet_crosnier/PetCrosnier15.mp3
 
 flutter_launcher_icons:
   android: true
