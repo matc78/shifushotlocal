@@ -69,336 +69,347 @@ class _DiceGamePageState extends State<DiceGamePage> {
   }
 
   void _showTemporaryRules() {
-  final theme = AppTheme.of(context);
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Règles temporaires', style: theme.titleMedium),
-      backgroundColor: theme.background,
-      content: temporaryRules.isEmpty
-          ? Center(
-              child: Text(
-                'Aucune règle temporaire ajoutée.',
-                style: theme.bodyMedium,
+    final theme = AppTheme.of(context);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Règles temporaires', style: theme.titleMedium),
+        backgroundColor: theme.background,
+        content: temporaryRules.isEmpty
+            ? Center(
+                child: Text(
+                  'Aucune règle temporaire ajoutée.',
+                  style: theme.bodyMedium,
+                ),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: temporaryRules.map((entry) {
+                  final combination = entry.keys.first.split('_');
+                  final ruleDescription = entry.values.first;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      '• combinaison ${combination[0]} et ${combination[1]} : $ruleDescription',
+                      textAlign: TextAlign.center,
+                      style: theme.bodyLarge,
+                    ),
+                  );
+                }).toList(),
               ),
-            )
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: temporaryRules.map((entry) {
-                final combination = entry.keys.first.split('_');
-                final ruleDescription = entry.values.first;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Text(
-                    '• combinaison ${combination[0]} et ${combination[1]} : $ruleDescription',
-                    textAlign: TextAlign.center,
-                    style: theme.bodyLarge,
-                  ),
-                );
-              }).toList(),
-            ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Fermer', style: theme.bodyMedium),
-        ),
-      ],
-    ),
-  );
-}
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Fermer', style: theme.bodyMedium),
+          ),
+        ],
+      ),
+    );
+  }
 
-Future<void> _handleInventRule() async {
-  final theme = AppTheme.of(context);
-  return await showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => AlertDialog(
-      title: Text('Inventer une règle', style: theme.titleMedium),
-      backgroundColor: theme.background,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _addRuleForSpecificNumber();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.primary,
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            ),
-            child: Text(
-              'Règle temporaire pour un résultat spécifique',
-              textAlign: TextAlign.center,
-              style: theme.buttonText,
-            ),
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _addGeneralRule();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.primary,
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            ),
-            child: Text(
-              'Règle temporaire générale',
-              textAlign: TextAlign.center,
-              style: theme.buttonText,
-            ),
-          ),
-          const SizedBox(height: 10),
-          if (temporaryRules.isNotEmpty)
+  Future<void> _handleInventRule() async {
+    final theme = AppTheme.of(context);
+    return await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Inventer une règle', style: theme.titleMedium),
+        backgroundColor: theme.background,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _removeTemporaryRule();
+                _addRuleForSpecificNumber();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.secondary,
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                backgroundColor: theme.primary,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               ),
               child: Text(
-                'Supprimer une règle ajoutée',
+                'Règle temporaire pour un résultat spécifique',
                 textAlign: TextAlign.center,
                 style: theme.buttonText,
               ),
             ),
-        ],
-      ),
-    ),
-  );
-}
-
-void _removeTemporaryRule() {
-  final theme = AppTheme.of(context);
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Supprimer une règle temporaire', style: theme.titleMedium),
-      backgroundColor: theme.background,
-      content: temporaryRules.isEmpty
-          ? Center(
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _addGeneralRule();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primary,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              ),
               child: Text(
-                'Aucune règle temporaire à supprimer.',
-                style: theme.bodyMedium,
-              ),
-            )
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: temporaryRules.map((entry) {
-                final key = entry.keys.first;
-                final combination = key.split('_');
-                final ruleDescription = entry.values.first;
-                return ListTile(
-                  title: Text(
-                    '• combinaison ${combination[0]} et ${combination[1]} : $ruleDescription',
-                    textAlign: TextAlign.center,
-                    style: theme.bodyLarge,
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      setState(() {
-                        temporaryRules.remove(entry);
-                        rules[key] = rules[key]!.replaceAll('\n$ruleDescription', '');
-                      });
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Fermer', style: theme.bodyMedium),
-        ),
-      ],
-    ),
-  );
-}
-
-void _addRuleForSpecificNumber() {
-  final theme = AppTheme.of(context);
-  int? selectedDie1;
-  int? selectedDie2;
-  final TextEditingController ruleController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Ajouter une règle pour un nombre spécifique', style: theme.titleMedium),
-      backgroundColor: theme.background,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Choisissez une combinaison de dés\n(par ex. 1 et 6, '
-            'Cela s\'appliquera également pour 6 et 1.)',
-            style: theme.bodyMedium.copyWith(fontStyle: FontStyle.italic),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<int>(
-            value: selectedDie1,
-            items: List.generate(
-              6,
-              (index) => DropdownMenuItem(
-                value: index + 1,
-                child: Text('${index + 1}', style: theme.bodyMedium),
+                'Règle temporaire générale',
+                textAlign: TextAlign.center,
+                style: theme.buttonText,
               ),
             ),
-            onChanged: (value) {
-              setState(() {
-                selectedDie1 = value;
-              });
-            },
-            decoration: InputDecoration(
-              labelText: 'Premier dé',
-              labelStyle: theme.bodyMedium,
-            ),
-          ),
-          const SizedBox(height: 10),
-          DropdownButtonFormField<int>(
-            value: selectedDie2,
-            items: List.generate(
-              6,
-              (index) => DropdownMenuItem(
-                value: index + 1,
-                child: Text('${index + 1}', style: theme.bodyMedium),
+            const SizedBox(height: 10),
+            if (temporaryRules.isNotEmpty)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _removeTemporaryRule();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.secondary,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                ),
+                child: Text(
+                  'Supprimer une règle ajoutée',
+                  textAlign: TextAlign.center,
+                  style: theme.buttonText,
+                ),
               ),
-            ),
-            onChanged: (value) {
-              setState(() {
-                selectedDie2 = value;
-              });
-            },
-            decoration: InputDecoration(
-              labelText: 'Deuxième dé',
-              labelStyle: theme.bodyMedium,
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: ruleController,
-            decoration: InputDecoration(
-              labelText: 'Description de la règle',
-              labelStyle: theme.bodyMedium,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            if (selectedDie1 != null &&
-                selectedDie2 != null &&
-                ruleController.text.trim().isNotEmpty) {
-              final String key = selectedDie1! <= selectedDie2!
-                  ? '${selectedDie1!}_${selectedDie2!}'
-                  : '${selectedDie2!}_${selectedDie1!}';
-              _addTemporaryRule(key, '\n${ruleController.text.trim()}');
-              Navigator.of(context).pop();
-            }
-          },
-          child: Text('Ajouter', style: theme.bodyMedium),
-        ),
-      ],
-    ),
-  );
-}
-
-void _addGeneralRule() {
-  final theme = AppTheme.of(context);
-  final TextEditingController ruleController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Ajouter une règle temporaire générale', style: theme.titleMedium),
-      backgroundColor: theme.background,
-      content: TextField(
-        controller: ruleController,
-        decoration: InputDecoration(
-          labelText: 'Description de la règle',
-          labelStyle: theme.bodyMedium,
+          ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            if (ruleController.text.trim().isNotEmpty) {
-              temporaryRules.add({'Générale': '\n${ruleController.text.trim()}'});
-              Navigator.of(context).pop();
-            }
-          },
-          child: Text('Ajouter', style: theme.bodyMedium),
-        ),
-      ],
-    ),
-  );
-}
-
-  void rollDice() {
-  setState(() {
-    isRolling = true;
-  });
-
-  int animationSteps = 15; // Nombre de frames pour l'animation (1.5 secondes à raison de ~10 changements par seconde)
-
-  void animateDice(int step) {
-    if (step < animationSteps) {
-      setState(() {
-        // Affichage aléatoire pendant l'animation
-        dice1 = Random().nextInt(6) + 1; // Générer un chiffre aléatoire entre 1 et 6
-        dice2 = Random().nextInt(6) + 1;
-      });
-
-      // Continuer l'animation avec un intervalle de 100 ms
-      Timer(const Duration(milliseconds: 100), () => animateDice(step + 1));
-    } else {
-      // Animation terminée, afficher les vraies valeurs
-      setState(() {
-        dice1 = Random().nextInt(6) + 1; // Générer le résultat final pour le premier dé
-        dice2 = Random().nextInt(6) + 1; // Générer le résultat final pour le deuxième dé
-
-        final String key = dice1 <= dice2 ? '${dice1}_$dice2' : '${dice2}_$dice1';
-
-        if (rules.containsKey(key)) {
-          if (rules[key]!.contains('Inventer une règle')) {
-            _handleInventRule();
-          }
-          resultMessage = rules[key]!;
-        } else {
-          resultMessage = 'Aucune règle trouvée';
-        }
-
-        isRolling = false;
-      });
-    }
+    );
   }
 
-  // Lancer l'animation
-  animateDice(0);
-}
+  void _removeTemporaryRule() {
+    final theme = AppTheme.of(context);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Supprimer une règle temporaire', style: theme.titleMedium),
+        backgroundColor: theme.background,
+        content: temporaryRules.isEmpty
+            ? Center(
+                child: Text(
+                  'Aucune règle temporaire à supprimer.',
+                  style: theme.bodyMedium,
+                ),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: temporaryRules.map((entry) {
+                  final key = entry.keys.first;
+                  final combination = key.split('_');
+                  final ruleDescription = entry.values.first;
+                  return ListTile(
+                    title: Text(
+                      '• combinaison ${combination[0]} et ${combination[1]} : $ruleDescription',
+                      textAlign: TextAlign.center,
+                      style: theme.bodyLarge,
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        setState(() {
+                          temporaryRules.remove(entry);
+                          rules[key] =
+                              rules[key]!.replaceAll('\n$ruleDescription', '');
+                        });
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Fermer', style: theme.bodyMedium),
+          ),
+        ],
+      ),
+    );
+  }
 
+  void _addRuleForSpecificNumber() {
+    final theme = AppTheme.of(context);
+    int? selectedDie1;
+    int? selectedDie2;
+    final TextEditingController ruleController = TextEditingController();
 
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Ajouter une règle pour un nombre spécifique',
+            style: theme.titleMedium),
+        backgroundColor: theme.background,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Choisissez une combinaison de dés\n(par ex. 1 et 6, '
+              'Cela s\'appliquera également pour 6 et 1.)',
+              style: theme.bodyMedium.copyWith(fontStyle: FontStyle.italic),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<int>(
+              initialValue: selectedDie1,
+              items: List.generate(
+                6,
+                (index) => DropdownMenuItem(
+                  value: index + 1,
+                  child: Text('${index + 1}', style: theme.bodyMedium),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  selectedDie1 = value;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Premier dé',
+                labelStyle: theme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: 10),
+            DropdownButtonFormField<int>(
+              initialValue: selectedDie2,
+              items: List.generate(
+                6,
+                (index) => DropdownMenuItem(
+                  value: index + 1,
+                  child: Text('${index + 1}', style: theme.bodyMedium),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  selectedDie2 = value;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Deuxième dé',
+                labelStyle: theme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: ruleController,
+              decoration: InputDecoration(
+                labelText: 'Description de la règle',
+                labelStyle: theme.bodyMedium,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (selectedDie1 != null &&
+                  selectedDie2 != null &&
+                  ruleController.text.trim().isNotEmpty) {
+                final String key = selectedDie1! <= selectedDie2!
+                    ? '${selectedDie1!}_${selectedDie2!}'
+                    : '${selectedDie2!}_${selectedDie1!}';
+                _addTemporaryRule(key, '\n${ruleController.text.trim()}');
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text('Ajouter', style: theme.bodyMedium),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addGeneralRule() {
+    final theme = AppTheme.of(context);
+    final TextEditingController ruleController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Ajouter une règle temporaire générale',
+            style: theme.titleMedium),
+        backgroundColor: theme.background,
+        content: TextField(
+          controller: ruleController,
+          decoration: InputDecoration(
+            labelText: 'Description de la règle',
+            labelStyle: theme.bodyMedium,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (ruleController.text.trim().isNotEmpty) {
+                temporaryRules
+                    .add({'Générale': '\n${ruleController.text.trim()}'});
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text('Ajouter', style: theme.bodyMedium),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void rollDice() {
+    setState(() {
+      isRolling = true;
+    });
+
+    int animationSteps =
+        15; // Nombre de frames pour l'animation (1.5 secondes à raison de ~10 changements par seconde)
+
+    void animateDice(int step) {
+      if (step < animationSteps) {
+        setState(() {
+          // Affichage aléatoire pendant l'animation
+          dice1 = Random().nextInt(6) +
+              1; // Générer un chiffre aléatoire entre 1 et 6
+          dice2 = Random().nextInt(6) + 1;
+        });
+
+        // Continuer l'animation avec un intervalle de 100 ms
+        Timer(const Duration(milliseconds: 100), () => animateDice(step + 1));
+      } else {
+        // Animation terminée, afficher les vraies valeurs
+        setState(() {
+          dice1 = Random().nextInt(6) +
+              1; // Générer le résultat final pour le premier dé
+          dice2 = Random().nextInt(6) +
+              1; // Générer le résultat final pour le deuxième dé
+
+          final String key =
+              dice1 <= dice2 ? '${dice1}_$dice2' : '${dice2}_$dice1';
+
+          if (rules.containsKey(key)) {
+            if (rules[key]!.contains('Inventer une règle')) {
+              _handleInventRule();
+            }
+            resultMessage = rules[key]!;
+          } else {
+            resultMessage = 'Aucune règle trouvée';
+          }
+
+          isRolling = false;
+        });
+      }
+    }
+
+    // Lancer l'animation
+    animateDice(0);
+  }
 
   void _showRulesExplanation() {
     final theme = AppTheme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Explications des règles de base', style: theme.titleMedium),
+        title:
+            Text('Explications des règles de base', style: theme.titleMedium),
         backgroundColor: theme.background,
         content: SingleChildScrollView(
           child: Column(
@@ -408,42 +419,61 @@ void _addGeneralRule() {
                 TextSpan(
                   style: theme.bodyMedium,
                   children: const [
-                    TextSpan(text: 'Double 1 :', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: 'Double 1 :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(text: ' Donner un FU\n\n'),
-                    TextSpan(text: 'Tous les doubles :', style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: ' Donner le nombre de SHI correspondant\n\n'),
-                    TextSpan(text: '11 et 12 :', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: 'Tous les doubles :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: ' Donner le nombre de SHI correspondant\n\n'),
+                    TextSpan(
+                        text: '11 et 12 :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(text: ' Inventer une règle\n\n'),
-                    TextSpan(text: 'Si un 4 dans la combinaison :', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: 'Si un 4 dans la combinaison :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
                           ' Le premier joueur ayant lancé un 4 devient prisonnier et doit boire une SHI à chaque fois qu’un 4 est lancé par un autre joueur.\n'
                           'Il ne peut y avoir qu’un seul prisonnier et pour sortir, il faut qu’il fasse un autre 4.\n\n',
                     ),
-                    TextSpan(text: 'Double 4 :', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: 'Double 4 :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
                           ' Si quelqu’un est en prison alors il boit double. Si personne, alors il entre et ressort de prison donc personne en prison.\n\n',
                     ),
-                    TextSpan(text: '8 :', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: '8 :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
                           ' Le lanceur peut inventer un thème. Chaque joueur doit dire un mot en rapport avec le thème tour à tour sans se répéter. '
                           'Ou il peut inventer un mini-jeu et décider de ses règles.\n\n',
                     ),
-                    TextSpan(text: '9 :', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: '9 :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
                           ' Le jeu du doigt. Chaque joueur doit mettre son doigt sur une bouteille, et chacun son tour, ils diront : 1, 2, 3... un chiffre qu’ils pensent être '
                           'le nombre de doigts restant sur la bouteille.\n'
                           'Si un joueur devine le bon nombre, il peut enlever son doigt. Cela continue jusqu’au dernier joueur restant qui devra prendre un FU.\n\n',
                     ),
-                    TextSpan(text: '7 :', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: '7 :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
                           ' Le dernier qui dira "Bizkit !" avec le pouce sur le front devra prendre 5 SHI.\n\n',
                     ),
-                    TextSpan(text: '5 :', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: '5 :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
                           ' Jeu du clap. On commence par le lanceur des dés et dans le sens des aiguilles d’une montre.\n'
@@ -453,7 +483,9 @@ void _addGeneralRule() {
                           '3 claps pour passer le prochain joueur en gardant le sens.\n'
                           '3 SHI pour celui qui se trompe.\n\n',
                     ),
-                    TextSpan(text: '6 :', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                        text: '6 :',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text:
                           ' Donner un surnom à un joueur. Tout le monde devra l’appeler par ce surnom sinon celui qui se trompe prend 1 SHI.\n'
@@ -463,7 +495,6 @@ void _addGeneralRule() {
                 ),
               ),
             ],
-
           ),
         ),
         actions: [
@@ -477,59 +508,6 @@ void _addGeneralRule() {
       ),
     );
   }
-
-  void _endGame() {
-  if (widget.remainingGames.isNotEmpty && widget.remainingGames.first != '/homepage') {
-    // Jeux restants : passer au jeu suivant automatiquement
-    Navigator.pushNamed(
-      context,
-      widget.remainingGames.first,
-      arguments: {
-        'players': widget.players,
-        'remainingGames': widget.remainingGames.sublist(1),
-      },
-    );
-  } else {
-    // Plus de jeux (ou uniquement /homepage) : afficher un bouton pour terminer
-    showDialog(
-      context: context,
-      builder: (context) {
-        final theme = AppTheme.of(context);
-        return AlertDialog(
-          backgroundColor: theme.background,
-          title: Text(
-            "Fin de la partie",
-            style: theme.titleMedium,
-          ),
-          content: Text(
-            "Voulez-vous terminer le jeu et revenir à l'accueil ?",
-            style: theme.bodyMedium,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-              child: Text(
-                "Terminer",
-                style: theme.buttonText.copyWith(color: theme.primary),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Fermer la boîte de dialogue
-              },
-              child: Text(
-                "Annuler",
-                style: theme.buttonText.copyWith(color: theme.secondary),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -564,7 +542,9 @@ void _addGeneralRule() {
                   children: [
                     Center(
                       child: Icon(
-                        isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice1),
+                        isRolling
+                            ? _getDiceIcon(Random().nextInt(6) + 1)
+                            : _getDiceIcon(dice1),
                         size: 200,
                         color: theme.primary,
                       ),
@@ -572,7 +552,9 @@ void _addGeneralRule() {
                     const SizedBox(height: 10),
                     Center(
                       child: Icon(
-                        isRolling ? _getDiceIcon(Random().nextInt(6) + 1) : _getDiceIcon(dice2),
+                        isRolling
+                            ? _getDiceIcon(Random().nextInt(6) + 1)
+                            : _getDiceIcon(dice2),
                         size: 200,
                         color: theme.primary,
                       ),
@@ -585,7 +567,8 @@ void _addGeneralRule() {
                 onPressed: isRolling ? null : rollDice,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.buttonColor,
-                  padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -607,7 +590,8 @@ void _addGeneralRule() {
                 onPressed: _showTemporaryRules,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -619,7 +603,8 @@ void _addGeneralRule() {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: widget.remainingGames.isEmpty || widget.remainingGames.first == '/homepage'
+                onPressed: widget.remainingGames.isEmpty ||
+                        widget.remainingGames.first == '/homepage'
                     ? () {
                         // Retour à l'accueil
                         Navigator.popUntil(context, (route) => route.isFirst);
@@ -637,13 +622,15 @@ void _addGeneralRule() {
                       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.secondary,
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: Text(
-                  widget.remainingGames.isEmpty || widget.remainingGames.first == '/homepage'
+                  widget.remainingGames.isEmpty ||
+                          widget.remainingGames.first == '/homepage'
                       ? 'Retour à l\'accueil'
                       : 'Passer au jeu suivant',
                   style: theme.buttonText.copyWith(fontSize: 16),
@@ -655,6 +642,7 @@ void _addGeneralRule() {
       ),
     );
   }
+
   IconData _getDiceIcon(int diceValue) {
     switch (diceValue) {
       case 1:
