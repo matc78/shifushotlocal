@@ -15,11 +15,12 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.lazyking.shifushot"
     compileSdk = 35
-    ndkVersion = "23.1.7779620" 
+    ndkVersion = "26.1.10909125"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -28,7 +29,7 @@ android {
 
     defaultConfig {
         applicationId = "com.lazyking.shifushot"
-        minSdk = 23
+        minSdkVersion = flutter.minSdkVersion
         targetSdk = 34
         versionCode = 9
         versionName = "1.8"
@@ -68,4 +69,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:22.1.1'
     implementation 'com.google.firebase:firebase-firestore:24.7.1'
     implementation 'com.google.android.gms:play-services-auth:20.7.0' // Pour Google Sign-In
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.4"
 }
