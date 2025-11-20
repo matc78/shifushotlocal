@@ -30,7 +30,7 @@ android {
     defaultConfig {
         applicationId = "com.lazyking.shifushot"
         minSdkVersion = flutter.minSdkVersion
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 10
         versionName = "1.9"
     }
