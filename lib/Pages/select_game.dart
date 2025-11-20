@@ -12,44 +12,66 @@ class SelectGamePage extends StatelessWidget {
       {
         'name': 'Killer',
         'description': 'Un jeu d’assassin mystérieux.',
-        'image': 'https://img.icons8.com/?size=100&id=20802&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=20802&format=png&color=000000',
         'route': '/killer',
       },
       {
         'name': 'Clicker',
         'description': 'Une compétition de clique.',
-        'image': 'https://img.icons8.com/?size=100&id=gjsnNuxwktgL&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=gjsnNuxwktgL&format=png&color=000000',
         'route': '/clicker_game',
       },
       {
         'name': 'Bizkit !',
         'description': 'Lancez les dés et suivez les règles amusantes !',
-        'image': 'https://img.icons8.com/?size=100&id=80024&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=80024&format=png&color=000000',
         'route': '/dice_game',
       },
       {
         'name': 'Jeu des papiers',
         'description': 'Un jeu de papier mystérieux.',
-        'image': 'https://img.icons8.com/?size=100&id=22033&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=22033&format=png&color=000000',
         'route': '/Pages/lobby_screen',
       },
       {
         'name': 'L\'horloge',
         'description': 'Parier sur votre chance.',
-        'image': 'https://img.icons8.com/?size=100&id=34&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=34&format=png&color=000000',
         'route': '/Pages/lobby_screen',
       },
       {
         'name': 'Test de réflexes',
         'description': 'Un jeu pour tester vos réflexes.',
-        'image': 'https://img.icons8.com/?size=100&id=61096&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=61096&format=png&color=000000',
         'route': '/reflex_game',
       },
       {
         'name': 'Suit la ligne',
         'description': 'Un jeu de rapidité et de concentration.',
-        'image': 'https://img.icons8.com/?size=100&id=87064&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=87064&format=png&color=000000',
         'route': '/follow_line',
+      },
+      {
+        'name': 'Pyramide',
+        'description':
+            'Retourne la pyramide de cartes en commençant par la base.',
+        'image':
+            'https://img.icons8.com/?size=100&id=QJJ60v6ChwhS&format=png&color=000000',
+        'route': '/pyramid',
+      },
+      {
+        'name': 'Pyramide moderne',
+        'description': 'Version carrousel pour retourner les cartes une à une.',
+        'image':
+            'https://img.icons8.com/?size=100&id=571&format=png&color=000000',
+        'route': '/pyramid_modern',
       },
     ];
 
@@ -57,7 +79,8 @@ class SelectGamePage extends StatelessWidget {
       {
         'name': 'Jeu du débat', // 🔹 Faux jeu pour tester
         'description': 'Jeu de bluff et de stratégie.',
-        'image': 'https://img.icons8.com/?size=100&id=rGBIEi57JpPS&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=rGBIEi57JpPS&format=png&color=000000',
         'route': '/online_lobby',
       },
     ];
@@ -72,31 +95,36 @@ class SelectGamePage extends StatelessWidget {
       {
         'name': 'Tireur de cartes',
         'description': 'Tirer des cartes aléatoires avec ou sans Joker.',
-        'image': 'https://img.icons8.com/?size=100&id=16427&format=png&color=000000',
+        'image':
+            'https://e7.pngegg.com/pngimages/993/804/png-clipart-gambling-playing-card-game-of-chance-computer-icons-others-miscellaneous-game.png',
         'route': '/cardDrawer',
       },
       {
         'name': 'Cartes pyramide',
         'description': '4 cartes pour jouer à la pyramide.',
-        'image': 'https://img.icons8.com/?size=100&id=QJJ60v6ChwhS&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=QJJ60v6ChwhS&format=png&color=000000',
         'route': '/pyramid_card',
       },
       {
         'name': 'ShifuShot ?',
         'description': 'Envoyer une notif de shifushot',
-        'image': 'https://img.icons8.com/?size=100&id=LkjR8vZ077vb&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=LkjR8vZ077vb&format=png&color=000000',
         'route': '/shifushot_request',
       },
       {
         'name': 'Sonothèque',
         'description': 'banque de sons',
-        'image': 'https://img.icons8.com/?size=100&id=41562&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=41562&format=png&color=000000',
         'route': '/select_sound',
       },
       {
         'name': 'Les 12 bars',
         'description': 'Prêt à relever le défi ?',
-        'image': 'https://img.icons8.com/?size=100&id=97404&format=png&color=000000',
+        'image':
+            'https://img.icons8.com/?size=100&id=97404&format=png&color=000000',
         'route': '/twelve_bars',
       }
     ];
@@ -107,7 +135,8 @@ class SelectGamePage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           color: theme.textPrimary,
           onPressed: () {
-            Navigator.pushNamedAndRemoveUntil(context, '/homepage', (route) => false);
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/homepage', (route) => false);
           },
         ),
         title: Text('Sélectionnez un jeu', style: theme.titleMedium),
@@ -127,7 +156,8 @@ class SelectGamePage extends StatelessWidget {
               style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...jeuxEnLocal.map((game) => GameCard(game: game, theme: theme, context: context)),
+            ...jeuxEnLocal.map(
+                (game) => GameCard(game: game, theme: theme, context: context)),
 
             const SizedBox(height: 20),
 
@@ -137,7 +167,8 @@ class SelectGamePage extends StatelessWidget {
               style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...jeuxEnLigne.map((game) => GameCard(game: game, theme: theme, context: context)),
+            ...jeuxEnLigne.map(
+                (game) => GameCard(game: game, theme: theme, context: context)),
 
             const SizedBox(height: 20),
 
@@ -147,7 +178,8 @@ class SelectGamePage extends StatelessWidget {
               style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...fonctionnalites.map((feature) => GameCard(game: feature, theme: theme, context: context)),
+            ...fonctionnalites.map((feature) =>
+                GameCard(game: feature, theme: theme, context: context)),
           ],
         ),
       ),
@@ -156,7 +188,10 @@ class SelectGamePage extends StatelessWidget {
 }
 
 // 🔹 Widget pour une carte de jeu
-Widget GameCard({required Map<String, String> game, required AppTheme theme, required BuildContext context}) {
+Widget GameCard(
+    {required Map<String, String> game,
+    required AppTheme theme,
+    required BuildContext context}) {
   return Card(
     elevation: 4,
     margin: const EdgeInsets.symmetric(vertical: 8),
