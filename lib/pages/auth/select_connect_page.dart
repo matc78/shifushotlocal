@@ -10,97 +10,74 @@ class SelectConnectPage extends StatelessWidget {
     final theme = AppTheme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.textPrimary),
-          onPressed: () => Navigator.maybePop(context),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              const Spacer(flex: 2),
-              // Titre
-              Text(
-                'SHIFUSHOT',
-                style: theme.titleLarge.copyWith(fontSize: 40),
-              ),
-              const SizedBox(height: 16.0),
-              // Logo
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: 213.0,
-                  height: 103.0,
-                  fit: BoxFit.contain,
+      body: PartyBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back_ios_new_rounded,
+                        color: theme.textPrimary),
+                    onPressed: () => Navigator.maybePop(context),
+                  ),
                 ),
-              ),
-              const Spacer(flex: 4),
-              // Bouton Connexion
-              SizedBox(
-                width: 370.0,
-                height: 54.0,
-                child: ElevatedButton(
+                const Spacer(flex: 2),
+                Text(
+                  'BIENVENUE',
+                  style: theme.overline.copyWith(color: theme.secondary),
+                ),
+                const SizedBox(height: 12),
+                ShaderMask(
+                  shaderCallback: (rect) =>
+                      theme.brandGradient.createShader(rect),
+                  child: Text(
+                    'SHIFUSHOT',
+                    style:
+                        theme.displayLarge.copyWith(color: Colors.white, fontSize: 48),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: theme.glowShadow,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 213,
+                      height: 103,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                const Spacer(flex: 3),
+                GradientButton(
+                  label: 'Connexion',
+                  icon: Icons.login_rounded,
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ConnexionPage(), // Redirection vers ConnexionPage
+                        builder: (_) => const ConnexionPage(),
                       ),
-                    );// Redirection vers la page Connexion
+                    );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.0),
-                    ),
-                  ),
-                  child: Text(
-                    'Connexion',
-                    style: theme.buttonText.copyWith(color: Colors.white),
-                  ),
                 ),
-              ),
-              const SizedBox(height: 30.0),
-              // Divider
-              SizedBox(
-                width: 200.0,
-                child: Divider(
-                  thickness: 1.0,
-                  color: theme.primary,
+                const SizedBox(height: 14),
+                GhostButton(
+                  label: 'Créer un compte',
+                  icon: Icons.person_add_alt_rounded,
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/createAccount'),
                 ),
-              ),
-              const SizedBox(height: 20.0),
-              // Bouton Créer un compte
-              SizedBox(
-                width: 190.0,
-                height: 40.0,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Redirection vers la page Créer un compte
-                    Navigator.pushNamed(context, '/createAccount');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.secondary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.0),
-                    ),
-                  ),
-                  child: Text(
-                    'Créer un compte',
-                    style: theme.buttonText.copyWith(color: Colors.white),
-                  ),
-                ),
-              ),
-              const Spacer(flex: 2),
-            ],
+                const Spacer(flex: 2),
+              ],
+            ),
           ),
         ),
       ),

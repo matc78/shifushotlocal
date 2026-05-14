@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/pages/auth/connexion_page.dart';
 import 'package:shifushotlocal/pages/auth/create_account_page.dart';
 import 'package:shifushotlocal/pages/auth/debut_page.dart';
@@ -48,6 +49,13 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+    systemNavigationBarColor: Color(0xFF0E0B1F),
+    systemNavigationBarIconBrightness: Brightness.light,
+  ));
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MainApp());
 }
@@ -60,6 +68,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
+      theme: AppTheme.materialTheme(),
       home: const AuthWrapper(),
       routes: {
         '/debutpage': (_) => const DebutPage(),

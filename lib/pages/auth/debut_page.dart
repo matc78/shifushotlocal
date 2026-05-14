@@ -11,80 +11,85 @@ class DebutPage extends StatelessWidget {
     final theme = AppTheme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.background,
-      body: SafeArea(
-        child: Center(
+      body: PartyBackground(
+        child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const Spacer(),
                 Text(
-                  'SHIFUSHOT',
-                  style: theme.titleLarge.copyWith(fontSize: 40),
+                  'PARTY ON.',
+                  textAlign: TextAlign.center,
+                  style: theme.overline.copyWith(color: theme.secondary),
                 ),
-                const SizedBox(height: 50),
-                Image.asset(
-                  'assets/images/logo.png',
-                  height: 150,
-                  width: 300,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 120),
-                SizedBox(
-                  width: 400,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const SelectConnectPage(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.buttonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: Text("C'est parti !", style: theme.buttonText),
+                const SizedBox(height: 12),
+                ShaderMask(
+                  shaderCallback: (rect) => theme.brandGradient.createShader(rect),
+                  child: Text(
+                    'SHIFUSHOT',
+                    style: theme.displayLarge.copyWith(color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  width: 400,
-                  child: TextButton(
-                    onPressed: () {
-                      GuestSession.instance.enterGuestMode();
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/homepage',
-                        (route) => false,
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(color: theme.buttonColor, width: 1.5),
-                      ),
-                    ),
-                    child: Text(
-                      'Jouer sans compte',
-                      style: theme.buttonText.copyWith(color: theme.buttonColor),
-                    ),
+                Text(
+                  "Le party game N°1\nentre potes.",
+                  textAlign: TextAlign.center,
+                  style: theme.bodyLarge.copyWith(
+                    fontSize: 18,
+                    color: theme.textSecondary,
+                    height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 36),
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: theme.glowShadow,
+                  ),
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    height: 180,
+                    width: 280,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const Spacer(),
+                GradientButton(
+                  label: "C'est parti !",
+                  icon: Icons.local_fire_department_rounded,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SelectConnectPage(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 14),
+                GhostButton(
+                  label: 'Jouer sans compte',
+                  icon: Icons.bolt_rounded,
+                  onPressed: () {
+                    GuestSession.instance.enterGuestMode();
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/homepage',
+                      (route) => false,
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
                 Text(
-                  'En invité : jeux locaux uniquement.\nCrée un compte pour accéder aux amis et au jeu en ligne.',
+                  'En invité : jeux locaux uniquement.\nCrée un compte pour les amis & le jeu en ligne.',
                   textAlign: TextAlign.center,
                   style: theme.bodyMedium.copyWith(
                     fontSize: 12,
-                    color: theme.textPrimary.withValues(alpha: 0.6),
+                    color: theme.textMuted,
                   ),
                 ),
+                const SizedBox(height: 8),
               ],
             ),
           ),
