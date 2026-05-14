@@ -1,43 +1,43 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shifushotlocal/Pages/features/pyramid_card.dart';
-import 'package:shifushotlocal/Pages/features/pyramide.dart';
-import 'package:shifushotlocal/Pages/features/pyramide_moderne.dart';
-import 'package:shifushotlocal/Pages/features/sound_category_selection_page.dart';
-import 'package:shifushotlocal/Pages/features/twelve_bars_page.dart';
-import 'package:shifushotlocal/Pages/local_games/clicker/clicker_game.dart';
-import 'package:shifushotlocal/Pages/friends/add_friends_page.dart';
-import 'package:shifushotlocal/Pages/features/card_drawer.dart';
-import 'package:shifushotlocal/Pages/local_games/follow_line/follow_line_precision_easy_game.dart';
-import 'package:shifushotlocal/Pages/local_games/follow_line/follow_line_selection.dart';
-import 'package:shifushotlocal/Pages/local_games/follow_line/follow_line_speed_easy_game.dart';
-import 'package:shifushotlocal/Pages/local_games/horloge/clock_game_page.dart';
-import 'package:shifushotlocal/Pages/connexion/create_account_page.dart';
-import 'package:shifushotlocal/Pages/connexion/debut_page.dart';
-import 'package:shifushotlocal/Pages/connexion/connexion_page.dart';
-import 'package:shifushotlocal/Pages/local_games/bizkit/dice_game_page.dart';
-import 'package:shifushotlocal/Pages/local_games/reflex/reflex_game.dart';
-import 'package:shifushotlocal/Pages/online_games/lobby_screen_online.dart';
-import 'package:shifushotlocal/Pages/online_games/lobby_waiting_screen.dart';
-import 'package:shifushotlocal/Pages/online_games/debate_game.dart';
-import 'package:shifushotlocal/Pages/profil/edit_profil_page.dart';
-import 'package:shifushotlocal/Pages/feedback/feedback_page.dart';
-import 'package:shifushotlocal/Pages/friends/friends_page.dart';
-import 'package:shifushotlocal/Pages/home_page.dart';
-import 'package:shifushotlocal/Pages/local_games/killer/killer_actions_page.dart';
-import 'package:shifushotlocal/Pages/local_games/killer/killer_page.dart';
-import 'package:shifushotlocal/Pages/local_games/killer/killer_summary_page.dart';
-import 'package:shifushotlocal/Pages/local_games/paper/paper_game_page.dart';
-import 'package:shifushotlocal/Pages/party_screen.dart';
-import 'package:shifushotlocal/Pages/select_game.dart';
-import 'package:shifushotlocal/Pages/features/team_generator_page.dart';
-import 'package:shifushotlocal/Pages/profil/user_profil_page.dart';
-import 'package:shifushotlocal/Pages/local_games/lobby_screen.dart';
-import 'package:shifushotlocal/Pages/features/shifushot_request_page.dart';
+import 'package:shifushotlocal/pages/auth/connexion_page.dart';
+import 'package:shifushotlocal/pages/auth/create_account_page.dart';
+import 'package:shifushotlocal/pages/auth/debut_page.dart';
+import 'package:shifushotlocal/pages/games/features/card_drawer.dart';
+import 'package:shifushotlocal/pages/games/features/pyramid_card.dart';
+import 'package:shifushotlocal/pages/games/features/pyramide.dart';
+import 'package:shifushotlocal/pages/games/features/pyramide_moderne.dart';
+import 'package:shifushotlocal/pages/games/features/shifushot_request_page.dart';
+import 'package:shifushotlocal/pages/games/features/sound_category_selection_page.dart';
+import 'package:shifushotlocal/pages/games/features/team_generator_page.dart';
+import 'package:shifushotlocal/pages/games/features/twelve_bars_page.dart';
+import 'package:shifushotlocal/pages/games/local/bizkit/dice_game_page.dart';
+import 'package:shifushotlocal/pages/games/local/clicker/clicker_game.dart';
+import 'package:shifushotlocal/pages/games/local/follow_line/follow_line_precision_easy_game.dart';
+import 'package:shifushotlocal/pages/games/local/follow_line/follow_line_selection.dart';
+import 'package:shifushotlocal/pages/games/local/follow_line/follow_line_speed_easy_game.dart';
+import 'package:shifushotlocal/pages/games/local/horloge/clock_game_page.dart';
+import 'package:shifushotlocal/pages/games/local/killer/killer_actions_page.dart';
+import 'package:shifushotlocal/pages/games/local/killer/killer_page.dart';
+import 'package:shifushotlocal/pages/games/local/killer/killer_summary_page.dart';
+import 'package:shifushotlocal/pages/games/local/lobby_screen.dart';
+import 'package:shifushotlocal/pages/games/local/paper/paper_game_page.dart';
+import 'package:shifushotlocal/pages/games/local/reflex/reflex_game.dart';
+import 'package:shifushotlocal/pages/games/online/debate_game.dart';
+import 'package:shifushotlocal/pages/games/online/lobby_screen_online.dart';
+import 'package:shifushotlocal/pages/games/online/lobby_waiting_screen.dart';
+import 'package:shifushotlocal/pages/home/home_page.dart';
+import 'package:shifushotlocal/pages/home/party_screen.dart';
+import 'package:shifushotlocal/pages/home/select_game.dart';
+import 'package:shifushotlocal/pages/profile/edit_profile_page.dart';
+import 'package:shifushotlocal/pages/profile/user_profile_page.dart';
+import 'package:shifushotlocal/pages/social/add_friends_page.dart';
+import 'package:shifushotlocal/pages/social/feedback_page.dart';
+import 'package:shifushotlocal/pages/social/friends_page.dart';
+import 'package:shifushotlocal/services/firebase_messaging_service.dart';
+import 'package:shifushotlocal/state/guest_session.dart';
 import 'firebase_options.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -52,65 +52,9 @@ Future<void> main() async {
   runApp(const MainApp());
 }
 
-Future<void> initializeFirebaseMessaging() async {
-  final fcm = FirebaseMessaging.instance;
-  await fcm.requestPermission(alert: true, badge: true, sound: true);
-  
-  final user = FirebaseAuth.instance.currentUser;
-  final token = await fcm.getToken();
-
-  if (user != null && token != null) {
-    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-
-    final doc = await userRef.get();
-    if (!doc.exists) {
-      // Crée un document minimal si inexistant
-      await userRef.set({
-        'name': user.displayName ?? '',
-        'email': user.email ?? '',
-        'photoUrl': user.photoURL ?? '',
-        'fcmToken': token,
-        'notifications': {
-          'enabled': true,
-          'friend_requests': true,
-          'shifushot_requests': true,
-        },
-        'friends': [],
-        'friend_requests': [],
-        'pending_approval': [],
-      });
-    } else {
-      // Sinon, juste mettre à jour le token
-      await userRef.update({'fcmToken': token});
-    }
-  }
-
-  fcm.onTokenRefresh.listen((newToken) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-        'fcmToken': newToken,
-      });
-    }
-  });
-
-  FirebaseMessaging.onMessage.listen((message) {
-    showDialog(
-      context: navigatorKey.currentContext!,
-      builder: (_) => AlertDialog(
-        title: Text(message.notification?.title ?? 'Notification'),
-        content: Text(message.notification?.body ?? 'Nouveau message'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(_), child: const Text("OK")),
-        ],
-      ),
-    );
-  });
-}
-
-
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -123,15 +67,19 @@ class MainApp extends StatelessWidget {
         '/createAccount': (_) => const CreateAccountPage(),
         '/homepage': (_) => const HomePage(),
         '/user_profile_page': (_) => const UserProfilePage(),
-        '/Pages/lobby_screen': (_) => const LobbyScreen(),
+        '/lobby_screen': (_) => const LobbyScreen(),
         '/friends': (_) => const FriendsPage(),
         '/addFriend': (_) => const AddFriendsPage(),
         '/editProfile': (_) => const EditProfilePage(),
         '/teamGenerator': (_) => const TeamGeneratorPage(),
         '/select_game': (_) => const SelectGamePage(),
         '/killer': (_) => const KillerPage(),
-        '/killerActions': (context) => KillerActionsPage(players: ModalRoute.of(context)!.settings.arguments as List<String>),
-        '/killerSummary': (context) => KillerSummaryPage(playerData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>),
+        '/killerActions': (context) => KillerActionsPage(
+              players: ModalRoute.of(context)!.settings.arguments as List<String>,
+            ),
+        '/killerSummary': (context) => KillerSummaryPage(
+              playerData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
+            ),
         '/clicker_game': (_) => const ClickerGame(),
         '/dice_game': (context) {
           final args = ModalRoute.of(context)!.settings.arguments;
@@ -142,9 +90,8 @@ class MainApp extends StatelessWidget {
               players: List<String>.from(args['players']),
               remainingGames: List<String>.from(args['remainingGames']),
             );
-          } else {
-            return const Scaffold(body: Center(child: Text("Erreur : Arguments invalides.")));
           }
+          return const Scaffold(body: Center(child: Text('Erreur : Arguments invalides.')));
         },
         '/paper_game': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -159,7 +106,7 @@ class MainApp extends StatelessWidget {
         '/cardDrawer': (_) => const CardDrawerPage(),
         '/online_lobby': (context) {
           final gameName = ModalRoute.of(context)!.settings.arguments as String?;
-          return OnlineLobbyScreen(gameName: gameName ?? "Jeu inconnu");
+          return OnlineLobbyScreen(gameName: gameName ?? 'Jeu inconnu');
         },
         '/lobby_waiting': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -173,27 +120,47 @@ class MainApp extends StatelessWidget {
           final args = ModalRoute.of(context)!.settings.arguments;
           if (args is Map<String, dynamic> && args.containsKey('lobbyId')) {
             return DebateGameScreen(lobbyId: args['lobbyId'] as String);
-          } else {
-            return const Scaffold(body: Center(child: Text("Erreur : Aucun lobbyId fourni")));
           }
+          return const Scaffold(body: Center(child: Text('Erreur : Aucun lobbyId fourni')));
         },
         '/pyramid_card': (_) => const PyramidCardPage(),
         '/pyramid': (_) => const PyramidePage(),
         '/pyramid_modern': (_) => const PyramideModernePage(),
-        '/shifushot_request': (context) => const ShifushotRequestPage(),
-        '/select_sound': (context) => SoundCategorySelectionPage(),
-        '/twelve_bars': (context) => const TwelveBarsPage(),
-        '/reflex_game': (context) => const ReflexGamePage(),
-        '/follow_line': (context) => const FollowLineModeSelector(),
-        '/follow_line_speed_easy': (context) => const FollowLineSpeedEasy(),
-        '/follow_line_precision_easy': (context) => const FollowLinePrecisionEasy(),
+        '/shifushot_request': (_) => const ShifushotRequestPage(),
+        '/select_sound': (_) => SoundCategorySelectionPage(),
+        '/twelve_bars': (_) => const TwelveBarsPage(),
+        '/reflex_game': (_) => const ReflexGamePage(),
+        '/follow_line': (_) => const FollowLineModeSelector(),
+        '/follow_line_speed_easy': (_) => const FollowLineSpeedEasy(),
+        '/follow_line_precision_easy': (_) => const FollowLinePrecisionEasy(),
       },
     );
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    GuestSession.instance.addListener(_onGuestChanged);
+  }
+
+  @override
+  void dispose() {
+    GuestSession.instance.removeListener(_onGuestChanged);
+    super.dispose();
+  }
+
+  void _onGuestChanged() {
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -202,13 +169,16 @@ class AuthWrapper extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasData) {
-          // 🔥 Initialiser FCM après connexion
-          initializeFirebaseMessaging(); // ✅ Maintenant ici
-          return const HomePage();
-        } else {
-          return const DebutPage();
         }
+        if (snapshot.hasData) {
+          FirebaseMessagingService.instance.initializeForUser(navigatorKey);
+          return const HomePage();
+        }
+        if (GuestSession.instance.isGuest) {
+          return const HomePage();
+        }
+        FirebaseMessagingService.instance.reset();
+        return const DebutPage();
       },
     );
   }
