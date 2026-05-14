@@ -27,7 +27,7 @@ class SelectConnectPage extends StatelessWidget {
                 const Spacer(flex: 2),
                 Text(
                   'BIENVENUE',
-                  style: theme.overline.copyWith(color: theme.secondary),
+                  style: theme.overline.copyWith(color: theme.textMuted),
                 ),
                 const SizedBox(height: 12),
                 ShaderMask(

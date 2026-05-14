@@ -29,7 +29,7 @@ class HomePage extends StatelessWidget {
                 Text(
                   'WELCOME TO',
                   textAlign: TextAlign.center,
-                  style: theme.overline.copyWith(color: theme.secondary),
+                  style: theme.overline.copyWith(color: theme.textMuted),
                 ),
                 const SizedBox(height: 8),
                 ShaderMask(
@@ -195,7 +195,6 @@ class _BottomActions extends StatelessWidget {
           icon: Icons.celebration_rounded,
           label: 'Soirée',
           onTap: () => Navigator.pushNamed(context, '/party_screen'),
-          accent: theme.secondary,
         ),
       ],
     );

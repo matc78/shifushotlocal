@@ -21,7 +21,7 @@ class DebutPage extends StatelessWidget {
                 Text(
                   'PARTY ON.',
                   textAlign: TextAlign.center,
-                  style: theme.overline.copyWith(color: theme.secondary),
+                  style: theme.overline.copyWith(color: theme.textMuted),
                 ),
                 const SizedBox(height: 12),
                 ShaderMask(
