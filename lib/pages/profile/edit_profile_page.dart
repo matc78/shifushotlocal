@@ -82,6 +82,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           _isUploading = false;
         });
 
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Photo de profil mise à jour avec succès !"),
@@ -131,7 +132,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ClipOval(
                       child: ColorFiltered(
                         colorFilter: ColorFilter.mode(
-                          Colors.black.withOpacity(0.3),
+                          Colors.black.withValues(alpha: 0.3),
                           BlendMode.darken,
                         ),
                         child: Image.network(
@@ -151,7 +152,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       child: Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                         ),
                         padding: const EdgeInsets.all(10),
                         child: const Icon(Icons.edit, size: 30, color: Colors.black),

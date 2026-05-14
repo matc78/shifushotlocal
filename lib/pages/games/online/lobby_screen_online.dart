@@ -79,6 +79,7 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
     }
 
     DocumentSnapshot lobbyDoc = await _firestore.collection('lobbies').doc(lobbyId).get();
+    if (!mounted) return;
     if (!lobbyDoc.exists) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Lobby introuvable")),

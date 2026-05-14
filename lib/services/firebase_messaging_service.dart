@@ -60,6 +60,7 @@ class FirebaseMessagingService {
       final ctx = navigatorKey.currentContext;
       if (ctx == null) return;
       showDialog(
+        // ignore: use_build_context_synchronously
         context: ctx,
         builder: (dialogCtx) => AlertDialog(
           title: Text(message.notification?.title ?? 'Notification'),

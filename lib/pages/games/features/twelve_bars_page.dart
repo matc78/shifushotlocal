@@ -287,7 +287,7 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
                         LinearProgressIndicator(
                           value: 1 - (timeLeft.inSeconds / barDuration.inSeconds),
                           minHeight: 8,
-                          backgroundColor: theme.textSecondary.withOpacity(0.2),
+                          backgroundColor: theme.textSecondary.withValues(alpha: 0.2),
                           valueColor: AlwaysStoppedAnimation<Color>(theme.secondary),
                         ),
                         const SizedBox(height: 16),
@@ -299,7 +299,7 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
                           margin: const EdgeInsets.symmetric(vertical: 12),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: theme.secondary.withOpacity(0.1),
+                            color: theme.secondary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: theme.secondary, width: 1),
                           ),

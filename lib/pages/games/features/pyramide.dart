@@ -259,7 +259,7 @@ class _PyramidePageState extends State<PyramidePage> {
               Positioned.fill(
                 child: IgnorePointer(
                   child: Container(
-                    color: Colors.black.withOpacity(0.25),
+                    color: Colors.black.withValues(alpha: 0.25),
                     alignment: Alignment.center,
                     child: SizedBox(
                       width: min(
@@ -274,7 +274,7 @@ class _PyramidePageState extends State<PyramidePage> {
                                 Border.all(color: theme.secondary, width: 4),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Colors.black.withValues(alpha: 0.3),
                                 blurRadius: 24,
                                 offset: const Offset(0, 12),
                               ),
@@ -311,7 +311,7 @@ class _PyramidePageState extends State<PyramidePage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -443,7 +443,7 @@ class _PyramidePageState extends State<PyramidePage> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -513,9 +513,9 @@ class _CardContent extends StatelessWidget {
   Color? _overlayColor(CardBadge badge, bool isRevealed) {
     switch (badge) {
       case CardBadge.green:
-        return Colors.green.withOpacity(isRevealed ? 0.35 : 0.75);
+        return Colors.green.withValues(alpha: isRevealed ? 0.35 : 0.75);
       case CardBadge.black:
-        return Colors.black.withOpacity(isRevealed ? 0.45 : 0.8);
+        return Colors.black.withValues(alpha: isRevealed ? 0.45 : 0.8);
       case CardBadge.none:
         return null;
     }

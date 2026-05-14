@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
-import 'package:shifushotlocal/pages/home/home_page.dart';
 
 class ConnexionPage extends StatefulWidget {
   const ConnexionPage({super.key});
@@ -17,94 +16,80 @@ class _ConnexionPageState extends State<ConnexionPage> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
+  bool _loading = false;
 
-  /// 🔹 **Connexion avec Email et Mot de passe**
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _snack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> _signIn() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-
     if (!_formKey.currentState!.validate()) return;
-
+    setState(() => _loading = true);
     try {
-      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+      final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
+      if (!mounted) return;
 
-      final user = userCredential.user;
-
-      if (user != null && !user.emailVerified) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Veuillez vérifier votre adresse email avant de vous connecter.")),
-        );
+      if (cred.user != null && !cred.user!.emailVerified) {
+        _snack('Vérifie ton adresse email avant de te connecter.');
         return;
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Connexion réussie !")),
-      );
-
-      // Redirection vers la HomePage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      _snack('Connexion réussie !');
+      Navigator.pushNamedAndRemoveUntil(context, '/homepage', (_) => false);
     } on FirebaseAuthException catch (e) {
-      String errorMessage;
-      if (e.code == 'user-not-found') {
-        errorMessage = "Utilisateur introuvable.";
-      } else if (e.code == 'wrong-password') {
-        errorMessage = "Mot de passe incorrect.";
-      } else {
-        errorMessage = "Erreur : ${e.message}";
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+      _snack(switch (e.code) {
+        'user-not-found' => 'Utilisateur introuvable.',
+        'wrong-password' => 'Mot de passe incorrect.',
+        _ => 'Erreur : ${e.message}',
+      });
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
-  /// 🔹 **Connexion avec Google**
   Future<void> _signInWithGoogle() async {
+    setState(() => _loading = true);
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return; // L'utilisateur a annulé
+      final googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
-      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      final User? user = userCredential.user;
-
+      final userCred =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      final user = userCred.user;
       if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Échec de la connexion avec Google.")),
-        );
+        _snack('Échec de la connexion avec Google.');
         return;
       }
 
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final users = FirebaseFirestore.instance.collection('users');
+      final userDoc = await users.doc(user.uid).get();
 
       if (!userDoc.exists) {
-        // 🔹 Récupération de l'email et extraction de l'identifiant avant le "@"
-        String email = user.email ?? "";
-        String baseName = email.split("@").first; 
-
-        // 🔹 Génération d'un pseudo unique en comptant les utilisateurs existants
-        final usersCollection = FirebaseFirestore.instance.collection('users');
-        final QuerySnapshot existingUsers = await usersCollection.get();
-        String uniquePseudo = "noob${existingUsers.docs.length + 1}";
-
-        // 🔹 Enregistrement du nouvel utilisateur dans Firestore
-        await usersCollection.doc(user.uid).set({
-          'email': email,
-          'pseudo': uniquePseudo, // Pseudo unique généré
-          'name': baseName, // Identifiant email comme nom
-          'surname': baseName, // Identifiant email comme prénom
+        final baseName = (user.email ?? '').split('@').first;
+        final existing = await users.get();
+        final pseudo = 'noob${existing.docs.length + 1}';
+        await users.doc(user.uid).set({
+          'email': user.email ?? '',
+          'pseudo': pseudo,
+          'name': baseName,
+          'surname': baseName,
           'photoUrl': user.photoURL ?? '',
           'gender': 'Autre',
           'createdAt': Timestamp.now(),
@@ -115,148 +100,127 @@ class _ConnexionPageState extends State<ConnexionPage> {
             'enabled': true,
             'friend_requests': true,
             'shifushot_requests': true,
-          }
+          },
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Bienvenue, $uniquePseudo !")),
-        );
+        _snack('Bienvenue, $pseudo !');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Connexion réussie, bienvenue ${userDoc['pseudo']} !")),
-        );
+        _snack('Bienvenue ${userDoc['pseudo']} !');
       }
 
-      // 🔹 Redirection vers la page d'accueil après l'authentification réussie
-      Navigator.pushNamed(context, '/homepage');
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(context, '/homepage', (_) => false);
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur de connexion avec Google : $error")),
-      );
+      _snack('Erreur Google : $error');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        backgroundColor: theme.background,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+      body: PartyBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  /// 🔹 **Logo et Titre**
-                  Center(
-                    child: Column(
-                      children: [
-                        Text('SHIFUSHOT', style: theme.titleLarge.copyWith(fontSize: 36)),
-                        const SizedBox(height: 50),
-                        Text('Se connecter', style: theme.titleMedium.copyWith(fontSize: 28)),
-                        const SizedBox(height: 8),
-                        Text('Remplissez les informations demandées ci-dessous', style: theme.bodyMedium, textAlign: TextAlign.center),
-                      ],
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: theme.textPrimary),
+                      onPressed: () => Navigator.maybePop(context),
                     ),
                   ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'CONNEXION',
+                    textAlign: TextAlign.center,
+                    style: theme.overline.copyWith(color: theme.textMuted),
+                  ),
+                  const SizedBox(height: 8),
+                  ShaderMask(
+                    shaderCallback: (rect) =>
+                        theme.brandGradient.createShader(rect),
+                    child: Text(
+                      'SHIFUSHOT',
+                      textAlign: TextAlign.center,
+                      style: theme.displayLarge
+                          .copyWith(color: Colors.white, fontSize: 44),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Ton compte, tes potes, tes parties.',
+                    textAlign: TextAlign.center,
+                    style: theme.bodyMedium,
+                  ),
                   const SizedBox(height: 32),
-
-                  /// 🔹 **Champ Email**
                   TextFormField(
                     controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      labelStyle: theme.bodyMedium,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
                     keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return 'Veuillez entrer un email';
-                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return 'Veuillez entrer un email valide';
+                    style: theme.bodyLarge,
+                    decoration: const InputDecoration(hintText: 'Email'),
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Entre un email';
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) {
+                        return 'Email invalide';
+                      }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
-
-                  /// 🔹 **Champ Mot de passe**
+                  const SizedBox(height: 12),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: !_isPasswordVisible,
+                    style: theme.bodyLarge,
                     decoration: InputDecoration(
-                      labelText: 'Mot de passe',
-                      labelStyle: theme.bodyMedium,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      hintText: 'Mot de passe',
                       suffixIcon: IconButton(
-                        icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
-                        onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility_rounded
+                              : Icons.visibility_off_rounded,
+                          color: theme.textMuted,
+                        ),
+                        onPressed: () => setState(
+                            () => _isPasswordVisible = !_isPasswordVisible),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return 'Veuillez entrer un mot de passe';
-                      if (value.length < 8) return 'Le mot de passe doit contenir au moins 8 caractères';
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Entre un mot de passe';
+                      if (v.length < 8) return 'Au moins 8 caractères';
                       return null;
                     },
                   ),
-                  const SizedBox(height: 50),
-
-                  /// 🔹 **Bouton Connexion**
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _signIn,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.secondary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text("C'est moi !", style: theme.buttonText),
-                    ),
+                  const SizedBox(height: 28),
+                  GradientButton(
+                    label: _loading ? 'Connexion…' : 'Connexion',
+                    icon: Icons.login_rounded,
+                    onPressed: _loading ? null : _signIn,
                   ),
-                  const SizedBox(height: 16),
-
-                  /// 🔹 **Bouton Connexion avec Google**
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _signInWithGoogle,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14.0),
-                          side: BorderSide(color: Colors.grey.shade300),
-                        ),
-                      ),
-                      icon: Image.network(
-                        'https://img.icons8.com/color/48/000000/google-logo.png',
-                        width: 24,
-                        height: 24,
-                      ),
-                      label: Text('Se connecter avec Google', style: theme.bodyMedium.copyWith(color: theme.textPrimary)),
-                    ),
+                  const SizedBox(height: 12),
+                  GhostButton(
+                    label: 'Continuer avec Google',
+                    icon: Icons.g_mobiledata_rounded,
+                    onPressed: _loading ? null : _signInWithGoogle,
                   ),
-
-                  const SizedBox(height: 32),
-
-                  /// 🔹 **Image en bas de la page**
-                  Center(
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      height: 200,
-                      width: 220,
-                      fit: BoxFit.contain,
+                  const SizedBox(height: 24),
+                  TextButton(
+                    onPressed: () =>
+                        Navigator.pushReplacementNamed(context, '/createAccount'),
+                    child: Text(
+                      "Pas de compte ? Crées-en un",
+                      style: theme.bodyMedium.copyWith(
+                        color: theme.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ],

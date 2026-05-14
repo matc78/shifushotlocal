@@ -43,7 +43,7 @@ class _TeamGeneratorPageState extends State<TeamGeneratorPage> {
           });
         }
       } catch (e) {
-        print('Erreur lors de la récupération du surname : $e');
+        debugPrint('Erreur lors de la récupération du surname : $e');
       }
     }
   }

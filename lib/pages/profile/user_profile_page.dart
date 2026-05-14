@@ -70,6 +70,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   void _logout() async {
     await _auth.signOut();
+    if (!mounted) return;
     Navigator.pushReplacementNamed(context, '/');
   }
 
@@ -151,6 +152,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
 
     if (confirmation != true) return;
+    if (!mounted) return;
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;

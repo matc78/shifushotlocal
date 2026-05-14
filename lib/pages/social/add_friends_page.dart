@@ -41,30 +41,30 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        print("❌ Utilisateur non connecté !");
+        debugPrint("❌ Utilisateur non connecté !");
         return;
       }
 
-      print("🔹 Token utilisateur : ${user.uid}");
+      debugPrint("🔹 Token utilisateur : ${user.uid}");
       HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'us-central1')
           .httpsCallable('sendFriendRequestNotification');
 
-      print("🔹 Envoi de la notification...");
+      debugPrint("🔹 Envoi de la notification...");
 
       final response = await callable.call({
         "token": token,
         "senderName": senderName,
       });
 
-      print("🔹 Réponse de la fonction : ${response.data}");
+      debugPrint("🔹 Réponse de la fonction : ${response.data}");
 
       if (response.data['success'] == true) {
-        print("✅ Notification envoyée avec succès !");
+        debugPrint("✅ Notification envoyée avec succès !");
       } else {
-        print("❌ Erreur : ${response.data['error']}");
+        debugPrint("❌ Erreur : ${response.data['error']}");
       }
     } catch (e) {
-      print("❌ Exception lors de l'envoi de la notification : $e");
+      debugPrint("❌ Exception lors de l'envoi de la notification : $e");
     }
   }
 
@@ -134,7 +134,7 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
         'friend_requests': FieldValue.arrayUnion([friendUid]),
       });
 
-      print("friend token : $friendToken et senderName : $senderName");
+      debugPrint("friend token : $friendToken et senderName : $senderName");
 
       // ✅ Vérifier si le destinataire a activé les notifs
       final wantsFriendRequestNotif =
@@ -143,9 +143,10 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
       if (friendToken != null && wantsFriendRequestNotif) {
         await sendPushNotification(friendToken, senderName);
       } else {
-        print("🔕 Le destinataire a désactivé les notifications de demandes d'ami.");
+        debugPrint("🔕 Le destinataire a désactivé les notifications de demandes d'ami.");
       }
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.black,
@@ -156,6 +157,7 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
         ),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,

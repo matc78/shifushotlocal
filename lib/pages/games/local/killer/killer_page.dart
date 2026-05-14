@@ -44,7 +44,7 @@ class _KillerPageState extends State<KillerPage> {
         });
       }
     } catch (e) {
-      print('Erreur lors de la récupération du surname : $e');
+      debugPrint('Erreur lors de la récupération du surname : $e');
       setState(() {
         players.add("Moi");
       });

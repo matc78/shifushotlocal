@@ -108,6 +108,7 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
           shots += shotsParies;
         });
 
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Vous avez gagné !"),
@@ -120,11 +121,12 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
         final totalGorgees = gorgees + gorgeesPariees;
         final totalShots = shots + shotsParies;
 
+        if (!mounted) return;
         await showDialog(
           context: context,
           builder: (context) => Theme(
             data: Theme.of(context).copyWith(
-              dialogBackgroundColor: Colors.white.withOpacity(0.85), // Fond semi-transparent
+              dialogBackgroundColor: Colors.white.withValues(alpha: 0.85), // Fond semi-transparent
             ),
             child: AlertDialog(
               title: const Text("Tour terminé"),

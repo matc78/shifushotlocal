@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 
 class CreateAccountPage extends StatefulWidget {
@@ -23,147 +23,132 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   String? _selectedGender;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _loading = false;
+
+  static final _passwordRegex = RegExp(
+      r'^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?/~\\-])[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?/~\\-]{8,}$');
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _nameController.dispose();
+    _surnameController.dispose();
+    _pseudoController.dispose();
+    super.dispose();
+  }
+
+  void _snack(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(msg)));
+  }
 
   Future<void> _createAccount() async {
     if (!_formKey.currentState!.validate()) return;
-
     final password = _passwordController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
+    final confirm = _confirmPasswordController.text.trim();
     final email = _emailController.text.trim();
     final pseudo = _pseudoController.text.trim();
 
-    // Validation du mot de passe : au moins 8 caractères, 1 majuscule, 1 chiffre, 1 caractère spécial
-    final passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?/~\\-])[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?/~\\-]{8,}$');
-
-    if (!passwordRegex.hasMatch(password)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial."),
-        ),
-      );
+    if (!_passwordRegex.hasMatch(password)) {
+      _snack(
+          'Mot de passe : 8 caractères min, 1 majuscule, 1 chiffre, 1 spécial.');
+      return;
+    }
+    if (password != confirm) {
+      _snack('Les mots de passe ne correspondent pas.');
       return;
     }
 
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Les mots de passe ne correspondent pas.")),
-      );
-      return;
-    }
-
+    setState(() => _loading = true);
     try {
-      // Vérification si le pseudo est unique
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('pseudo', isEqualTo: pseudo)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Le pseudo est déjà utilisé.")),
-        );
+      final users = FirebaseFirestore.instance.collection('users');
+      final taken =
+          await users.where('pseudo', isEqualTo: pseudo).limit(1).get();
+      if (taken.docs.isNotEmpty) {
+        _snack('Pseudo déjà utilisé.');
         return;
       }
 
-      // Création du compte avec Firebase Auth
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      // Envoi de l'email de vérification
-      await userCredential.user?.sendEmailVerification();
-
-      // Sauvegarde des informations de l'utilisateur dans Firestore
-      final user = userCredential.user;
-        if (user == null) {
-          throw Exception("Erreur : utilisateur non authentifié.");
-        }
-
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'email': email,
-          'pseudo': pseudo,
-          'name': _nameController.text.trim(),
-          'surname': _surnameController.text.trim(),
-          'gender': _selectedGender,
-          'createdAt': Timestamp.now(),
-          'emailVerified': false,
-          'friends': [],
-          'pending_approval': [],
-          'friend_requests': [],
-          'photoUrl': 'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
-          'notifications': {
-            'enabled': true,
-            'friend_requests': true,
-            'shifushot_requests': true,
-          }
-        });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Compte créé avec succès ! Un email de vérification a été envoyé.")),
-      );
-
-      // Redirection vers la page de connexion après création du compte
-      Navigator.pushNamed(context, '/connexion');
-    } on FirebaseAuthException catch (e) {
-      String errorMessage;
-      if (e.code == 'email-already-in-use') {
-        errorMessage = "Cet email est déjà utilisé.";
-      } else if (e.code == 'weak-password') {
-        errorMessage = "Le mot de passe est trop faible.";
-      } else {
-        errorMessage = "Erreur : ${e.message}";
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Une erreur s'est produite : $e")),
-      );
-    }
-  }
-
-
-  Future<void> _signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return; // L'utilisateur a annulé
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      final User? user = userCredential.user;
-
+      await cred.user?.sendEmailVerification();
+      final user = cred.user;
       if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Échec de la connexion avec Google.")),
-        );
+        _snack('Erreur : utilisateur non authentifié.');
         return;
       }
 
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      await users.doc(user.uid).set({
+        'email': email,
+        'pseudo': pseudo,
+        'name': _nameController.text.trim(),
+        'surname': _surnameController.text.trim(),
+        'gender': _selectedGender,
+        'createdAt': Timestamp.now(),
+        'emailVerified': false,
+        'friends': [],
+        'pending_approval': [],
+        'friend_requests': [],
+        'photoUrl':
+            'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
+        'notifications': {
+          'enabled': true,
+          'friend_requests': true,
+          'shifushot_requests': true,
+        },
+      });
 
+      _snack('Compte créé ! Un email de vérification a été envoyé.');
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/connexion');
+    } on FirebaseAuthException catch (e) {
+      _snack(switch (e.code) {
+        'email-already-in-use' => 'Cet email est déjà utilisé.',
+        'weak-password' => 'Mot de passe trop faible.',
+        _ => 'Erreur : ${e.message}',
+      });
+    } catch (e) {
+      _snack("Erreur : $e");
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _loading = true);
+    try {
+      final googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      final userCred =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      final user = userCred.user;
+      if (user == null) {
+        _snack('Échec de la connexion avec Google.');
+        return;
+      }
+
+      final users = FirebaseFirestore.instance.collection('users');
+      final userDoc = await users.doc(user.uid).get();
       if (!userDoc.exists) {
-        // 🔹 Récupération de l'email et extraction de l'identifiant avant le "@"
-        String email = user.email ?? "";
-        String baseName = email.split("@").first; 
-
-        // 🔹 Génération d'un pseudo unique en comptant les utilisateurs existants
-        final usersCollection = FirebaseFirestore.instance.collection('users');
-        final QuerySnapshot existingUsers = await usersCollection.get();
-        String uniquePseudo = "noob${existingUsers.docs.length + 1}";
-
-        // 🔹 Enregistrement du nouvel utilisateur dans Firestore
-        await usersCollection.doc(user.uid).set({
-          'email': email,
-          'pseudo': uniquePseudo, // Pseudo unique généré
-          'name': baseName, // Identifiant email comme nom
-          'surname': baseName, // Identifiant email comme prénom
+        final baseName = (user.email ?? '').split('@').first;
+        final existing = await users.get();
+        final pseudo = 'noob${existing.docs.length + 1}';
+        await users.doc(user.uid).set({
+          'email': user.email ?? '',
+          'pseudo': pseudo,
+          'name': baseName,
+          'surname': baseName,
           'photoUrl': user.photoURL ?? '',
           'gender': 'Autre',
           'createdAt': Timestamp.now(),
@@ -174,293 +159,205 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             'enabled': true,
             'friend_requests': true,
             'shifushot_requests': true,
-          }
+          },
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Bienvenue, $uniquePseudo !")),
-        );
+        _snack('Bienvenue, $pseudo !');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Connexion réussie, bienvenue ${userDoc['pseudo']} !")),
-        );
+        _snack('Bienvenue ${userDoc['pseudo']} !');
       }
 
-      // 🔹 Redirection vers la page d'accueil après l'authentification réussie
-      Navigator.pushNamed(context, '/homepage');
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur de connexion avec Google : $error")),
-      );
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(context, '/homepage', (_) => false);
+    } catch (e) {
+      _snack('Erreur Google : $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        backgroundColor: theme.background,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.textPrimary),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+      body: PartyBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Center(
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: theme.textPrimary),
+                      onPressed: () => Navigator.maybePop(context),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'NOUVEAU JOUEUR',
+                    textAlign: TextAlign.center,
+                    style: theme.overline.copyWith(color: theme.textMuted),
+                  ),
+                  const SizedBox(height: 8),
+                  ShaderMask(
+                    shaderCallback: (rect) =>
+                        theme.brandGradient.createShader(rect),
                     child: Text(
                       'SHIFUSHOT',
-                      style: theme.titleLarge.copyWith(fontSize: 36),
+                      textAlign: TextAlign.center,
+                      style: theme.displayLarge
+                          .copyWith(color: Colors.white, fontSize: 40),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Créer un compte',
-                    style: theme.titleMedium.copyWith(fontSize: 28),
+                  const SizedBox(height: 24),
+                  GhostButton(
+                    label: 'Continuer avec Google',
+                    icon: Icons.g_mobiledata_rounded,
+                    onPressed: _loading ? null : _signInWithGoogle,
                   ),
-                  const SizedBox(height: 15),
-                  ElevatedButton.icon(
-                    onPressed: _signInWithGoogle,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14.0),
-                        side: BorderSide(color: Colors.grey.shade300),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: theme.border)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text('OU', style: theme.overline),
                       ),
-                    ),
-                    icon: Image.network(
-                      'https://img.icons8.com/color/48/000000/google-logo.png',
-                      width: 24,
-                      height: 24,
-                    ),
-                    label: Text(
-                      'Se connecter avec Google',
-                      style: theme.bodyMedium.copyWith(color: theme.textPrimary),
-                    ),
+                      Expanded(child: Divider(color: theme.border)),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'OU',
-                    style: theme.bodyMedium,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Remplissez les informations demandées ci-dessous.',
-                    style: theme.bodyMedium,
-                  ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                     keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer un email.';
-                      }
-                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                        return 'Veuillez entrer un email valide.';
+                    style: theme.bodyLarge,
+                    decoration: const InputDecoration(hintText: 'Email'),
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Entre un email';
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) {
+                        return 'Email invalide';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Nom',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _nameController,
+                          style: theme.bodyLarge,
+                          decoration: const InputDecoration(hintText: 'Nom'),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp('[a-zA-Z]')),
+                          ],
+                          validator: (v) =>
+                              (v == null || v.isEmpty) ? 'Requis' : null,
+                        ),
                       ),
-                    ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
-                    ],
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer votre nom.';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _surnameController,
-                    decoration: InputDecoration(
-                      labelText: 'Prénom',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _surnameController,
+                          style: theme.bodyLarge,
+                          decoration: const InputDecoration(hintText: 'Prénom'),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp('[a-zA-Z]')),
+                          ],
+                          validator: (v) =>
+                              (v == null || v.isEmpty) ? 'Requis' : null,
+                        ),
                       ),
-                    ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
                     ],
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer votre prénom.';
-                      }
-                      return null;
-                    },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   TextFormField(
                     controller: _pseudoController,
-                    decoration: InputDecoration(
-                      labelText: 'Pseudo',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer un pseudo.';
-                      }
-                      return null;
-                    },
+                    style: theme.bodyLarge,
+                    decoration: const InputDecoration(hintText: 'Pseudo'),
+                    validator: (v) =>
+                        (v == null || v.isEmpty) ? 'Entre un pseudo' : null,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      labelText: 'Genre',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    value: _selectedGender,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedGender = value;
-                      });
-                    },
-                    items: ['Homme', 'Femme', 'Autre']
-                        .map((gender) => DropdownMenuItem<String>(
-                              value: gender,
-                              child: Text(gender),
-                            ))
+                    decoration: const InputDecoration(hintText: 'Genre'),
+                    style: theme.bodyLarge,
+                    dropdownColor: theme.surface,
+                    initialValue: _selectedGender,
+                    onChanged: (v) => setState(() => _selectedGender = v),
+                    items: const ['Homme', 'Femme', 'Autre']
+                        .map((g) => DropdownMenuItem(value: g, child: Text(g)))
                         .toList(),
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Veuillez sélectionner un genre.';
-                      }
-                      return null;
-                    },
+                    validator: (v) => v == null ? 'Sélectionne un genre' : null,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: !_isPasswordVisible,
+                    style: theme.bodyLarge,
                     decoration: InputDecoration(
-                      labelText: 'Mot de passe',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      hintText: 'Mot de passe',
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                              ? Icons.visibility_rounded
+                              : Icons.visibility_off_rounded,
+                          color: theme.textMuted,
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
+                        onPressed: () => setState(
+                            () => _isPasswordVisible = !_isPasswordVisible),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer un mot de passe.';
-                      }
-                      if (value.length < 6) {
-                        return 'Le mot de passe doit contenir au moins 6 caractères.';
-                      }
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Entre un mot de passe';
+                      if (v.length < 8) return 'Au moins 8 caractères';
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: !_isConfirmPasswordVisible,
+                    style: theme.bodyLarge,
                     decoration: InputDecoration(
-                      labelText: 'Confirmer le mot de passe',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      hintText: 'Confirme le mot de passe',
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isConfirmPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                              ? Icons.visibility_rounded
+                              : Icons.visibility_off_rounded,
+                          color: theme.textMuted,
                         ),
-                        onPressed: () {
-                          setState(() {
+                        onPressed: () => setState(() =>
                             _isConfirmPasswordVisible =
-                                !_isConfirmPasswordVisible;
-                          });
-                        },
+                                !_isConfirmPasswordVisible),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez confirmer votre mot de passe.';
-                      }
-                      return null;
-                    },
+                    validator: (v) =>
+                        (v == null || v.isEmpty) ? 'Confirme le mot de passe' : null,
                   ),
                   const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity, // Largeur maximale pour le bouton
-                    child: Center(
-                      child: ElevatedButton(
-                        onPressed: _createAccount,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.secondary,
-                          padding: const EdgeInsets.symmetric(vertical: 18.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14.0),
-                          ),
-                        ),
-                        child: Text(
-                          'Créer un compte',
-                          style: theme.buttonText.copyWith(color: theme.background),
-                        ),
-                      ),
-                    ),
+                  GradientButton(
+                    label: _loading ? 'Création…' : 'Créer mon compte',
+                    icon: Icons.person_add_alt_rounded,
+                    onPressed: _loading ? null : _createAccount,
                   ),
-
-                  const SizedBox(height: 24), // Espacement sous le bouton
-
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        // Naviguer vers la page de connexion
-                        Navigator.pushNamed(context, '/connexion');
-                      },
-                      child: Text(
-                        "Déjà un compte ? Connecte-toi ici !",
-                        style: theme.bodyMedium.copyWith(
-                          color: theme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () => Navigator.pushReplacementNamed(
+                        context, '/connexion'),
+                    child: Text(
+                      'Déjà un compte ? Connecte-toi',
+                      style: theme.bodyMedium.copyWith(
+                        color: theme.textPrimary,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),

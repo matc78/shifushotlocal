@@ -63,7 +63,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
   Future<void> _checkAndAssignRoles() async {
   DocumentSnapshot lobbyDoc = await _firestore.collection('lobbies').doc(widget.lobbyId).get();
   if (!lobbyDoc.exists) {
-    print("❌ Erreur : Lobby introuvable.");
+    debugPrint("❌ Erreur : Lobby introuvable.");
     return;
   }
 
@@ -72,7 +72,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
 
   // ✅ Vérifie si les rôles ET le débat sont déjà assignés
   if (lobbyData.containsKey('roles') && lobbyData.containsKey('debate')) {
-    print("⏭️ Rôles et débat déjà assignés, récupération...");
+    debugPrint("⏭️ Rôles et débat déjà assignés, récupération...");
     if (mounted) {
       setState(() {
         players = Map<String, dynamic>.from(lobbyData['roles']);
@@ -87,7 +87,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     if (lobbyData['hostId'] == userId) {
       await _assignRoles();
     } else {
-      print("⏳ Attente des rôles et du débat...");
+      debugPrint("⏳ Attente des rôles et du débat...");
     }
   }
 }
@@ -96,10 +96,10 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
   Future<void> _assignRoles() async {
     if (_rolesAssigned) return; // ✅ Vérification de sécurité
 
-    print("🟢 Vérification du rôle de l'hôte...");
+    debugPrint("🟢 Vérification du rôle de l'hôte...");
     DocumentSnapshot lobbyDoc = await _firestore.collection('lobbies').doc(widget.lobbyId).get();
     if (!lobbyDoc.exists) {
-      print("❌ Erreur : Le lobby n'existe pas.");
+      debugPrint("❌ Erreur : Le lobby n'existe pas.");
       return;
     }
 
@@ -112,7 +112,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
 
     // Si les rôles existent déjà, on les récupère plutôt que de les réattribuer
     if (lobbyData.containsKey('roles') && lobbyData.containsKey('debate')) {
-      print("⏭️ Rôles et débat déjà assignés, récupération...");
+      debugPrint("⏭️ Rôles et débat déjà assignés, récupération...");
       if (mounted) {
         setState(() {
           players = Map<String, dynamic>.from(lobbyData['roles']);
@@ -121,14 +121,14 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
           debateWord2 = lobbyData['debate']['word2'] ?? "???";
           civilDebate = "$debateWord1 vs $debateWord2";
         });
-        print("✅ Rôles récupérés : $players, Débat -> $debateWord1 vs $debateWord2");
+        debugPrint("✅ Rôles récupérés : $players, Débat -> $debateWord1 vs $debateWord2");
       }
       return;
     }
 
     // L'hôte attribue les rôles et choisit un débat
     if (isHost) {
-      print("👑 Cet utilisateur est l'hôte. Attribution des rôles et choix du débat...");
+      debugPrint("👑 Cet utilisateur est l'hôte. Attribution des rôles et choix du débat...");
 
       List<dynamic> playerIds = List.from(lobbyData['players'] ?? []);
       List<dynamic> nonEliminated = playerIds;
@@ -156,9 +156,9 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
         'currentSpeaker': firstSpeaker, // ✅ Premier joueur choisi
       });
 
-      print("✅ Rôles et débat enregistrés : $assignedRoles, Débat -> $debate1 vs $debate2");
+      debugPrint("✅ Rôles et débat enregistrés : $assignedRoles, Débat -> $debate1 vs $debate2");
     } else {
-      print("⏳ Cet utilisateur n'est pas l'hôte. Attente des rôles et du débat...");
+      debugPrint("⏳ Cet utilisateur n'est pas l'hôte. Attente des rôles et du débat...");
     }
 
     // 🔹 Récupérer les rôles et le débat après mise à jour (pour tout le monde)
@@ -193,7 +193,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
         return debates[DateTime.now().millisecondsSinceEpoch % debates.length]; // Sélection aléatoire
       }
     } catch (e) {
-      print("⚠️ Erreur lors du chargement du débat : $e");
+      debugPrint("⚠️ Erreur lors du chargement du débat : $e");
     }
     return ["Erreur", "Débat introuvable"]; // Valeur de secours en cas d'erreur
   }
@@ -222,7 +222,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
       });
     }
 
-    print("✅ Noms des joueurs récupérés : $playerNames");
+    debugPrint("✅ Noms des joueurs récupérés : $playerNames");
   }
 
 
@@ -266,7 +266,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
               ? players.keys.where((id) => !eliminatedPlayers.contains(id)).length
               : 0;
 
-          print("🗳 Total Votes: $totalVotes / $remainingPlayers");
+          debugPrint("🗳 Total Votes: $totalVotes / $remainingPlayers");
 
           // ✅ Vérifier si tous les survivants ont voté et lancer l'élimination
           if (totalVotes >= remainingPlayers && !votingComplete) {
@@ -285,7 +285,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
 
   Future<void> _votePlayer(String targetPlayerId) async {
     if (hasVoted[userId] == true) return; // Empêcher de voter plusieurs fois
-    print("📩 Vote pour éliminer : $targetPlayerId");
+    debugPrint("📩 Vote pour éliminer : $targetPlayerId");
 
     String voterName = playerNames[userId] ?? "Inconnu";
     //String targetName = playerNames[targetPlayerId] ?? "Inconnu";
@@ -308,7 +308,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
   String playerToEliminate = votes.entries.reduce((a, b) => a.value > b.value ? a : b).key;
   String eliminatedName = playerNames[playerToEliminate] ?? "Joueur inconnu";
 
-  print("❌ Joueur éliminé : $playerToEliminate");
+  debugPrint("❌ Joueur éliminé : $playerToEliminate");
 
   eliminatedPlayers.add(playerToEliminate);
 
@@ -370,7 +370,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                 ? "👿 L'imposteur a gagné en devinant '$guess' !"
                 : "🎉 Les civils ont gagné !";
 
-            print("🔮 L'imposteur a deviné : $guess, mots : $debateWord1 / $debateWord2");
+            debugPrint("🔮 L'imposteur a deviné : $guess, mots : $debateWord1 / $debateWord2");
 
             Navigator.pop(context); // 🔄 Ferme la boîte de dialogue
 
@@ -398,7 +398,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
       if (data.containsKey('gameOverMessage')) {
         String message = data['gameOverMessage'];
 
-        print("🏁 Fin de partie détectée : $message");
+        debugPrint("🏁 Fin de partie détectée : $message");
 
         if (mounted) {
           _endGame(message); // 🚀 Affiche le message de fin de partie à tout le monde
@@ -410,7 +410,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
 
 
   void _checkGameEnd(String eliminatedPlayer) {
-  print("🔍 Vérification de la fin de partie...");
+  debugPrint("🔍 Vérification de la fin de partie...");
 
   // Fin du jeu si l'imposteur est éliminé
   if (players[eliminatedPlayer] == "Imposteur") {
@@ -433,7 +433,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
 
 
   Future<void> _startNewVote() async {
-    print("🔄 Nouveau vote lancé...");
+    debugPrint("🔄 Nouveau vote lancé...");
     
     // Sélectionner un nouveau joueur qui commence à parler (parmi ceux non éliminés)
     List<String> remainingPlayers = players.keys.where((id) => !eliminatedPlayers.contains(id)).toList();
@@ -464,7 +464,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
 
 
   void _endGame(String message) {
-    print("🏁 Fin de la partie : $message");
+    debugPrint("🏁 Fin de la partie : $message");
 
     showDialog(
       context: context,
@@ -505,7 +505,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
       // 🚨 Supprime le lobby si plus personne
       await lobbyRef.delete();
       if (kDebugMode) {
-        print("🏁 Lobby supprimé car plus aucun joueur.");
+        debugPrint("🏁 Lobby supprimé car plus aucun joueur.");
       }
     } else {
       // 🔄 Met à jour le lobby avec un nouvel hôte
@@ -516,7 +516,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     }
 
     if (kDebugMode) {
-      print("🚪 Joueur ${user.uid} a quitté le lobby.");
+      debugPrint("🚪 Joueur ${user.uid} a quitté le lobby.");
     }
   }
 
@@ -539,12 +539,12 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
         if (!lobbyData.containsKey('roles')) {
           if (lobbyData['hostId'] == userId) {
             if (kDebugMode) {
-              print("👑 Hôte détecté, attribution des rôles...");
+              debugPrint("👑 Hôte détecté, attribution des rôles...");
             }
             _assignRoles();
           } else {
             if (kDebugMode) {
-              print("⏳ En attente des rôles...");
+              debugPrint("⏳ En attente des rôles...");
             }
           }
         } else {

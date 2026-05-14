@@ -47,7 +47,7 @@ class _ClickerGameState extends State<ClickerGame> {
           highScore = (highScores['clicker_game'] ?? 0) as int;
         });
       } catch (e) {
-        print("❌ Erreur récupération des données : $e");
+        debugPrint("❌ Erreur récupération des données : $e");
       }
     }
   }
@@ -108,16 +108,17 @@ class _ClickerGameState extends State<ClickerGame> {
           setState(() {
             highScore = score;
           });
-          print("🎉 Nouveau record personnel : $score");
+          debugPrint("🎉 Nouveau record personnel : $score");
         } else {
-          print("ℹ️ Score actuel : $score (record : $existingScore)");
+          debugPrint("ℹ️ Score actuel : $score (record : $existingScore)");
         }
       } catch (e) {
-        print("❌ Erreur mise à jour du high score : $e");
+        debugPrint("❌ Erreur mise à jour du high score : $e");
       }
     }
 
     await Future.delayed(const Duration(seconds: 1));
+    if (!mounted) return;
 
     showDialog(
       context: context,

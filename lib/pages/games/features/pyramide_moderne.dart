@@ -419,11 +419,11 @@ class _PyramideModernePageState extends State<PyramideModernePage>
                           horizontal: 20, vertical: 12),
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          color: theme.primary.withOpacity(0.9),
+                          color: theme.primary.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
+                              color: Colors.black.withValues(alpha: 0.15),
                               blurRadius: 18,
                               offset: const Offset(0, 10),
                             ),
@@ -516,7 +516,7 @@ class _PyramideModernePageState extends State<PyramideModernePage>
             if (_showShotOverlay)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withOpacity(0.9),
+                  color: Colors.black.withValues(alpha: 0.9),
                   alignment: Alignment.center,
                   child: AnimatedBuilder(
                     animation: _skullController,
@@ -611,7 +611,7 @@ class _CarouselCard extends StatelessWidget {
         EdgeInsets.only(left: sequenceIndex == 0 ? 20 : 12, right: 12);
     final backgroundColor = (isShot && isRevealed)
         ? Colors.black
-        : stage.color.withOpacity(isActive ? 0.95 : 0.75);
+        : stage.color.withValues(alpha: isActive ? 0.95 : 0.75);
     final isClickable = isActive && !isRevealed;
     final showShotLabel = isShot && isRevealed;
     final showDoubleLabel = !showShotLabel && isRevealed && isDoubled;
@@ -674,7 +674,7 @@ class _CarouselCard extends StatelessWidget {
                       border: Border.all(
                         color: isClickable
                             ? Colors.white
-                            : Colors.white.withOpacity(0.45),
+                            : Colors.white.withValues(alpha: 0.45),
                         width: isClickable
                             ? 5
                             : isActive
@@ -721,7 +721,7 @@ class _CarouselCard extends StatelessWidget {
                                       ),
                                     if (isShot && isRevealed)
                                       Container(
-                                        color: Colors.black.withOpacity(0.5),
+                                        color: Colors.black.withValues(alpha: 0.5),
                                         alignment: Alignment.center,
                                         child: Text(
                                           "SHOT",
@@ -736,7 +736,7 @@ class _CarouselCard extends StatelessWidget {
                                         child: DecoratedBox(
                                           decoration: BoxDecoration(
                                             color:
-                                                theme.primary.withOpacity(0.25),
+                                                theme.primary.withValues(alpha: 0.25),
                                           ),
                                         ),
                                       ),
@@ -758,7 +758,7 @@ class _CarouselCard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(999),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.red.shade700.withOpacity(0.4),
+                                    color: Colors.red.shade700.withValues(alpha: 0.4),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -828,7 +828,7 @@ class _ProgressOverview extends StatelessWidget {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: theme.textPrimary.withOpacity(0.08),
+                        color: theme.textPrimary.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(999),
                       ),
                     ),
@@ -950,11 +950,11 @@ class _TapHintState extends State<_TapHint>
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(999),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),

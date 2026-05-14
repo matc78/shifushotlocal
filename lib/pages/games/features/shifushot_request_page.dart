@@ -49,6 +49,7 @@ class _ShifushotRequestPageState extends State<ShifushotRequestPage> {
     final currentUser = FirebaseAuth.instance.currentUser;
     final senderDoc = await FirebaseFirestore.instance.collection('users').doc(currentUser!.uid).get();
     final senderName = senderDoc.data()?['name'] ?? "Quelqu'un";
+    if (!mounted) return;
 
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -97,15 +98,17 @@ class _ShifushotRequestPageState extends State<ShifushotRequestPage> {
         });
       });
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Demande de Shifushot envoyée !')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur lors de l\'envoi : $e')),
       );
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 

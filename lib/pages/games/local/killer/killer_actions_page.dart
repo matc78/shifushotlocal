@@ -69,7 +69,7 @@ class _KillerActionsPageState extends State<KillerActionsPage> {
         killerActions = actions;
       });
     } catch (e) {
-      print('Erreur lors du chargement des actions : $e');
+      debugPrint('Erreur lors du chargement des actions : $e');
     }
   }
 
@@ -94,7 +94,7 @@ class _KillerActionsPageState extends State<KillerActionsPage> {
   void _nextPlayer() {
     if (currentPlayerIndex >= shuffledPlayers.length - 1) {
       // Log pour vérifier ce qui est envoyé
-      print('Envoi vers KillerSummaryPage: $playerData');
+      debugPrint('Envoi vers KillerSummaryPage: $playerData');
 
       Navigator.pushReplacementNamed(
         context,

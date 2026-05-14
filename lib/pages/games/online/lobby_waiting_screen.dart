@@ -90,13 +90,14 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
 
   /// 🔹 **Lancer la partie (uniquement pour l’hôte)**
   Future<void> _startGame() async {
-    print("🟢 Tentative de démarrage du jeu...");
+    debugPrint("🟢 Tentative de démarrage du jeu...");
 
     final DocumentReference lobbyRef = _firestore.collection('lobbies').doc(widget.lobbyId);
     final DocumentSnapshot lobbyDoc = await lobbyRef.get();
+    if (!mounted) return;
 
     if (!lobbyDoc.exists) {
-      print("❌ Erreur : Le lobby n'existe pas.");
+      debugPrint("❌ Erreur : Le lobby n'existe pas.");
       return;
     }
 
@@ -104,7 +105,7 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
     final theme = AppTheme.of(context);
     // 🔹 Vérification du nombre de joueurs
     if (players.length < 2) {
-      print("⚠️ Impossible de démarrer : il faut au moins 2 joueurs !");
+      debugPrint("⚠️ Impossible de démarrer : il faut au moins 2 joueurs !");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Il faut au moins 2 joueurs pour commencer la partie !", style: theme.bodyLarge),
@@ -115,15 +116,15 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
       return;
     }
 
-    print("✅ Lobby trouvé, récupération des joueurs...");
+    debugPrint("✅ Lobby trouvé, récupération des joueurs...");
     String gameRoute = widget.gameRoute;
 
     // 🔹 Marquer la partie comme commencée
     try {
       await lobbyRef.update({'isStarted': true});
-      print("✅ Partie marquée comme commencée.");
+      debugPrint("✅ Partie marquée comme commencée.");
     } catch (e) {
-      print("❌ Erreur lors de la mise à jour du statut de la partie : $e");
+      debugPrint("❌ Erreur lors de la mise à jour du statut de la partie : $e");
       return;
     }
 
@@ -136,15 +137,15 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
             'gameRoute': gameRoute
           },
         });
-        print("✅ Joueur $player mis à jour avec le jeu en cours.");
+        debugPrint("✅ Joueur $player mis à jour avec le jeu en cours.");
       } catch (e) {
-        print("❌ Erreur lors de la mise à jour du joueur $player : $e");
+        debugPrint("❌ Erreur lors de la mise à jour du joueur $player : $e");
       }
     }
 
     // 🔹 Redirection immédiate de l'hôte
     if (mounted) {
-      print("🚀 Redirection de l'hôte vers $gameRoute");
+      debugPrint("🚀 Redirection de l'hôte vers $gameRoute");
       Navigator.pushReplacementNamed(
         context,
         gameRoute,
@@ -152,7 +153,7 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
       );
     }
 
-    print("🎉 Jeu lancé avec succès !");
+    debugPrint("🎉 Jeu lancé avec succès !");
   }
 
 
@@ -208,6 +209,7 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
               icon: const Icon(Icons.exit_to_app),
               onPressed: () async {
                 await _leaveLobby();
+                if (!context.mounted) return;
                 Navigator.pop(context);
               },
               color: theme.textPrimary,
@@ -301,6 +303,7 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
                     ElevatedButton(
                       onPressed: () async {
                         await _leaveLobby();
+                        if (!context.mounted) return;
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(

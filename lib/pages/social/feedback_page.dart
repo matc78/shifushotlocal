@@ -110,6 +110,7 @@ class FeedbackPage extends StatelessWidget {
                       'timestamp': FieldValue.serverTimestamp(),
                     });
 
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -123,6 +124,7 @@ class FeedbackPage extends StatelessWidget {
                     titleController.clear();
                     feedbackController.clear();
                   } catch (e) {
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(

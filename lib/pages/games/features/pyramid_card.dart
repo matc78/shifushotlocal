@@ -94,7 +94,7 @@ Widget build(BuildContext context) {
           double spacing = cardHeight * 0.15; // Espacement fixe entre les cartes
           double startPosition = (screenHeight - (4 * cardHeight + 3 * spacing)) /4; // Centrage vertical
           if (kDebugMode) {
-            print("start position : $startPosition");
+            debugPrint("start position : $startPosition");
           }
 
           return Positioned(
