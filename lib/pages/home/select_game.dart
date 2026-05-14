@@ -231,10 +231,10 @@ class _GameGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 14,
-        crossAxisSpacing: 14,
-        childAspectRatio: 0.95,
+        crossAxisCount: 3,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.92,
       ),
       itemCount: games.length,
       itemBuilder: (_, i) => _GameTile(game: games[i], isGuest: isGuest),
@@ -253,7 +253,7 @@ class _GameTile extends StatelessWidget {
     final locked = isGuest && game.requiresAccount;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
       onTap: () async {
         if (locked) {
           await promptToSignUp(
@@ -275,68 +275,46 @@ class _GameTile extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: game.gradient,
               ),
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               boxShadow: locked ? null : theme.cardShadow,
             ),
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                  ),
-                  child: Text(
-                    game.emoji,
-                    style: const TextStyle(fontSize: 32),
-                  ),
+                Text(
+                  game.emoji,
+                  style: const TextStyle(fontSize: 30),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      game.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.titleMedium.copyWith(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      locked ? 'Compte requis' : game.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.bodyMedium.copyWith(
-                        color: Colors.white.withValues(alpha: 0.85),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 6),
+                Text(
+                  game.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.bodyLarge.copyWith(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    height: 1.15,
+                  ),
                 ),
               ],
             ),
           ),
           if (locked)
             Positioned(
-              top: 10,
-              right: 10,
+              top: 6,
+              right: 6,
               child: Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.35),
+                  color: Colors.black.withValues(alpha: 0.4),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.lock_outline_rounded,
-                  size: 16,
+                  size: 12,
                   color: Colors.white,
                 ),
               ),
