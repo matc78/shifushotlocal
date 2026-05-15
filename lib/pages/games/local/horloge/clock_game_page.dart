@@ -1,8 +1,10 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:playing_cards/playing_cards.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class ClockGameScreen extends StatefulWidget {
   const ClockGameScreen({super.key});
@@ -260,57 +262,58 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
 
     return ScaffoldMessenger(
       key: _scaffoldMessengerKey,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "L'horloge",
-            style: theme.titleMedium,
+      child: AppShell(
+        title: "L'horloge",
+        actions: [
+          IconButton(
+            icon: Icon(Icons.help_outline_rounded, color: theme.textPrimary),
+            onPressed: _showRulesExplanation,
           ),
-          centerTitle: true,
-          backgroundColor: theme.background,
-          iconTheme: IconThemeData(color: theme.textPrimary),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.help_outline, color: theme.primary),
-              onPressed: _showRulesExplanation,
-            ),
-          ],
-        ),
-        backgroundColor: theme.background,
-        body: Stack(
+        ],
+        child: Stack(
           children: [
             Positioned.fill(
-              child: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.identity()
-                  ..scaleByDouble(1.7, 1.7, 1.0, 1.0)
-                  ..rotateZ(pi / 2)
-                  ..translateByDouble(
-                      screenWidth * 0.02, screenWidth * 0.005, 0.0, 1.0),
-                child: Image.asset(
-                  "assets/images/tapis_de_jeu.png",
-                  fit: BoxFit.contain,
+              child: Opacity(
+                opacity: 0.35,
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()
+                    ..scaleByDouble(1.7, 1.7, 1.0, 1.0)
+                    ..rotateZ(pi / 2)
+                    ..translateByDouble(
+                        screenWidth * 0.02, screenWidth * 0.005, 0.0, 1.0),
+                  child: Image.asset(
+                    "assets/images/tapis_de_jeu.png",
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        "C'est le tour de ${players[currentPlayerIndex]}",
-                        style: theme.titleLarge,
-                      ),
-                      const SizedBox(
-                          height: 4), // Réduit l'espace entre les deux textes
-                      Text(
-                        "Compteur : $gorgees gorgée(s), $shots shot(s)",
-                        style: theme.bodyLarge,
-                      ),
-                    ],
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                  child: SectionCard(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    child: Column(
+                      children: [
+                        Text('AU TOUR DE',
+                            style: theme.overline
+                                .copyWith(color: theme.textMuted)),
+                        const SizedBox(height: 4),
+                        Text(players[currentPlayerIndex],
+                            style: theme.titleMedium.copyWith(
+                              color: theme.textPrimary,
+                              fontWeight: FontWeight.w800,
+                            )),
+                        const SizedBox(height: 8),
+                        Text(
+                          '$gorgees gorgée(s) • $shots shot(s)',
+                          style: theme.bodyMedium,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
@@ -321,71 +324,52 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
                       child: Stack(
                         children: [
                           Positioned(
-                            left: screenWidth / 2 - cardSize / 2,
-                            top: screenWidth * 0.7 - cardSize / 2,
-                            child: buildCard(0, cardSize),
-                          ),
+                              left: screenWidth / 2 - cardSize / 2,
+                              top: screenWidth * 0.7 - cardSize / 2,
+                              child: buildCard(0, cardSize)),
                           Positioned(
-                            left: screenWidth / 2 - cardSize / 2,
-                            top: screenWidth * 0.07,
-                            child: buildCard(1, cardSize),
-                          ),
+                              left: screenWidth / 2 - cardSize / 2,
+                              top: screenWidth * 0.07,
+                              child: buildCard(1, cardSize)),
                           Positioned(
-                            left: screenWidth / 2 - cardSize / 2,
-                            top: screenWidth * 0.43 - cardSize / 2,
-                            child: buildCard(5, cardSize),
-                          ),
+                              left: screenWidth / 2 - cardSize / 2,
+                              top: screenWidth * 0.43 - cardSize / 2,
+                              child: buildCard(5, cardSize)),
                           Positioned(
-                            left: screenWidth / 2 - cardSize / 2,
-                            top: screenWidth * 1.24 - cardSize / 2,
-                            child: buildCard(2, cardSize),
-                          ),
+                              left: screenWidth / 2 - cardSize / 2,
+                              top: screenWidth * 1.24 - cardSize / 2,
+                              child: buildCard(2, cardSize)),
                           Positioned(
-                            left: screenWidth / 2 - cardSize / 2,
-                            top: screenWidth * 0.97 - cardSize / 2,
-                            child: buildCard(8, cardSize),
-                          ),
+                              left: screenWidth / 2 - cardSize / 2,
+                              top: screenWidth * 0.97 - cardSize / 2,
+                              child: buildCard(8, cardSize)),
                           Positioned(
-                            left: screenWidth * 0.03,
-                            top: screenWidth * 0.7 - cardSize / 2,
-                            child: buildCard(3, cardSize),
-                          ),
+                              left: screenWidth * 0.03,
+                              top: screenWidth * 0.7 - cardSize / 2,
+                              child: buildCard(3, cardSize)),
                           Positioned(
-                            left: screenWidth * 0.30 - cardSize / 2,
-                            top: screenWidth * 0.7 - cardSize / 2,
-                            child: buildCard(7, cardSize),
-                          ),
+                              left: screenWidth * 0.30 - cardSize / 2,
+                              top: screenWidth * 0.7 - cardSize / 2,
+                              child: buildCard(7, cardSize)),
                           Positioned(
-                            left: screenWidth * 0.97 - cardSize,
-                            top: screenWidth * 0.7 - cardSize / 2,
-                            child: buildCard(4, cardSize),
-                          ),
+                              left: screenWidth * 0.97 - cardSize,
+                              top: screenWidth * 0.7 - cardSize / 2,
+                              child: buildCard(4, cardSize)),
                           Positioned(
-                            left: screenWidth * 0.70 - cardSize / 2,
-                            top: screenWidth * 0.7 - cardSize / 2,
-                            child: buildCard(6, cardSize),
-                          ),
+                              left: screenWidth * 0.70 - cardSize / 2,
+                              top: screenWidth * 0.7 - cardSize / 2,
+                              child: buildCard(6, cardSize)),
                         ],
                       ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                  child: GradientButton(
+                    label: 'Fin du jeu',
+                    icon: Icons.flag_rounded,
                     onPressed: _goToNextGame,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      minimumSize: const Size(150, 20), // Largeur maximale
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      "Fin du jeu",
-                      style: theme.buttonText,
-                    ),
                   ),
                 ),
               ],
