@@ -1,10 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:shifushotlocal/services/auth_service.dart';
+import 'package:shifushotlocal/services/user_repository.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -29,6 +28,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   static final _passwordRegex = RegExp(
       r'^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?/~\\-])[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?/~\\-]{8,}$');
 
+  AuthService get _auth => AuthServiceLocator.instance;
+  UserRepository get _users => UserRepositoryLocator.instance;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -51,12 +53,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     if (!_formKey.currentState!.validate()) return;
     final password = _passwordController.text.trim();
     final confirm = _confirmPasswordController.text.trim();
-    final email = _emailController.text.trim();
     final pseudo = _pseudoController.text.trim();
 
     if (!_passwordRegex.hasMatch(password)) {
-      _snack(
-          'Mot de passe : 8 caractères min, 1 majuscule, 1 chiffre, 1 spécial.');
+      _snack('Mot de passe : 8 caractères min, 1 majuscule, 1 chiffre, 1 spécial.');
       return;
     }
     if (password != confirm) {
@@ -65,114 +65,54 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     }
 
     setState(() => _loading = true);
-    try {
-      final users = FirebaseFirestore.instance.collection('users');
-      final taken =
-          await users.where('pseudo', isEqualTo: pseudo).limit(1).get();
-      if (taken.docs.isNotEmpty) {
-        _snack('Pseudo déjà utilisé.');
-        return;
-      }
 
-      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      await cred.user?.sendEmailVerification();
-      final user = cred.user;
-      if (user == null) {
-        _snack('Erreur : utilisateur non authentifié.');
-        return;
-      }
-
-      await users.doc(user.uid).set({
-        'email': email,
-        'pseudo': pseudo,
-        'name': _nameController.text.trim(),
-        'surname': _surnameController.text.trim(),
-        'gender': _selectedGender,
-        'createdAt': Timestamp.now(),
-        'emailVerified': false,
-        'friends': [],
-        'pending_approval': [],
-        'friend_requests': [],
-        'photoUrl':
-            'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
-        'notifications': {
-          'enabled': true,
-          'friend_requests': true,
-          'shifushot_requests': true,
-        },
-      });
-
-      _snack('Compte créé ! Un email de vérification a été envoyé.');
+    if (await _users.isPseudoTaken(pseudo)) {
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, Routes.connexion);
-    } on FirebaseAuthException catch (e) {
-      _snack(switch (e.code) {
-        'email-already-in-use' => 'Cet email est déjà utilisé.',
-        'weak-password' => 'Mot de passe trop faible.',
-        _ => 'Erreur : ${e.message}',
-      });
-    } catch (e) {
-      _snack("Erreur : $e");
-    } finally {
-      if (mounted) setState(() => _loading = false);
+      setState(() => _loading = false);
+      _snack('Pseudo déjà utilisé.');
+      return;
+    }
+
+    final result = await _auth.createAccountWithEmail(
+      email: _emailController.text.trim(),
+      password: password,
+      pseudo: pseudo,
+      name: _nameController.text.trim(),
+      surname: _surnameController.text.trim(),
+      gender: _selectedGender,
+    );
+    if (!mounted) return;
+    setState(() => _loading = false);
+
+    switch (result) {
+      case AuthSuccess():
+        _snack('Compte créé ! Un email de vérification a été envoyé.');
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, Routes.connexion);
+      case AuthFailure(:final message):
+        _snack(message);
+      case AuthEmailNotVerified():
+      case AuthCancelled():
+        break;
     }
   }
 
   Future<void> _signInWithGoogle() async {
     setState(() => _loading = true);
-    try {
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return;
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      final userCred =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-      final user = userCred.user;
-      if (user == null) {
-        _snack('Échec de la connexion avec Google.');
-        return;
-      }
+    final result = await _auth.signInWithGoogle();
+    if (!mounted) return;
+    setState(() => _loading = false);
 
-      final users = FirebaseFirestore.instance.collection('users');
-      final userDoc = await users.doc(user.uid).get();
-      if (!userDoc.exists) {
-        final baseName = (user.email ?? '').split('@').first;
-        final existing = await users.get();
-        final pseudo = 'noob${existing.docs.length + 1}';
-        await users.doc(user.uid).set({
-          'email': user.email ?? '',
-          'pseudo': pseudo,
-          'name': baseName,
-          'surname': baseName,
-          'photoUrl': user.photoURL ?? '',
-          'gender': 'Autre',
-          'createdAt': Timestamp.now(),
-          'friends': [],
-          'pending_approval': [],
-          'friend_requests': [],
-          'notifications': {
-            'enabled': true,
-            'friend_requests': true,
-            'shifushot_requests': true,
-          },
-        });
-        _snack('Bienvenue, $pseudo !');
-      } else {
-        _snack('Bienvenue ${userDoc['pseudo']} !');
-      }
-
-      if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, Routes.home, (_) => false);
-    } catch (e) {
-      _snack('Erreur Google : $e');
-    } finally {
-      if (mounted) setState(() => _loading = false);
+    switch (result) {
+      case AuthSuccess(:final isNewUser):
+        _snack(isNewUser ? 'Bienvenue !' : 'Connexion réussie !');
+        if (!mounted) return;
+        Navigator.pushNamedAndRemoveUntil(context, Routes.home, (_) => false);
+      case AuthFailure(:final message):
+        _snack(message);
+      case AuthEmailNotVerified():
+      case AuthCancelled():
+        break;
     }
   }
 
@@ -255,8 +195,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           style: theme.bodyLarge,
                           decoration: const InputDecoration(hintText: 'Nom'),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp('[a-zA-Z]')),
+                            FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
                           ],
                           validator: (v) =>
                               (v == null || v.isEmpty) ? 'Requis' : null,
@@ -269,8 +208,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           style: theme.bodyLarge,
                           decoration: const InputDecoration(hintText: 'Prénom'),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp('[a-zA-Z]')),
+                            FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
                           ],
                           validator: (v) =>
                               (v == null || v.isEmpty) ? 'Requis' : null,
