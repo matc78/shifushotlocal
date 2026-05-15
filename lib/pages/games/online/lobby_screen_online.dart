@@ -1,11 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart'; // Pour restreindre les entrées du code lobby
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shifushotlocal/routes.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 import 'package:uuid/uuid.dart';
-import 'lobby_waiting_screen.dart'; // Page d'attente du lobby
+
+import 'lobby_waiting_screen.dart';
 
 class OnlineLobbyScreen extends StatefulWidget {
   final String gameName; // 🔹 Nom du jeu sélectionné
@@ -115,83 +117,82 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title:
-            Text("Jeu en Ligne - ${widget.gameName}", style: theme.titleMedium),
-        backgroundColor: theme.background,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      backgroundColor: theme.background,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              /// **Section Création du Lobby**
-              Text("Créer un Lobby", style: theme.titleMedium),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _isProcessing ? null : _createLobby,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.textPrimary,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 14, horizontal: 30),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-                child: _isProcessing
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text("Créer un Lobby", style: theme.buttonText),
-              ),
-              const SizedBox(height: 20),
-              const Divider(thickness: 1.5),
-              const SizedBox(height: 20),
-
-              /// **Section Rejoindre un Lobby**
-              Text("Rejoindre un Lobby", style: theme.titleMedium),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _lobbyCodeController,
-                textCapitalization: TextCapitalization.characters,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9]+$')),
+    return AppShell(
+      title: 'En ligne — ${widget.gameName}',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 8),
+            SectionCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('CRÉER UN LOBBY',
+                      style: theme.overline
+                          .copyWith(color: theme.textMuted, letterSpacing: 2)),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Tu génères un code que tes potes utilisent pour rejoindre.",
+                    style: theme.bodyMedium,
+                  ),
+                  const SizedBox(height: 14),
+                  GradientButton(
+                    label: _isProcessing ? 'Création…' : 'Créer un lobby',
+                    icon: Icons.add_rounded,
+                    onPressed: _isProcessing ? null : _createLobby,
+                  ),
                 ],
-                decoration: InputDecoration(
-                  labelText: "Entrer un Code Lobby",
-                  labelStyle: theme.bodyMedium,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: theme.textSecondary),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: theme.primary),
-                  ),
-                ),
-                textAlign: TextAlign.center,
-                style: theme.bodyLarge,
               ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _isProcessing ? null : _joinLobby,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.secondary,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 14, horizontal: 30),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(child: Divider(color: theme.border)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('OU', style: theme.overline),
                 ),
-                child: _isProcessing
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text("Rejoindre", style: theme.buttonText),
+                Expanded(child: Divider(color: theme.border)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            SectionCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('REJOINDRE UN LOBBY',
+                      style: theme.overline
+                          .copyWith(color: theme.textMuted, letterSpacing: 2)),
+                  const SizedBox(height: 8),
+                  Text('Tape le code partagé par l\'hôte.',
+                      style: theme.bodyMedium),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: _lobbyCodeController,
+                    textCapitalization: TextCapitalization.characters,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^[a-zA-Z0-9]+$')),
+                    ],
+                    textAlign: TextAlign.center,
+                    style: theme.titleMedium.copyWith(
+                      letterSpacing: 6,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    decoration: const InputDecoration(hintText: 'CODE'),
+                  ),
+                  const SizedBox(height: 14),
+                  GhostButton(
+                    label: _isProcessing ? 'Connexion…' : 'Rejoindre',
+                    icon: Icons.login_rounded,
+                    onPressed: _isProcessing ? null : _joinLobby,
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

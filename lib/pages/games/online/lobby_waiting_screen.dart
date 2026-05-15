@@ -1,9 +1,11 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class LobbyWaitingScreen extends StatefulWidget {
   final String lobbyId;
@@ -204,39 +206,32 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) await _leaveLobby();
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Lobby en attente", style: theme.titleMedium),
-          backgroundColor: theme.background,
-          elevation: 0,
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.exit_to_app),
-              onPressed: () async {
-                await _leaveLobby();
-                if (!context.mounted) return;
-                Navigator.pop(context);
-              },
-              color: theme.textPrimary,
-            ),
-          ],
-        ),
-        backgroundColor: theme.background,
-        body: StreamBuilder<DocumentSnapshot>(
+      child: AppShell(
+        title: 'Lobby en attente',
+        actions: [
+          IconButton(
+            icon: Icon(Icons.exit_to_app_rounded, color: theme.textPrimary),
+            onPressed: () async {
+              await _leaveLobby();
+              if (!context.mounted) return;
+              Navigator.pop(context);
+            },
+          ),
+        ],
+        child: StreamBuilder<DocumentSnapshot>(
           stream:
               _firestore.collection('lobbies').doc(widget.lobbyId).snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData || !snapshot.data!.exists) {
-              return Center(
-                child: Text("Lobby supprimé ou introuvable",
-                    style: theme.bodyLarge),
+              return const EmptyState(
+                icon: Icons.broken_image_rounded,
+                title: 'Lobby supprimé',
+                subtitle: "Le lobby n'existe plus.",
               );
             }
-
-            var lobbyData = snapshot.data!;
-            List<dynamic> players = lobbyData['players'] ?? [];
-            bool isStarted = lobbyData['isStarted'] ?? false;
+            final lobbyData = snapshot.data!;
+            final players = List<dynamic>.from(lobbyData['players'] ?? []);
+            final isStarted = lobbyData['isStarted'] ?? false;
 
             if (isStarted) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -244,99 +239,137 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
                   context,
                   widget.gameRoute,
                   arguments: {
-                    'lobbyId': widget.lobbyId, // ✅ Pass the correct lobby ID
+                    'lobbyId': widget.lobbyId,
                     'players': players,
                   },
                 );
               });
             }
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Code du Lobby :\n ${widget.lobbyId}",
-                      style: theme.bodyLarge.copyWith(fontSize: 35),
-                      textAlign: TextAlign.center,
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SectionCard(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Text('CODE DU LOBBY',
+                            style: theme.overline.copyWith(
+                                color: theme.textMuted, letterSpacing: 2)),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ShaderMask(
+                              shaderCallback: (rect) =>
+                                  theme.brandGradient.createShader(rect),
+                              child: Text(
+                                widget.lobbyId,
+                                style: theme.displayLarge.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 40,
+                                  letterSpacing: 6,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            IconButton(
+                              icon: Icon(Icons.content_copy_rounded,
+                                  color: theme.primary),
+                              onPressed: () {
+                                Clipboard.setData(
+                                    ClipboardData(text: widget.lobbyId));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Code copié !',
+                                        style: theme.bodyMedium),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-
-                    // 🔹 Bouton de copie
-                    IconButton(
-                      icon: Icon(Icons.content_copy,
-                          color: theme.primary, size: 20), // ✅ Icône de copie
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(
-                            text: widget
-                                .lobbyId)); // ✅ Copie dans le presse-papier
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: theme.background,
-                            content:
-                                Text("Code copié !", style: theme.bodyLarge),
-                            duration: const Duration(seconds: 2),
+                  ),
+                  const SizedBox(height: 20),
+                  Text('JOUEURS CONNECTÉS (${players.length})',
+                      style: theme.overline.copyWith(
+                          color: theme.textPrimary, letterSpacing: 2)),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: players.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 6),
+                      itemBuilder: (_, i) {
+                        final pid = players[i] as String;
+                        final name = playerNames[pid] ?? 'Chargement…';
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: theme.surface,
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMd),
+                            border: Border.all(color: theme.border),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 32,
+                                height: 32,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  gradient: theme.brandGradient,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                  style: theme.bodyLarge.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(name, style: theme.bodyLarge),
+                              ),
+                            ],
                           ),
                         );
                       },
                     ),
-                    const SizedBox(height: 50),
-                    Text(
-                      "Joueurs connectés :",
-                      style: theme.titleMedium.copyWith(fontSize: 26),
-                    ),
-                    const SizedBox(height: 10),
-                    ...players.map((playerId) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0),
-                        child: Text(
-                          playerNames[playerId] ?? "Chargement...",
-                          style: theme.bodyLarge.copyWith(fontSize: 24),
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 30),
-                    isHost
-                        ? ElevatedButton(
-                            onPressed: players.length < 2
-                                ? null
-                                : _startGame, // ✅ Désactive si moins de 2 joueurs
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: players.length < 2
-                                  ? Colors.grey
-                                  : theme.primary, // ✅ Grise le bouton
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 32, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                            ),
-                            child: Text("Démarrer la Partie",
-                                style: theme.buttonText),
-                          )
-                        : Text(
-                            "En attente de l'hôte...",
-                            style: theme.bodyLarge
-                                .copyWith(fontStyle: FontStyle.italic),
-                          ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await _leaveLobby();
-                        if (!context.mounted) return;
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.secondary,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 32, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                  ),
+                  if (isHost)
+                    GradientButton(
+                      label: 'Démarrer la partie',
+                      icon: Icons.play_arrow_rounded,
+                      onPressed: players.length < 2 ? null : _startGame,
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        "En attente de l'hôte…",
+                        textAlign: TextAlign.center,
+                        style: theme.bodyLarge
+                            .copyWith(fontStyle: FontStyle.italic),
                       ),
-                      child: Text("Quitter le Lobby", style: theme.buttonText),
                     ),
-                  ],
-                ),
+                  const SizedBox(height: 10),
+                  GhostButton(
+                    label: 'Quitter le lobby',
+                    icon: Icons.logout_rounded,
+                    onPressed: () async {
+                      await _leaveLobby();
+                      if (!context.mounted) return;
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               ),
             );
           },
