@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 import 'package:shifushotlocal/routes.dart';
 
 class ClickerGame extends StatefulWidget {
@@ -234,104 +236,121 @@ class _ClickerGameState extends State<ClickerGame> {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        title: Text(
-          "Le Clicker",
-          style: theme.titleMedium,
-        ),
-        backgroundColor: theme.background,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: theme.textPrimary),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
+    return AppShell(
+      title: 'Le Clicker',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+        child: Column(
+          children: [
+            // Score / state card
+            SectionCard(
+              padding: const EdgeInsets.all(20),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    playerName,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: theme.textPrimary,
+                    playerName.toUpperCase(),
+                    style: theme.overline
+                        .copyWith(color: theme.textMuted, letterSpacing: 2),
+                  ),
+                  const SizedBox(height: 8),
+                  ShaderMask(
+                    shaderCallback: (rect) =>
+                        theme.brandGradient.createShader(rect),
+                    child: Text(
+                      '$score',
+                      style: theme.displayLarge.copyWith(
+                          color: Colors.white, fontSize: 64, height: 1),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'High Score personnel : $highScore',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: theme.secondary,
-                    ),
+                  const SizedBox(height: 6),
+                  Text('SCORE',
+                      style: theme.overline.copyWith(color: theme.textMuted)),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _Stat(label: 'TEMPS', value: '${timeLeft}s'),
+                      _Stat(label: 'RECORD', value: '$highScore'),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Temps restant : $timeLeft",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: theme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "Score: $score",
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: theme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  if (showStartButton)
-                    ElevatedButton(
-                      onPressed: startClickingPhase,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Text(
-                        "C'EST PARTI !",
-                        style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ),
-                  if (!showStartButton)
-                    ElevatedButton(
-                      onPressed: incrementScore,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.primary,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 150),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Text(
-                        "TAPE MOI !!\nMAIS TAPE PLUS VITE !!\nP****N J'ADORE ÇA !!",
-                        style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ),
                 ],
               ),
             ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Center(
+                child: showStartButton
+                    ? GradientButton(
+                        label: "C'EST PARTI !",
+                        icon: Icons.play_arrow_rounded,
+                        onPressed: startClickingPhase,
+                        height: 64,
+                      )
+                    : _BigTapTarget(onTap: incrementScore),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Stat extends StatelessWidget {
+  const _Stat({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    return Column(
+      children: [
+        Text(label,
+            style: theme.overline
+                .copyWith(color: theme.textMuted, letterSpacing: 2)),
+        const SizedBox(height: 4),
+        Text(value,
+            style: theme.titleMedium.copyWith(
+              color: theme.textPrimary,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+            )),
+      ],
+    );
+  }
+}
+
+class _BigTapTarget extends StatelessWidget {
+  const _BigTapTarget({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 20),
+          decoration: BoxDecoration(
+            gradient: theme.brandGradient,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+            boxShadow: theme.glowShadow,
           ),
-        ],
+          child: Text(
+            'TAP TAP TAP\nPLUS VITE !!',
+            textAlign: TextAlign.center,
+            style: theme.titleLarge.copyWith(
+              color: Colors.white,
+              fontSize: 28,
+              height: 1.2,
+            ),
+          ),
+        ),
       ),
     );
   }
