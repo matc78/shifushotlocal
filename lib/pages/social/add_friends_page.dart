@@ -1,10 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
-import 'package:cloud_functions/cloud_functions.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class AddFriendsPage extends StatefulWidget {
   const AddFriendsPage({super.key});
@@ -185,95 +186,141 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: theme.background,
-        elevation: 0,
-        title: Text('Ajouter des amis', style: theme.titleMedium),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      backgroundColor: theme.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Material(
-                elevation: 2,
-                borderRadius: BorderRadius.circular(12),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Rechercher un utilisateur par pseudo...',
-                    prefixIcon: Icon(Icons.search, color: theme.textSecondary),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.all(16),
-                  ),
-                  onChanged: searchUsers,
-                ),
+    return AppShell(
+      title: 'Ajouter des amis',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              style: theme.bodyLarge,
+              decoration: InputDecoration(
+                hintText: 'Rechercher par pseudo…',
+                prefixIcon: Icon(Icons.search_rounded, color: theme.textMuted),
               ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: StreamBuilder<DocumentSnapshot>(
-                  stream: fetchCurrentUserStream(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (!snapshot.hasData || !snapshot.data!.exists) {
-                      return const Center(
-                          child: Text('Aucun utilisateur trouvé.'));
-                    }
-
-                    final userData =
-                        snapshot.data!.data() as Map<String, dynamic>;
-                    final currentUserFriends = userData['friends'] ?? [];
-                    final currentUserFriendRequests =
-                        userData['friend_requests'] ?? [];
-
+              onChanged: searchUsers,
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: StreamBuilder<DocumentSnapshot>(
+                stream: fetchCurrentUserStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return ListView.separated(
-                      itemCount: searchResults.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (context, index) {
-                        final user = searchResults[index];
-                        final friendUid = user['id'];
-
-                        String buttonText =
-                            currentUserFriends.contains(friendUid)
-                                ? 'Ami'
-                                : currentUserFriendRequests.contains(friendUid)
-                                    ? 'En attente'
-                                    : 'Ajouter';
-
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: (user['photoUrl'] != null &&
-                                    (user['photoUrl'] as String).isNotEmpty)
-                                ? CachedNetworkImageProvider(
-                                    user['photoUrl'] as String)
-                                : null,
-                          ),
-                          title: Text('${user['surname']} ${user['name']}'),
-                          subtitle: Text(user['pseudo'] ?? ''),
-                          trailing: ElevatedButton(
-                            onPressed: buttonText == 'Ajouter'
-                                ? () => sendFriendRequest(friendUid)
-                                : null,
-                            child: Text(buttonText),
-                          ),
-                        );
-                      },
+                      itemCount: 4,
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      itemBuilder: (_, __) => const SkeletonListTile(),
                     );
-                  },
-                ),
+                  }
+                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return const EmptyState(
+                      icon: Icons.search_off_rounded,
+                      title: 'Aucun utilisateur trouvé',
+                      subtitle: 'Essaie un autre pseudo.',
+                    );
+                  }
+                  final userData =
+                      snapshot.data!.data() as Map<String, dynamic>;
+                  final friends = userData['friends'] ?? [];
+                  final requests = userData['friend_requests'] ?? [];
+
+                  if (searchResults.isEmpty) {
+                    return const EmptyState(
+                      icon: Icons.person_search_rounded,
+                      title: 'Aucun résultat',
+                      subtitle: 'Tape un pseudo pour rechercher.',
+                    );
+                  }
+                  return ListView.separated(
+                    itemCount: searchResults.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (_, i) {
+                      final user = searchResults[i];
+                      final uid = user['id'];
+                      final isFriend = friends.contains(uid);
+                      final isPending = requests.contains(uid);
+                      final label = isFriend
+                          ? 'Ami'
+                          : isPending
+                              ? 'Attente'
+                              : 'Ajouter';
+                      final photoUrl = user['photoUrl'] as String?;
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: theme.surface,
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusMd),
+                          border: Border.all(color: theme.border),
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 22,
+                              backgroundColor: theme.surfaceAlt,
+                              backgroundImage:
+                                  (photoUrl != null && photoUrl.isNotEmpty)
+                                      ? CachedNetworkImageProvider(photoUrl)
+                                      : null,
+                              child: (photoUrl == null || photoUrl.isEmpty)
+                                  ? Icon(Icons.person, color: theme.textMuted)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(user['pseudo'] ?? '',
+                                      style: theme.bodyLarge.copyWith(
+                                        color: theme.textPrimary,
+                                        fontWeight: FontWeight.w700,
+                                      )),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                      '${user['surname'] ?? ''} ${user['name'] ?? ''}'
+                                          .trim(),
+                                      style: theme.bodyMedium),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 36,
+                              child: !isFriend && !isPending
+                                  ? GradientButton(
+                                      label: label,
+                                      onPressed: () => sendFriendRequest(uid),
+                                      expanded: false,
+                                      height: 36,
+                                    )
+                                  : Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: theme.surfaceAlt,
+                                        borderRadius: BorderRadius.circular(
+                                            AppTheme.radiusPill),
+                                        border: Border.all(color: theme.border),
+                                      ),
+                                      child: Text(label,
+                                          style: theme.bodyMedium.copyWith(
+                                            color: theme.textMuted,
+                                            fontWeight: FontWeight.w700,
+                                          )),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

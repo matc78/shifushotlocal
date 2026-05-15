@@ -1,11 +1,13 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -15,18 +17,21 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final ImagePicker _picker = ImagePicker();
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  final _storage = FirebaseStorage.instance;
+  final _picker = ImagePicker();
 
-  final TextEditingController _pseudoController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _surnameController = TextEditingController();
+  final _pseudoController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _surnameController = TextEditingController();
 
   String? _gender;
   String? _photoUrl;
   bool _isUploading = false;
+
+  static const _defaultPhoto =
+      'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg';
 
   @override
   void initState() {
@@ -34,75 +39,61 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _fetchUserData();
   }
 
-  Future<void> _fetchUserData() async {
-    final User? user = _auth.currentUser;
-    if (user != null) {
-      final DocumentSnapshot userDoc =
-          await _firestore.collection('users').doc(user.uid).get();
-      if (userDoc.exists) {
-        final data = userDoc.data() as Map<String, dynamic>?;
+  @override
+  void dispose() {
+    _pseudoController.dispose();
+    _nameController.dispose();
+    _surnameController.dispose();
+    super.dispose();
+  }
 
-        setState(() {
-          _pseudoController.text = data?['pseudo'] ?? '';
-          _nameController.text = data?['name'] ?? '';
-          _surnameController.text = data?['surname'] ?? '';
-          _gender = data?['gender'] ?? 'Autre';
-          _photoUrl = data?['photoUrl'];
-        });
-      }
-    }
+  Future<void> _fetchUserData() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+    final doc = await _firestore.collection('users').doc(user.uid).get();
+    if (!mounted) return;
+    if (!doc.exists) return;
+    final data = doc.data();
+    setState(() {
+      _pseudoController.text = data?['pseudo'] ?? '';
+      _nameController.text = data?['name'] ?? '';
+      _surnameController.text = data?['surname'] ?? '';
+      _gender = data?['gender'] ?? 'Autre';
+      _photoUrl = data?['photoUrl'];
+    });
   }
 
   Future<void> _pickAndUploadImage() async {
     try {
-      final User? user = _auth.currentUser;
+      final user = _auth.currentUser;
       if (user == null) return;
-
-      final XFile? pickedFile =
-          await _picker.pickImage(source: ImageSource.gallery);
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile == null) return;
+      final imageFile = File(pickedFile.path);
+      setState(() => _isUploading = true);
 
-      File imageFile = File(pickedFile.path);
-
-      setState(() {
-        _isUploading = true;
-      });
-
-      Reference ref = _storage.ref().child('profile_picture/${user.uid}.jpg');
-      UploadTask uploadTask = ref.putFile(imageFile);
-      TaskSnapshot snapshot = await uploadTask;
-
+      final ref = _storage.ref().child('profile_picture/${user.uid}.jpg');
+      final snapshot = await ref.putFile(imageFile);
       if (snapshot.state == TaskState.success) {
-        String newPhotoUrl = await snapshot.ref.getDownloadURL();
-
-        await _firestore.collection('users').doc(user.uid).update({
-          'photoUrl': newPhotoUrl,
-        });
-
-        setState(() {
-          _photoUrl = newPhotoUrl;
-          _isUploading = false;
-        });
-
+        final newUrl = await snapshot.ref.getDownloadURL();
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .update({'photoUrl': newUrl});
         if (!mounted) return;
+        setState(() => _photoUrl = newUrl);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Photo de profil mise à jour avec succès !"),
-            backgroundColor: Colors.green,
-          ),
+              content: Text('Photo mise à jour !'),
+              backgroundColor: Colors.green),
         );
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Erreur lors de l'upload : $e"),
-            backgroundColor: Colors.red),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Erreur upload : $e"), backgroundColor: Colors.red));
     } finally {
-      setState(() {
-        _isUploading = false;
-      });
+      if (mounted) setState(() => _isUploading = false);
     }
   }
 
@@ -110,127 +101,102 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: theme.background,
-        elevation: 0,
-        title: Text('Modifier le profil', style: theme.titleMedium),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.textPrimary),
-          onPressed: () => Navigator.pop(context, _photoUrl != null),
-        ),
-      ),
-      backgroundColor: theme.background,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: _pickAndUploadImage,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    ClipOval(
-                      child: ColorFiltered(
-                        colorFilter: ColorFilter.mode(
-                          Colors.black.withValues(alpha: 0.3),
-                          BlendMode.darken,
-                        ),
-                        child: CachedNetworkImage(
-                          imageUrl: _photoUrl ??
-                              "https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg",
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                        ),
+    return AppShell(
+      title: 'Modifier le profil',
+      onBack: () => Navigator.pop(context, _photoUrl != null),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: _pickAndUploadImage,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: theme.brandGradient,
+                    ),
+                    padding: const EdgeInsets.all(3),
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: _photoUrl ?? _defaultPhoto,
+                        width: 114,
+                        height: 114,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    if (_isUploading) const CircularProgressIndicator(),
-                    Positioned(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                        padding: const EdgeInsets.all(10),
-                        child: const Icon(Icons.edit,
-                            size: 30, color: Colors.black),
-                      ),
+                  ),
+                  if (_isUploading)
+                    const SizedBox(
+                      width: 120,
+                      height: 120,
+                      child: Center(child: CircularProgressIndicator()),
                     ),
-                  ],
-                ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: theme.surface,
+                        border: Border.all(color: theme.primary, width: 2),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(Icons.edit_rounded,
+                          size: 18, color: theme.primary),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 50),
-              _buildTextField(theme, 'Pseudo', _pseudoController),
-              _buildTextField(theme, 'Nom', _nameController),
-              _buildTextField(theme, 'Prénom', _surnameController),
-              _buildDropdownField(
-                  theme, 'Genre', _gender, ['Homme', 'Femme', 'Autre']),
-              const SizedBox(height: 100),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.secondary,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-                child: Text('Enregistrer', style: theme.buttonText),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-      AppTheme theme, String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdownField(
-      AppTheme theme, String label, String? value, List<String> items,
-      {double height = 60.0}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: SizedBox(
-        height: height, // 🔹 Définir la hauteur
-        child: InputDecorator(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            contentPadding: const EdgeInsets.symmetric(
-                vertical: 10, horizontal: 16), // Ajuste l'intérieur du champ
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: value,
-              isExpanded: true,
-              items: items.map((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item, style: theme.bodyMedium),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _gender = newValue;
-                });
-              },
             ),
-          ),
+            const SizedBox(height: 32),
+            TextField(
+              controller: _pseudoController,
+              style: theme.bodyLarge,
+              decoration: const InputDecoration(hintText: 'Pseudo'),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _nameController,
+                    style: theme.bodyLarge,
+                    decoration: const InputDecoration(hintText: 'Nom'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _surnameController,
+                    style: theme.bodyLarge,
+                    decoration: const InputDecoration(hintText: 'Prénom'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: _gender,
+              dropdownColor: theme.surface,
+              style: theme.bodyLarge,
+              decoration: const InputDecoration(hintText: 'Genre'),
+              items: const ['Homme', 'Femme', 'Autre']
+                  .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                  .toList(),
+              onChanged: (v) => setState(() => _gender = v),
+            ),
+            const SizedBox(height: 32),
+            GradientButton(
+              label: 'Enregistrer',
+              icon: Icons.check_rounded,
+              onPressed: () => Navigator.pop(context, true),
+            ),
+          ],
         ),
       ),
     );

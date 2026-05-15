@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'sound_board_page.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
+
+import 'sound_board_page.dart';
 
 class SoundCategorySelectionPage extends StatelessWidget {
   SoundCategorySelectionPage({super.key});
@@ -36,53 +37,65 @@ class SoundCategorySelectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        title: Text('Choisis une catégorie', style: theme.titleMedium),
-        centerTitle: true,
-        backgroundColor: theme.background,
-        elevation: 0,
-        iconTheme: IconThemeData(color: theme.textPrimary),
-      ),
-      body: ListView.builder(
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final category = categories.keys.elementAt(index);
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: Colors.white,
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              leading: ColorFiltered(
-                colorFilter:
-                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
-                child: CachedNetworkImage(
-                  imageUrl:
-                      'https://img.icons8.com/?size=100&id=FaFhLHDGUZAA&format=png&color=000000',
-                  width: 32,
-                  height: 32,
-                  errorWidget: (context, url, error) =>
-                      Icon(Icons.error, color: theme.textSecondary),
-                ),
-              ),
-              title: Text(category, style: theme.titleMedium),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.push(
+    return AppShell(
+      title: 'Sonothèque',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+        child: ListView.separated(
+          itemCount: categories.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          itemBuilder: (_, i) {
+            final name = categories.keys.elementAt(i);
+            return Material(
+              color: theme.surface,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => SoundBoardPage(
-                      categoryName: category,
-                      sounds: categories[category]!,
+                      categoryName: name,
+                      sounds: categories[name]!,
                     ),
                   ),
-                );
-              },
-            ),
-          );
-        },
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                    border: Border.all(color: theme.border),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          gradient: theme.brandGradient,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.volume_up_rounded,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Text(name,
+                            style: theme.bodyLarge.copyWith(
+                              color: theme.textPrimary,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            )),
+                      ),
+                      Icon(Icons.chevron_right_rounded, color: theme.textMuted),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

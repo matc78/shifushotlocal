@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class SoundBoardPage extends StatefulWidget {
-  final String categoryName;
-  final List<String> sounds;
-
   const SoundBoardPage({
     required this.categoryName,
     required this.sounds,
     super.key,
   });
+
+  final String categoryName;
+  final List<String> sounds;
 
   @override
   State<SoundBoardPage> createState() => _SoundBoardPageState();
@@ -19,9 +19,9 @@ class SoundBoardPage extends StatefulWidget {
 
 class _SoundBoardPageState extends State<SoundBoardPage>
     with SingleTickerProviderStateMixin {
-  final AudioPlayer player = AudioPlayer();
-  String? playing;
-  bool isLocked = false;
+  final AudioPlayer _player = AudioPlayer();
+  String? _playing;
+  bool _isLocked = false;
 
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -29,7 +29,6 @@ class _SoundBoardPageState extends State<SoundBoardPage>
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
@@ -40,29 +39,26 @@ class _SoundBoardPageState extends State<SoundBoardPage>
           _controller.forward();
         }
       });
-
     _scaleAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
 
   Future<void> _playSound(String path) async {
-    if (isLocked) return;
-
-    final relativePath = path.replaceFirst('assets/', '');
+    if (_isLocked) return;
+    final relative = path.replaceFirst('assets/', '');
     setState(() {
-      playing = path;
-      isLocked = true;
+      _playing = path;
+      _isLocked = true;
     });
-
     _controller.forward();
-
-    await player.play(AssetSource(relativePath));
-    player.onPlayerComplete.listen((event) {
+    await _player.play(AssetSource(relative));
+    _player.onPlayerComplete.listen((_) {
+      if (!mounted) return;
       _controller.stop();
       setState(() {
-        playing = null;
-        isLocked = false;
+        _playing = null;
+        _isLocked = false;
       });
     });
   }
@@ -70,66 +66,57 @@ class _SoundBoardPageState extends State<SoundBoardPage>
   @override
   void dispose() {
     _controller.dispose();
+    _player.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        title: Text(widget.categoryName, style: theme.titleMedium),
-        centerTitle: true,
-        backgroundColor: theme.background,
-        elevation: 0,
-        iconTheme: IconThemeData(color: theme.textPrimary),
-      ),
-      body: GridView.count(
+    return AppShell(
+      title: widget.categoryName,
+      child: GridView.count(
         crossAxisCount: 2,
-        padding: const EdgeInsets.all(16),
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        children: widget.sounds.map((soundPath) {
-          final label = soundPath.split('/').last.split('.').first;
-          final isPlaying = playing == soundPath;
-
-          final animatedCard = AnimatedBuilder(
-            animation: _scaleAnimation,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: isPlaying ? _scaleAnimation.value : 1.0,
-                child: child,
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: isPlaying ? theme.secondary : theme.buttonColor,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 6,
-                    offset: Offset(2, 4),
-                  )
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: theme.buttonText.copyWith(fontSize: 18),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        children: widget.sounds.map((path) {
+          final label = path.split('/').last.split('.').first;
+          final isPlaying = _playing == path;
+          return GestureDetector(
+            onTap: () => _playSound(path),
+            child: AbsorbPointer(
+              absorbing: _isLocked && !isPlaying,
+              child: AnimatedBuilder(
+                animation: _scaleAnimation,
+                builder: (context, child) => Transform.scale(
+                  scale: isPlaying ? _scaleAnimation.value : 1.0,
+                  child: child,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: isPlaying ? theme.brandGradient : null,
+                    color: isPlaying ? null : theme.surface,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                    border: Border.all(
+                        color: isPlaying ? theme.primary : theme.border),
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: theme.bodyLarge.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          );
-
-          return GestureDetector(
-            onTap: () => _playSound(soundPath),
-            child: AbsorbPointer(
-              absorbing: isLocked && !isPlaying,
-              child: animatedCard,
             ),
           );
         }).toList(),

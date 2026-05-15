@@ -1,10 +1,9 @@
-// ignore_for_file: unused_local_variable
-
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class ShifushotRequestPage extends StatefulWidget {
   const ShifushotRequestPage({super.key});
@@ -127,27 +126,27 @@ class _ShifushotRequestPageState extends State<ShifushotRequestPage> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
+    final enabled =
+        selectedFriendData?['notifications']?['shifushot_requests'] ?? false;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Demande de Shifushot"),
-        centerTitle: true,
-        backgroundColor: theme.background,
-      ),
-      backgroundColor: theme.background,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return AppShell(
+      title: 'ShifuShot ?',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             DropdownButtonFormField<String>(
               initialValue: selectedFriendId,
-              decoration: const InputDecoration(labelText: "Choisir un ami"),
-              items: friends.map((friend) {
-                return DropdownMenuItem<String>(
-                  value: friend['id'],
-                  child: Text(friend['name'] ?? 'Inconnu'),
-                );
-              }).toList(),
+              dropdownColor: theme.surface,
+              style: theme.bodyLarge,
+              decoration: const InputDecoration(hintText: 'Choisis un ami'),
+              items: friends
+                  .map((friend) => DropdownMenuItem<String>(
+                        value: friend['id'],
+                        child: Text(friend['name'] ?? 'Inconnu'),
+                      ))
+                  .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedFriendId = value;
@@ -158,24 +157,33 @@ class _ShifushotRequestPageState extends State<ShifushotRequestPage> {
             ),
             const SizedBox(height: 16),
             if (selectedFriendData != null)
-              Text(
-                (selectedFriendData!['notifications']?['shifushot_requests'] ??
-                        false)
-                    ? '✅ Notifications activées. \n\nSi la notification n’est pas reçue, dis à ton pote de\nvérifier les paramètres de notification de l’application sur le téléphone.'
-                    : '❌ Notifications désactivées. \n\nDemande à ton ami d’activer les notifications dans les paramètres de son téléphone\nou dans les notifications de son profil shifushot',
-                style: theme.bodyMedium,
+              SectionCard(
+                child: Row(
+                  children: [
+                    Icon(
+                      enabled
+                          ? Icons.check_circle_rounded
+                          : Icons.notifications_off_rounded,
+                      color: enabled ? theme.primary : theme.textMuted,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        enabled
+                            ? 'Notifications activées. Si elle n\'arrive pas, demande à ton pote de vérifier les paramètres notif sur son tel.'
+                            : 'Notifications désactivées. Demande-lui de les activer dans son profil ou les paramètres système.',
+                        style: theme.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             const Spacer(),
-            ElevatedButton.icon(
-              onPressed: sendShifushotRequest,
-              icon: const Icon(Icons.send),
-              label: const Text("Envoyer la demande"),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                backgroundColor: theme.primary,
-                foregroundColor: Colors.white,
-              ),
-            )
+            GradientButton(
+              label: isLoading ? 'Envoi…' : 'Envoyer la demande',
+              icon: Icons.send_rounded,
+              onPressed: isLoading ? null : sendShifushotRequest,
+            ),
           ],
         ),
       ),
