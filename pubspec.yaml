@@ -16,6 +16,7 @@ dependencies:
   firebase_admin: ^0.3.0+1
   firebase_auth: ^5.4.1
   firebase_core: ^3.10.1
+  firebase_crashlytics: ^4.3.10
   firebase_messaging: ^15.2.4
   firebase_storage: ^12.4.1
   flutter:
