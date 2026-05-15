@@ -3,11 +3,12 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:confetti/confetti.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
-import 'package:confetti/confetti.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class ReflexGamePage extends StatefulWidget {
   const ReflexGamePage({super.key});
@@ -149,106 +150,106 @@ class _ReflexGamePageState extends State<ReflexGamePage>
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
+    // Scaffold below the AppShell so we can override background color
+    // during the "tap NOW" window without rebuilding the whole shell.
     return Scaffold(
-      backgroundColor: _canTap ? theme.secondary : theme.background,
-      appBar: AppBar(
-        backgroundColor: theme.background,
-        elevation: 0,
-        leading: BackButton(
-          color: theme.textPrimary,
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, Routes.selectGame);
-          },
-        ),
-        title: Text("Réflexe Challenge", style: theme.titleMedium),
-        centerTitle: true,
-      ),
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          GestureDetector(
-            onTap: _handleTap,
-            behavior: HitTestBehavior.opaque,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    (_message == 'Prépare-toi...')
-                        ? FadeTransition(
-                            opacity: _messageController,
-                            child: Text(
+      backgroundColor: _canTap ? theme.primary : Colors.transparent,
+      body: AppShell(
+        title: 'Réflexe Challenge',
+        onBack: () =>
+            Navigator.pushReplacementNamed(context, Routes.selectGame),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            GestureDetector(
+              onTap: _handleTap,
+              behavior: HitTestBehavior.opaque,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _message == 'Prépare-toi...'
+                          ? FadeTransition(
+                              opacity: _messageController,
+                              child: Text(
+                                _message,
+                                textAlign: TextAlign.center,
+                                style: theme.titleMedium,
+                              ),
+                            )
+                          : Text(
                               _message,
                               textAlign: TextAlign.center,
                               style: theme.titleMedium,
                             ),
-                          )
-                        : Text(
-                            _message,
-                            textAlign: TextAlign.center,
-                            style: theme.titleMedium,
-                          ),
-                    const SizedBox(height: 20),
-                    if (_canTap)
-                      Text(
-                        '${_currentReaction.inMilliseconds} ms',
-                        style: theme.titleLarge.copyWith(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: theme.textPrimary,
-                        ),
-                      ),
-                    const SizedBox(height: 20),
-                    if (!_waiting)
-                      ScaleTransition(
-                        scale: _startButtonController
-                            .drive(Tween(begin: 0.8, end: 1.0)),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _startGame();
-                            _startButtonController.forward();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.buttonColor,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12.0, horizontal: 32.0),
-                          ),
-                          child: Text('Démarrer', style: theme.buttonText),
-                        ),
-                      ),
-                    const SizedBox(height: 20),
-                    if (_bestReaction != null)
-                      Text(
-                        '🏆 Record personnel : ${_bestReaction!.inMilliseconds} ms',
-                        style: theme.bodyMedium,
-                      ),
-                    if (_newRecord && !_hasDisplayedNewRecordMessage)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text(
-                          '🎉 Nouveau record personnel !',
-                          style: theme.bodyLarge.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.secondary,
+                      const SizedBox(height: 24),
+                      if (_canTap)
+                        ShaderMask(
+                          shaderCallback: (rect) =>
+                              const LinearGradient(colors: [
+                            Colors.white,
+                            Colors.white,
+                          ]).createShader(rect),
+                          child: Text(
+                            '${_currentReaction.inMilliseconds} ms',
+                            style: theme.displayLarge.copyWith(
+                              color: Colors.white,
+                              fontSize: 64,
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                      const SizedBox(height: 24),
+                      if (!_waiting)
+                        ScaleTransition(
+                          scale: _startButtonController
+                              .drive(Tween(begin: 0.8, end: 1.0)),
+                          child: GradientButton(
+                            label: 'Démarrer',
+                            icon: Icons.play_arrow_rounded,
+                            onPressed: () {
+                              _startGame();
+                              _startButtonController.forward();
+                            },
+                            expanded: false,
+                            height: 64,
+                          ),
+                        ),
+                      const SizedBox(height: 24),
+                      if (_bestReaction != null)
+                        Text(
+                          '🏆 Record : ${_bestReaction!.inMilliseconds} ms',
+                          style: theme.bodyMedium,
+                        ),
+                      if (_newRecord && !_hasDisplayedNewRecordMessage)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            '🎉 Nouveau record personnel !',
+                            style: theme.bodyLarge.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: theme.primary,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              shouldLoop: false,
-              colors: [theme.primary, theme.secondary, Colors.green],
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+                shouldLoop: false,
+                colors: [theme.primary, theme.primaryDeep, Colors.white],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

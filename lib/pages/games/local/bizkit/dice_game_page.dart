@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
+
 import 'package:dice_icons/dice_icons.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:flutter/material.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class DiceGamePage extends StatefulWidget {
   final List<String> players;
@@ -513,139 +515,98 @@ class _DiceGamePageState extends State<DiceGamePage> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
+    final isLastGame = widget.remainingGames.isEmpty ||
+        widget.remainingGames.first == Routes.home;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Bizkit !', style: theme.titleMedium),
-        backgroundColor: theme.background,
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.help_outline, color: theme.primary),
-            onPressed: () {
-              _showRulesExplanation();
-            },
-          ),
-        ],
-      ),
-      backgroundColor: theme.background,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                alignment: Alignment.center,
+    return AppShell(
+      title: 'Bizkit !',
+      actions: [
+        IconButton(
+          icon: Icon(Icons.help_outline_rounded, color: theme.textPrimary),
+          onPressed: _showRulesExplanation,
+        ),
+      ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _DiceFace(
+                  value: isRolling ? Random().nextInt(6) + 1 : dice1,
+                ),
+                _DiceFace(
+                  value: isRolling ? Random().nextInt(6) + 1 : dice2,
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            GradientButton(
+              label: isRolling ? 'Lancement…' : 'Lancer les dés',
+              icon: Icons.casino_rounded,
+              onPressed: isRolling ? null : rollDice,
+              height: 64,
+            ),
+            const SizedBox(height: 24),
+            if (resultMessage.isNotEmpty)
+              SectionCard(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: Icon(
-                        isRolling
-                            ? _getDiceIcon(Random().nextInt(6) + 1)
-                            : _getDiceIcon(dice1),
-                        size: 200,
-                        color: theme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Center(
-                      child: Icon(
-                        isRolling
-                            ? _getDiceIcon(Random().nextInt(6) + 1)
-                            : _getDiceIcon(dice2),
-                        size: 200,
-                        color: theme.primary,
-                      ),
+                    Text('RÈGLES',
+                        style: theme.overline.copyWith(
+                            color: theme.textMuted, letterSpacing: 2)),
+                    const SizedBox(height: 6),
+                    Text(
+                      resultMessage.trim(),
+                      style: theme.bodyLarge
+                          .copyWith(color: theme.textPrimary, height: 1.4),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: isRolling ? null : rollDice,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.buttonColor,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  isRolling ? 'Lancement...' : 'Lancer les dés',
-                  style: theme.buttonText.copyWith(fontSize: 30),
-                ),
-              ),
-              const SizedBox(height: 30),
-              if (resultMessage.isNotEmpty)
-                Text(
-                  'Règle(s) :$resultMessage',
-                  textAlign: TextAlign.center,
-                  style: theme.bodyLarge.copyWith(fontSize: 18),
-                ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _showTemporaryRules,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.primary,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Voir les règles temporaires',
-                  style: theme.buttonText,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: widget.remainingGames.isEmpty ||
-                        widget.remainingGames.first == Routes.home
-                    ? () {
-                        // Retour à l'accueil
-                        Navigator.popUntil(context, (route) => route.isFirst);
-                      }
-                    : () {
-                        // Passer au jeu suivant
-                        Navigator.pushNamed(
-                          context,
-                          widget.remainingGames.first,
-                          arguments: {
-                            'players': widget.players,
-                            'remainingGames': widget.remainingGames.sublist(1),
-                          },
-                        );
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.secondary,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  widget.remainingGames.isEmpty ||
-                          widget.remainingGames.first == Routes.home
-                      ? 'Retour à l\'accueil'
-                      : 'Passer au jeu suivant',
-                  style: theme.buttonText.copyWith(fontSize: 16),
-                ),
-              ),
-            ],
-          ),
+            const SizedBox(height: 16),
+            GhostButton(
+              label: 'Voir les règles temporaires',
+              icon: Icons.rule_rounded,
+              onPressed: _showTemporaryRules,
+            ),
+            const SizedBox(height: 10),
+            GhostButton(
+              label: isLastGame ? "Retour à l'accueil" : 'Jeu suivant',
+              icon:
+                  isLastGame ? Icons.home_rounded : Icons.arrow_forward_rounded,
+              onPressed: () {
+                if (isLastGame) {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                } else {
+                  Navigator.pushNamed(
+                    context,
+                    widget.remainingGames.first,
+                    arguments: {
+                      'players': widget.players,
+                      'remainingGames': widget.remainingGames.sublist(1),
+                    },
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 
-  IconData _getDiceIcon(int diceValue) {
-    switch (diceValue) {
+}
+
+class _DiceFace extends StatelessWidget {
+  const _DiceFace({required this.value});
+  final int value;
+
+  IconData _icon() {
+    switch (value) {
       case 1:
         return DiceIcons.dice1;
       case 2:
@@ -661,5 +622,21 @@ class _DiceGamePageState extends State<DiceGamePage> {
       default:
         return DiceIcons.dice0;
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    return Container(
+      width: 130,
+      height: 130,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        gradient: theme.brandGradient,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        boxShadow: theme.glowShadow,
+      ),
+      child: Icon(_icon(), size: 90, color: Colors.white),
+    );
   }
 }
