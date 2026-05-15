@@ -1,13 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:shifushotlocal/pages/profile/edit_profile_page.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/routes.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -231,42 +232,41 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme =
-        AppTheme.of(context); // Utilisation de votre thème personnalisé
+    final theme = AppTheme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: theme.background,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: theme.textPrimary,
-          onPressed: () => Navigator.pop(context),
+    return AppShell(
+      title: 'Mon profil',
+      actions: [
+        IconButton(
+          icon: Icon(Icons.edit_rounded, color: theme.textPrimary),
+          onPressed: _navigateToEditProfile,
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.edit, color: theme.textPrimary),
-            onPressed:
-                _navigateToEditProfile, // 🔹 Appelle la nouvelle fonction
-          ),
-        ],
-      ),
-      backgroundColor: theme.background,
-      body: userData == null
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+      ],
+      child: userData == null
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundImage: CachedNetworkImageProvider(
-                        userData!['photoUrl'] ??
-                            'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: theme.brandGradient,
+                        boxShadow: theme.glowShadow,
+                      ),
+                      padding: const EdgeInsets.all(3),
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: userData!['photoUrl'] ??
+                              'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
+                          width: 114,
+                          height: 114,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
