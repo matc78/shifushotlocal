@@ -1,0 +1,53 @@
+{
+  "@@locale": "fr",
+
+  "appTitle": "Shifushot",
+  "@appTitle": {
+    "description": "App name shown in OS task switcher"
+  },
+
+  "tagline": "Le party game N°1\nentre potes.",
+  "@tagline": {
+    "description": "Subtitle under the SHIFUSHOT wordmark on the welcome screen"
+  },
+
+  "partyOn": "PARTY ON.",
+  "welcomeTo": "WELCOME TO",
+  "home": "HOME",
+
+  "ctaStart": "C'est parti !",
+  "ctaPlayAsGuest": "Jouer sans compte",
+  "ctaLaunchGame": "Lancer une partie",
+  "ctaSignIn": "Connexion",
+  "ctaCreateAccount": "Créer un compte",
+  "ctaContinueWithGoogle": "Continuer avec Google",
+  "ctaAlreadyHaveAccount": "Déjà un compte ? Connecte-toi",
+  "ctaNoAccount": "Pas de compte ? Crées-en un",
+
+  "guestModeBanner": "Mode invité — jeux locaux uniquement",
+  "guestModeFootnote": "En invité : jeux locaux uniquement.\nCrée un compte pour les amis & le jeu en ligne.",
+
+  "selectGameTitle": "Choisis ton jeu",
+  "sectionLocal": "EN LOCAL",
+  "sectionOnline": "EN LIGNE",
+  "sectionFeatures": "OUTILS & FUN",
+  "accountRequired": "Compte requis",
+
+  "errEmailRequired": "Entre un email",
+  "errEmailInvalid": "Email invalide",
+  "errPasswordRequired": "Entre un mot de passe",
+  "errPasswordTooShort": "Au moins 8 caractères",
+  "errPasswordWeak": "Mot de passe : 8 caractères min, 1 majuscule, 1 chiffre, 1 spécial.",
+  "errPasswordMismatch": "Les mots de passe ne correspondent pas.",
+  "errPseudoTaken": "Pseudo déjà utilisé.",
+  "errEmailNotVerified": "Vérifie ton adresse email avant de te connecter.",
+
+  "okAccountCreated": "Compte créé ! Un email de vérification a été envoyé.",
+  "okWelcome": "Bienvenue !",
+  "okWelcomeNamed": "Bienvenue {pseudo} !",
+  "@okWelcomeNamed": {
+    "placeholders": {
+      "pseudo": { "type": "String" }
+    }
+  }
+}

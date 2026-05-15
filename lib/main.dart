@@ -7,6 +7,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shifushotlocal/l10n/generated/app_localizations.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/pages/auth/connexion_page.dart';
 import 'package:shifushotlocal/pages/auth/create_account_page.dart';
@@ -93,6 +94,8 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
       theme: AppTheme.materialTheme(),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: const AuthWrapper(),
       routes: {
         Routes.debut: (_) => const DebutPage(),

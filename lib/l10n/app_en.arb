@@ -1,0 +1,41 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Shifushot",
+  "tagline": "The #1 party game\nwith your crew.",
+
+  "partyOn": "PARTY ON.",
+  "welcomeTo": "WELCOME TO",
+  "home": "HOME",
+
+  "ctaStart": "Let's go!",
+  "ctaPlayAsGuest": "Play as guest",
+  "ctaLaunchGame": "Start a round",
+  "ctaSignIn": "Sign in",
+  "ctaCreateAccount": "Create account",
+  "ctaContinueWithGoogle": "Continue with Google",
+  "ctaAlreadyHaveAccount": "Already have an account? Sign in",
+  "ctaNoAccount": "No account? Create one",
+
+  "guestModeBanner": "Guest mode — local games only",
+  "guestModeFootnote": "Guest mode: local games only.\nCreate an account for friends & online play.",
+
+  "selectGameTitle": "Pick a game",
+  "sectionLocal": "LOCAL",
+  "sectionOnline": "ONLINE",
+  "sectionFeatures": "TOOLS & FUN",
+  "accountRequired": "Account required",
+
+  "errEmailRequired": "Enter an email",
+  "errEmailInvalid": "Invalid email",
+  "errPasswordRequired": "Enter a password",
+  "errPasswordTooShort": "At least 8 characters",
+  "errPasswordWeak": "Password: 8+ chars, 1 uppercase, 1 digit, 1 special.",
+  "errPasswordMismatch": "Passwords don't match.",
+  "errPseudoTaken": "Username already taken.",
+  "errEmailNotVerified": "Verify your email before signing in.",
+
+  "okAccountCreated": "Account created! A verification email has been sent.",
+  "okWelcome": "Welcome!",
+  "okWelcomeNamed": "Welcome {pseudo}!"
+}
