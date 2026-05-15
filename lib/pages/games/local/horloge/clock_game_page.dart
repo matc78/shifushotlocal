@@ -27,7 +27,8 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     players = args['players'] ?? [];
     remainingGames = args['remainingGames'] ?? [];
   }
@@ -61,7 +62,9 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
   }
 
   void _onCardSelected(int index) async {
-    if (revealedCards[index]!) return; // Si la carte est déjà visible, ignorer l'action
+    if (revealedCards[index]!) {
+      return; // Si la carte est déjà visible, ignorer l'action
+    }
 
     final colorChoice = await showDialog<String>(
       context: context,
@@ -85,7 +88,8 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
 
     if (colorChoice != null) {
       final selectedCard = deck[index];
-      final isRed = selectedCard.suit == Suit.hearts || selectedCard.suit == Suit.diamonds;
+      final isRed = selectedCard.suit == Suit.hearts ||
+          selectedCard.suit == Suit.diamonds;
 
       setState(() {
         revealedCards[index] = true; // Marquer la carte comme visible
@@ -99,10 +103,11 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
       } else if ([1, 2, 3, 4].contains(index)) {
         gorgeesPariees = 3; // Cartes éloignées
       } else {
-        gorgeesPariees = 5; // Cartes proches du centre 
+        gorgeesPariees = 5; // Cartes proches du centre
       }
 
-      if ((isRed && colorChoice == "Rouge") || (!isRed && colorChoice == "Noir")) {
+      if ((isRed && colorChoice == "Rouge") ||
+          (!isRed && colorChoice == "Noir")) {
         // En cas de victoire
         setState(() {
           gorgees += gorgeesPariees;
@@ -135,7 +140,8 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
               title: const Text("Tour terminé"),
               content: RichText(
                 text: TextSpan(
-                  style: const TextStyle( // Style de base pour éviter l’héritage non voulu
+                  style: const TextStyle(
+                    // Style de base pour éviter l’héritage non voulu
                     fontSize: 15,
                     color: Colors.black,
                     fontWeight: FontWeight.normal,
@@ -180,7 +186,8 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      gorgees = 0; // Réinitialiser le compteur en cas de défaite
+                      gorgees =
+                          0; // Réinitialiser le compteur en cas de défaite
                       shots = 0;
                     });
                     Navigator.pop(context);
@@ -204,7 +211,6 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
       }
     }
   }
-
 
   void _goToNextGame() {
     if (remainingGames.isNotEmpty) {
@@ -279,7 +285,8 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
                 transform: Matrix4.identity()
                   ..scaleByDouble(1.7, 1.7, 1.0, 1.0)
                   ..rotateZ(pi / 2)
-                  ..translateByDouble(screenWidth * 0.02, screenWidth * 0.005, 0.0, 1.0),
+                  ..translateByDouble(
+                      screenWidth * 0.02, screenWidth * 0.005, 0.0, 1.0),
                 child: Image.asset(
                   "assets/images/tapis_de_jeu.png",
                   fit: BoxFit.contain,
@@ -297,7 +304,8 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
                         "C'est le tour de ${players[currentPlayerIndex]}",
                         style: theme.titleLarge,
                       ),
-                      const SizedBox(height: 4), // Réduit l'espace entre les deux textes
+                      const SizedBox(
+                          height: 4), // Réduit l'espace entre les deux textes
                       Text(
                         "Compteur : $gorgees gorgée(s), $shots shot(s)",
                         style: theme.bodyLarge,

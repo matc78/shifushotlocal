@@ -32,7 +32,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     if (user != null) {
       final DocumentSnapshot userDoc =
           await _firestore.collection('users').doc(user.uid).get();
-      if (userDoc.exists && mounted) { // Vérifie si le widget est monté
+      if (userDoc.exists && mounted) {
+        // Vérifie si le widget est monté
         setState(() {
           userData = userDoc.data() as Map<String, dynamic>?;
         });
@@ -66,9 +67,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
         return rawKey.replaceAll('_', ' ').capitalize();
     }
   }
-
-
-
 
   void _logout() async {
     await _auth.signOut();
@@ -104,7 +102,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
             decoration: const InputDecoration(labelText: 'Mot de passe'),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Annuler')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Annuler')),
             TextButton(
               onPressed: () => Navigator.pop(ctx, passwordController.text),
               child: const Text('Valider'),
@@ -123,7 +123,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return false;
   }
 
-  Future<void> _deleteSubcollection(DocumentReference userRef, String name) async {
+  Future<void> _deleteSubcollection(
+      DocumentReference userRef, String name) async {
     final snap = await userRef.collection(name).get();
     for (final doc in snap.docs) {
       await doc.reference.delete();
@@ -147,7 +148,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Supprimer', style: theme.bodyMedium.copyWith(color: Colors.red)),
+            child: Text('Supprimer',
+                style: theme.bodyMedium.copyWith(color: Colors.red)),
           ),
         ],
       ),
@@ -201,7 +203,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           final ok = await _reauthenticate(user);
           if (!ok) {
             messenger.showSnackBar(const SnackBar(
-              content: Text('Réauthentification annulée. Le compte n\'a pas été supprimé.'),
+              content: Text(
+                  'Réauthentification annulée. Le compte n\'a pas été supprimé.'),
               backgroundColor: Colors.orange,
             ));
             return;
@@ -228,7 +231,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.of(context); // Utilisation de votre thème personnalisé
+    final theme =
+        AppTheme.of(context); // Utilisation de votre thème personnalisé
 
     return Scaffold(
       appBar: AppBar(
@@ -242,7 +246,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.edit, color: theme.textPrimary),
-            onPressed: _navigateToEditProfile, // 🔹 Appelle la nouvelle fonction
+            onPressed:
+                _navigateToEditProfile, // 🔹 Appelle la nouvelle fonction
           ),
         ],
       ),
@@ -271,22 +276,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     const SizedBox(height: 20),
                     _buildProfileField(theme, 'Email', userData!['email']),
-                    _buildProfileField(theme, 'Nom', userData!['surname'] ?? ''),
-                    _buildProfileField(theme, 'Prénom', userData!['name'] ?? ''),
                     _buildProfileField(
-                        theme,
-                        'Genre',
-                        userData!['gender'] ?? 'Non spécifié', // Affiche une valeur par défaut
-                      ),
+                        theme, 'Nom', userData!['surname'] ?? ''),
+                    _buildProfileField(
+                        theme, 'Prénom', userData!['name'] ?? ''),
+                    _buildProfileField(
+                      theme,
+                      'Genre',
+                      userData!['gender'] ??
+                          'Non spécifié', // Affiche une valeur par défaut
+                    ),
                     _buildProfileField(
                       theme,
                       'Date d\'inscription',
                       userData!['createdAt'] != null
-                          ? DateFormat('dd/MM/yyyy').format(userData!['createdAt'].toDate())
+                          ? DateFormat('dd/MM/yyyy')
+                              .format(userData!['createdAt'].toDate())
                           : '',
                     ),
                     const Divider(height: 32),
-                    if (userData!['high_scores'] != null && userData!['high_scores'] is Map) ...[
+                    if (userData!['high_scores'] != null &&
+                        userData!['high_scores'] is Map) ...[
                       const SizedBox(height: 16),
                       Align(
                         alignment: Alignment.centerLeft,
@@ -302,13 +312,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           '🎮 Jeux',
-                          style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                          style: theme.bodyMedium
+                              .copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 8),
                       ...userData!['high_scores'].entries.map<Widget>((entry) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 8.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -318,7 +330,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                               Text(
                                 entry.value.toString(),
-                                style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                                style: theme.bodyMedium
+                                    .copyWith(fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -331,7 +344,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           '📤 ShiFuShot envoyés',
-                          style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                          style: theme.bodyMedium
+                              .copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -356,14 +370,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               final count = data['count'] ?? 0;
 
                               return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4.0, horizontal: 8.0),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(pseudo, style: theme.bodyMedium),
                                     Text(
                                       '$count demandes',
-                                      style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                                      style: theme.bodyMedium.copyWith(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -379,7 +396,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           '📥 ShiFuShot reçus',
-                          style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                          style: theme.bodyMedium
+                              .copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -387,7 +405,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         future: FirebaseFirestore.instance
                             .collection('users')
                             .doc(FirebaseAuth.instance.currentUser!.uid)
-                            .collection('shifushot_notifs_received') // ← à adapter si besoin
+                            .collection(
+                                'shifushot_notifs_received') // ← à adapter si besoin
                             .orderBy('count', descending: true)
                             .limit(3)
                             .get(),
@@ -396,7 +415,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
                           final docs = snapshot.data!.docs;
                           if (docs.isEmpty) {
-                            return Text("Va chercher des potes", style: theme.bodyMedium);
+                            return Text("Va chercher des potes",
+                                style: theme.bodyMedium);
                           }
 
                           return Column(
@@ -406,12 +426,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               final count = data['count'] ?? 0;
 
                               return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 2.0, horizontal: 8.0),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(name, style: theme.bodyMedium),
-                                    Text('$count demandes', style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+                                    Text('$count demandes',
+                                        style: theme.bodyMedium.copyWith(
+                                            fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                               );
@@ -438,22 +462,33 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   .doc(FirebaseAuth.instance.currentUser!.uid)
                                   .snapshots(),
                               builder: (context, snapshot) {
-                                if (!snapshot.hasData) return const CircularProgressIndicator();
+                                if (!snapshot.hasData) {
+                                  return const CircularProgressIndicator();
+                                }
 
-                                final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
-                                final notif = (data['notifications'] as Map<String, dynamic>? ?? {});
+                                final data = snapshot.data!.data()
+                                        as Map<String, dynamic>? ??
+                                    {};
+                                final notif = (data['notifications']
+                                        as Map<String, dynamic>? ??
+                                    {});
                                 bool global = notif['enabled'] ?? false;
-                                bool friendRequests = notif['friend_requests'] ?? false;
-                                bool shifushotRequests = notif['shifushot_requests'] ?? false;
+                                bool friendRequests =
+                                    notif['friend_requests'] ?? false;
+                                bool shifushotRequests =
+                                    notif['shifushot_requests'] ?? false;
 
                                 return StatefulBuilder(
                                   builder: (context, setState) {
-                                    Future<void> updateNotif(String key, bool value) async {
-                                      final uid = FirebaseAuth.instance.currentUser!.uid;
+                                    Future<void> updateNotif(
+                                        String key, bool value) async {
+                                      final uid = FirebaseAuth
+                                          .instance.currentUser!.uid;
                                       await FirebaseFirestore.instance
                                           .collection('users')
                                           .doc(uid)
-                                          .update({'notifications.$key': value});
+                                          .update(
+                                              {'notifications.$key': value});
                                     }
 
                                     Future<void> toggleAll(bool value) async {
@@ -462,63 +497,83 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                         friendRequests = value;
                                         shifushotRequests = value;
                                       });
-                                      final uid = FirebaseAuth.instance.currentUser!.uid;
+                                      final uid = FirebaseAuth
+                                          .instance.currentUser!.uid;
                                       await FirebaseFirestore.instance
                                           .collection('users')
                                           .doc(uid)
                                           .update({
                                         'notifications.enabled': value,
                                         'notifications.friend_requests': value,
-                                        'notifications.shifushot_requests': value,
+                                        'notifications.shifushot_requests':
+                                            value,
                                       });
                                     }
 
-                                    Future<void> toggleOne(String key, bool value) async {
+                                    Future<void> toggleOne(
+                                        String key, bool value) async {
                                       setState(() {
-                                        if (key == 'friend_requests') friendRequests = value;
-                                        if (key == 'shifushot_requests') shifushotRequests = value;
+                                        if (key == 'friend_requests') {
+                                          friendRequests = value;
+                                        }
+                                        if (key == 'shifushot_requests') {
+                                          shifushotRequests = value;
+                                        }
                                       });
 
                                       await updateNotif(key, value);
 
                                       // Synchronise le switch global automatiquement
-                                      final allEnabled = [friendRequests, shifushotRequests].every((v) => v == true);
+                                      final allEnabled = [
+                                        friendRequests,
+                                        shifushotRequests
+                                      ].every((v) => v == true);
                                       await updateNotif('enabled', allEnabled);
                                       setState(() => global = allEnabled);
                                     }
 
                                     return AlertDialog(
-                                      title: const Text("Préférences de notification"),
+                                      title: const Text(
+                                          "Préférences de notification"),
                                       content: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              const Text("🔔 Toutes les notifications"),
+                                              const Text(
+                                                  "🔔 Toutes les notifications"),
                                               Switch(
                                                 value: global,
-                                                onChanged: (value) => toggleAll(value),
+                                                onChanged: (value) =>
+                                                    toggleAll(value),
                                               ),
                                             ],
                                           ),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               const Text("👥 Demandes d'amis"),
                                               Switch(
                                                 value: friendRequests,
-                                                onChanged: (value) => toggleOne('friend_requests', value),
+                                                onChanged: (value) => toggleOne(
+                                                    'friend_requests', value),
                                               ),
                                             ],
                                           ),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              const Text("🥤 Invitations Shifushot"),
+                                              const Text(
+                                                  "🥤 Invitations Shifushot"),
                                               Switch(
                                                 value: shifushotRequests,
-                                                onChanged: (value) => toggleOne('shifushot_requests', value),
+                                                onChanged: (value) => toggleOne(
+                                                    'shifushot_requests',
+                                                    value),
                                               ),
                                             ],
                                           ),
@@ -526,7 +581,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                       ),
                                       actions: [
                                         TextButton(
-                                          onPressed: () => Navigator.pop(context),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
                                           child: const Text("Fermer"),
                                         ),
                                       ],
@@ -602,4 +658,3 @@ extension StringCasingExtension on String {
     return this[0].toUpperCase() + substring(1);
   }
 }
-

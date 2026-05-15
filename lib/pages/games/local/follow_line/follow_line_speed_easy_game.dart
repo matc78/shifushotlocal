@@ -43,7 +43,8 @@ class _FollowLineSpeedEasyState extends State<FollowLineSpeedEasy> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
     final data = doc.data();
     if (data != null) {
       final scores = Map<String, dynamic>.from(data['high_scores'] ?? {});
@@ -277,16 +278,17 @@ class _FollowLineSpeedEasyState extends State<FollowLineSpeedEasy> {
         children: [
           GestureDetector(
             onPanStart: (details) {
-              if ((details.localPosition - startCircle).distance <= startRadius) {
+              if ((details.localPosition - startCircle).distance <=
+                  startRadius) {
                 setState(() {
-                hasStarted = true;
-                if (!isRunning) {
-                  isRunning = true;
-                  _startTimer();
-                }
-                userPath.clear();
-                userPath.add(details.localPosition);
-                isValid = true;
+                  hasStarted = true;
+                  if (!isRunning) {
+                    isRunning = true;
+                    _startTimer();
+                  }
+                  userPath.clear();
+                  userPath.add(details.localPosition);
+                  isValid = true;
                 });
                 _startTimer();
               }
@@ -316,7 +318,8 @@ class _FollowLineSpeedEasyState extends State<FollowLineSpeedEasy> {
             child: Container(
               color: theme.background,
               child: CustomPaint(
-                painter: _LinePainter(linePath, userPath, startCircle, startRadius, endBox, isValid),
+                painter: _LinePainter(linePath, userPath, startCircle,
+                    startRadius, endBox, isValid),
                 child: Container(),
               ),
             ),
@@ -351,7 +354,8 @@ class _LinePainter extends CustomPainter {
   final Rect endBox;
   final bool isValid;
 
-  _LinePainter(this.line, this.userPoints, this.start, this.radius, this.endBox, this.isValid);
+  _LinePainter(this.line, this.userPoints, this.start, this.radius, this.endBox,
+      this.isValid);
 
   @override
   void paint(Canvas canvas, Size size) {

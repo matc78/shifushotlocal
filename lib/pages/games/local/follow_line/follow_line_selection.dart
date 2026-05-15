@@ -22,13 +22,16 @@ class FollowLineModeSelector extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Mode Rapidité', style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+            Text('Mode Rapidité',
+                style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, Routes.followLineSpeedEasy),
+              onPressed: () =>
+                  Navigator.pushNamed(context, Routes.followLineSpeedEasy),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.buttonColor,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
               child: Text('Facile', style: theme.buttonText),
             ),
@@ -37,27 +40,34 @@ class FollowLineModeSelector extends StatelessWidget {
               onPressed: null, // pas encore implémenté
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey.shade400,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
-              child: Text('Compliqué (bientôt)', style: theme.bodyMedium.copyWith(color: Colors.red)),
+              child: Text('Compliqué (bientôt)',
+                  style: theme.bodyMedium.copyWith(color: Colors.red)),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey.shade400,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
-              child: Text('Très dur (bientôt)', style: theme.bodyMedium.copyWith(color: Colors.red)),
+              child: Text('Très dur (bientôt)',
+                  style: theme.bodyMedium.copyWith(color: Colors.red)),
             ),
             const SizedBox(height: 40),
-            Text('Mode Précision', style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+            Text('Mode Précision',
+                style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, Routes.followLinePrecisionEasy),
+              onPressed: () =>
+                  Navigator.pushNamed(context, Routes.followLinePrecisionEasy),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.buttonColor,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
               child: Text('Facile', style: theme.buttonText),
             ),
@@ -66,18 +76,22 @@ class FollowLineModeSelector extends StatelessWidget {
               onPressed: null, // pas encore implémenté
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey.shade400,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
-              child: Text('Compliqué (bientôt)', style: theme.bodyMedium.copyWith(color: Colors.red)),
+              child: Text('Compliqué (bientôt)',
+                  style: theme.bodyMedium.copyWith(color: Colors.red)),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey.shade400,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
-              child: Text('Très dur (bientôt)', style: theme.bodyMedium.copyWith(color: Colors.red)),
+              child: Text('Très dur (bientôt)',
+                  style: theme.bodyMedium.copyWith(color: Colors.red)),
             ),
           ],
         ),

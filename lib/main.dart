@@ -111,26 +111,31 @@ class MainApp extends StatelessWidget {
         Routes.selectGame: (_) => const SelectGamePage(),
         Routes.killer: (_) => const KillerPage(),
         Routes.killerActions: (context) => KillerActionsPage(
-              players: ModalRoute.of(context)!.settings.arguments as List<String>,
+              players:
+                  ModalRoute.of(context)!.settings.arguments as List<String>,
             ),
         Routes.killerSummary: (context) => KillerSummaryPage(
-              playerData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
+              playerData: ModalRoute.of(context)!.settings.arguments
+                  as Map<String, dynamic>,
             ),
         Routes.clickerGame: (_) => const ClickerGame(),
         Routes.diceGame: (context) {
           final args = ModalRoute.of(context)!.settings.arguments;
           if (args is String) {
-            return DiceGamePage(players: [args], remainingGames: const [Routes.home]);
+            return DiceGamePage(
+                players: [args], remainingGames: const [Routes.home]);
           } else if (args is Map<String, dynamic>) {
             return DiceGamePage(
               players: List<String>.from(args['players']),
               remainingGames: List<String>.from(args['remainingGames']),
             );
           }
-          return const Scaffold(body: Center(child: Text('Erreur : Arguments invalides.')));
+          return const Scaffold(
+              body: Center(child: Text('Erreur : Arguments invalides.')));
         },
         Routes.paperGame: (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          final args = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
           return PaperGamePage(
             players: List<String>.from(args['players']),
             remainingGames: List<String>.from(args['remainingGames']),
@@ -141,11 +146,13 @@ class MainApp extends StatelessWidget {
         Routes.clockGame: (_) => const ClockGameScreen(),
         Routes.cardDrawer: (_) => const CardDrawerPage(),
         Routes.onlineLobby: (context) {
-          final gameName = ModalRoute.of(context)!.settings.arguments as String?;
+          final gameName =
+              ModalRoute.of(context)!.settings.arguments as String?;
           return OnlineLobbyScreen(gameName: gameName ?? 'Jeu inconnu');
         },
         Routes.lobbyWaiting: (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          final args = ModalRoute.of(context)!.settings.arguments
+              as Map<String, dynamic>;
           return LobbyWaitingScreen(
             lobbyId: args['lobbyId'] as String,
             isHost: args['isHost'] as bool,
@@ -157,7 +164,8 @@ class MainApp extends StatelessWidget {
           if (args is Map<String, dynamic> && args.containsKey('lobbyId')) {
             return DebateGameScreen(lobbyId: args['lobbyId'] as String);
           }
-          return const Scaffold(body: Center(child: Text('Erreur : Aucun lobbyId fourni')));
+          return const Scaffold(
+              body: Center(child: Text('Erreur : Aucun lobbyId fourni')));
         },
         Routes.pyramidCard: (_) => const PyramidCardPage(),
         Routes.pyramid: (_) => const PyramidePage(),

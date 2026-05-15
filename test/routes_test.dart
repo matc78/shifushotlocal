@@ -66,8 +66,7 @@ void main() {
       final pattern = RegExp(r'^/[a-zA-Z0-9_/-]*$');
       for (final entry in all.entries) {
         expect(pattern.hasMatch(entry.value), isTrue,
-            reason:
-                'Routes.${entry.key} = "${entry.value}" has unsafe chars');
+            reason: 'Routes.${entry.key} = "${entry.value}" has unsafe chars');
       }
     });
 

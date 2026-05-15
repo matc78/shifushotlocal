@@ -183,8 +183,7 @@ class _BottomActions extends StatelessWidget {
             if (isGuest) {
               promptToSignUp(
                 context,
-                reason:
-                    "La liste d'amis n'est disponible qu'avec un compte.",
+                reason: "La liste d'amis n'est disponible qu'avec un compte.",
               );
               return;
             }

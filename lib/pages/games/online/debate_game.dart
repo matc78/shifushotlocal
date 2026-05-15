@@ -7,7 +7,6 @@ import 'package:shifushotlocal/theme/app_theme.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 
-
 class DebateGameScreen extends StatefulWidget {
   final String lobbyId;
 
@@ -42,7 +41,6 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
   String? currentSpeaker; // ✅ Joueur qui commence à parler
   List<String> voteMessages = [];
 
-
   @override
   void initState() {
     super.initState();
@@ -59,45 +57,45 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     });
   }
 
-
   Future<void> _checkAndAssignRoles() async {
-  DocumentSnapshot lobbyDoc = await _firestore.collection('lobbies').doc(widget.lobbyId).get();
-  if (!lobbyDoc.exists) {
-    debugPrint("❌ Erreur : Lobby introuvable.");
-    return;
-  }
-
-  Map<String, dynamic>? lobbyData = lobbyDoc.data() as Map<String, dynamic>?;
-  if (lobbyData == null) return;
-
-  // ✅ Vérifie si les rôles ET le débat sont déjà assignés
-  if (lobbyData.containsKey('roles') && lobbyData.containsKey('debate')) {
-    debugPrint("⏭️ Rôles et débat déjà assignés, récupération...");
-    if (mounted) {
-      setState(() {
-        players = Map<String, dynamic>.from(lobbyData['roles']);
-        role = players[userId] ?? "Civil";
-        debateWord1 = lobbyData['debate']['word1'] ?? "???";
-        debateWord2 = lobbyData['debate']['word2'] ?? "???";
-        civilDebate = "$debateWord1 vs $debateWord2";
-      });
+    DocumentSnapshot lobbyDoc =
+        await _firestore.collection('lobbies').doc(widget.lobbyId).get();
+    if (!lobbyDoc.exists) {
+      debugPrint("❌ Erreur : Lobby introuvable.");
+      return;
     }
-  } else {
-    // 🚀 Seul l'hôte assigne les rôles et choisit un débat
-    if (lobbyData['hostId'] == userId) {
-      await _assignRoles();
+
+    Map<String, dynamic>? lobbyData = lobbyDoc.data() as Map<String, dynamic>?;
+    if (lobbyData == null) return;
+
+    // ✅ Vérifie si les rôles ET le débat sont déjà assignés
+    if (lobbyData.containsKey('roles') && lobbyData.containsKey('debate')) {
+      debugPrint("⏭️ Rôles et débat déjà assignés, récupération...");
+      if (mounted) {
+        setState(() {
+          players = Map<String, dynamic>.from(lobbyData['roles']);
+          role = players[userId] ?? "Civil";
+          debateWord1 = lobbyData['debate']['word1'] ?? "???";
+          debateWord2 = lobbyData['debate']['word2'] ?? "???";
+          civilDebate = "$debateWord1 vs $debateWord2";
+        });
+      }
     } else {
-      debugPrint("⏳ Attente des rôles et du débat...");
+      // 🚀 Seul l'hôte assigne les rôles et choisit un débat
+      if (lobbyData['hostId'] == userId) {
+        await _assignRoles();
+      } else {
+        debugPrint("⏳ Attente des rôles et du débat...");
+      }
     }
   }
-}
-
 
   Future<void> _assignRoles() async {
     if (_rolesAssigned) return; // ✅ Vérification de sécurité
 
     debugPrint("🟢 Vérification du rôle de l'hôte...");
-    DocumentSnapshot lobbyDoc = await _firestore.collection('lobbies').doc(widget.lobbyId).get();
+    DocumentSnapshot lobbyDoc =
+        await _firestore.collection('lobbies').doc(widget.lobbyId).get();
     if (!lobbyDoc.exists) {
       debugPrint("❌ Erreur : Le lobby n'existe pas.");
       return;
@@ -121,14 +119,16 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
           debateWord2 = lobbyData['debate']['word2'] ?? "???";
           civilDebate = "$debateWord1 vs $debateWord2";
         });
-        debugPrint("✅ Rôles récupérés : $players, Débat -> $debateWord1 vs $debateWord2");
+        debugPrint(
+            "✅ Rôles récupérés : $players, Débat -> $debateWord1 vs $debateWord2");
       }
       return;
     }
 
     // L'hôte attribue les rôles et choisit un débat
     if (isHost) {
-      debugPrint("👑 Cet utilisateur est l'hôte. Attribution des rôles et choix du débat...");
+      debugPrint(
+          "👑 Cet utilisateur est l'hôte. Attribution des rôles et choix du débat...");
 
       List<dynamic> playerIds = List.from(lobbyData['players'] ?? []);
       List<dynamic> nonEliminated = playerIds;
@@ -136,7 +136,6 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
       String firstSpeaker = nonEliminated.first;
       playerIds.shuffle(); // Mélange des joueurs
       String impostor = playerIds.first; // Premier joueur = imposteur
-      
 
       Map<String, dynamic> assignedRoles = {};
       for (String id in playerIds) {
@@ -156,16 +155,20 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
         'currentSpeaker': firstSpeaker, // ✅ Premier joueur choisi
       });
 
-      debugPrint("✅ Rôles et débat enregistrés : $assignedRoles, Débat -> $debate1 vs $debate2");
+      debugPrint(
+          "✅ Rôles et débat enregistrés : $assignedRoles, Débat -> $debate1 vs $debate2");
     } else {
-      debugPrint("⏳ Cet utilisateur n'est pas l'hôte. Attente des rôles et du débat...");
+      debugPrint(
+          "⏳ Cet utilisateur n'est pas l'hôte. Attente des rôles et du débat...");
     }
 
     // 🔹 Récupérer les rôles et le débat après mise à jour (pour tout le monde)
-    DocumentSnapshot updatedLobbyDoc = await _firestore.collection('lobbies').doc(widget.lobbyId).get();
-    
+    DocumentSnapshot updatedLobbyDoc =
+        await _firestore.collection('lobbies').doc(widget.lobbyId).get();
+
     if (updatedLobbyDoc.exists) {
-      Map<String, dynamic> updatedData = updatedLobbyDoc.data() as Map<String, dynamic>;
+      Map<String, dynamic> updatedData =
+          updatedLobbyDoc.data() as Map<String, dynamic>;
 
       if (mounted) {
         setState(() {
@@ -179,18 +182,20 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     }
   }
 
-
   Future<List<String>> _chooseDebate() async {
     try {
       // Charge le fichier JSON contenant les débats
-      String jsonString = await rootBundle.loadString('assets/jsons/debate.json');
+      String jsonString =
+          await rootBundle.loadString('assets/jsons/debate.json');
       List<dynamic> rawDebates = json.decode(jsonString);
 
       // Vérifie que chaque élément est une liste de 2 chaînes
-      List<List<String>> debates = rawDebates.map((debate) => List<String>.from(debate)).toList();
+      List<List<String>> debates =
+          rawDebates.map((debate) => List<String>.from(debate)).toList();
 
       if (debates.isNotEmpty) {
-        return debates[DateTime.now().millisecondsSinceEpoch % debates.length]; // Sélection aléatoire
+        return debates[DateTime.now().millisecondsSinceEpoch %
+            debates.length]; // Sélection aléatoire
       }
     } catch (e) {
       debugPrint("⚠️ Erreur lors du chargement du débat : $e");
@@ -198,25 +203,26 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     return ["Erreur", "Débat introuvable"]; // Valeur de secours en cas d'erreur
   }
 
-
   Future<void> _fetchPlayerNames() async {
-
     if (_namesFetched) return; // ✅ Empêcher les appels multiples
     _namesFetched = true;
-    DocumentSnapshot lobbyDoc = await _firestore.collection('lobbies').doc(widget.lobbyId).get();
+    DocumentSnapshot lobbyDoc =
+        await _firestore.collection('lobbies').doc(widget.lobbyId).get();
     if (!lobbyDoc.exists) return;
 
     List<dynamic> playerIds = List.from(lobbyDoc['players'] ?? []);
     Map<String, String> names = {};
 
     for (String playerId in playerIds) {
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(playerId).get();
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(playerId).get();
       if (userDoc.exists) {
         names[playerId] = userDoc['name'] ?? "Joueur inconnu";
       }
     }
 
-    if (mounted) { // ✅ Vérifie si le widget est toujours dans l’arbre avant `setState()`
+    if (mounted) {
+      // ✅ Vérifie si le widget est toujours dans l’arbre avant `setState()`
       setState(() {
         playerNames = names;
       });
@@ -225,32 +231,41 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     debugPrint("✅ Noms des joueurs récupérés : $playerNames");
   }
 
-
   @override
   void dispose() {
     _voteSubscription?.cancel(); // ✅ Annule l'écoute Firestore
     super.dispose();
   }
 
-
   void _listenForVotes() {
-    _firestore.collection('lobbies').doc(widget.lobbyId).snapshots().listen((snapshot) {
+    _firestore
+        .collection('lobbies')
+        .doc(widget.lobbyId)
+        .snapshots()
+        .listen((snapshot) {
       if (!snapshot.exists) return;
 
       Map<String, dynamic>? data = snapshot.data();
       if (data == null) return;
 
       // 🔹 Mise à jour des votes et des joueurs qui ont voté
-      Map<String, int> updatedVotes = Map<String, int>.from(data['votes'] ?? {});
-      Map<String, bool> updatedHasVoted = Map<String, bool>.from(data['hasVoted'] ?? {});
-      List<String> updatedVoteMessages = List<String>.from(data['voteMessages'] ?? []);
+      Map<String, int> updatedVotes =
+          Map<String, int>.from(data['votes'] ?? {});
+      Map<String, bool> updatedHasVoted =
+          Map<String, bool>.from(data['hasVoted'] ?? {});
+      List<String> updatedVoteMessages =
+          List<String>.from(data['voteMessages'] ?? []);
 
       // 🔹 Récupération du tour actuel et du joueur qui commence
-      int updatedTurn = data.containsKey('currentTurn') ? data['currentTurn'] : _currentTurn;
-      String? updatedSpeaker = data.containsKey('currentSpeaker') ? data['currentSpeaker'] : currentSpeaker;
+      int updatedTurn =
+          data.containsKey('currentTurn') ? data['currentTurn'] : _currentTurn;
+      String? updatedSpeaker = data.containsKey('currentSpeaker')
+          ? data['currentSpeaker']
+          : currentSpeaker;
 
       // 🔹 Vérifier si le jeu est terminé (stocké dans Firestore)
-      String? gameOverMessage = data.containsKey('gameOverMessage') ? data['gameOverMessage'] : null;
+      String? gameOverMessage =
+          data.containsKey('gameOverMessage') ? data['gameOverMessage'] : null;
 
       if (mounted) {
         setState(() {
@@ -259,11 +274,13 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
           voteMessages = updatedVoteMessages;
           _currentTurn = updatedTurn;
           currentSpeaker = updatedSpeaker;
-          
+
           // 🔹 On ne compte que les votes des joueurs NON éliminés
           totalVotes = updatedVotes.values.fold(0, (acc, val) => acc + val);
-          int remainingPlayers = players.isNotEmpty 
-              ? players.keys.where((id) => !eliminatedPlayers.contains(id)).length
+          int remainingPlayers = players.isNotEmpty
+              ? players.keys
+                  .where((id) => !eliminatedPlayers.contains(id))
+                  .length
               : 0;
 
           debugPrint("🗳 Total Votes: $totalVotes / $remainingPlayers");
@@ -281,7 +298,6 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
       }
     });
   }
-
 
   Future<void> _votePlayer(String targetPlayerId) async {
     if (hasVoted[userId] == true) return; // Empêcher de voter plusieurs fois
@@ -301,95 +317,104 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     });
   }
 
-
   void _eliminatePlayer() async {
-  if (votes.isEmpty) return;
+    if (votes.isEmpty) return;
 
-  String playerToEliminate = votes.entries.reduce((a, b) => a.value > b.value ? a : b).key;
-  String eliminatedName = playerNames[playerToEliminate] ?? "Joueur inconnu";
+    String playerToEliminate =
+        votes.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+    String eliminatedName = playerNames[playerToEliminate] ?? "Joueur inconnu";
 
-  debugPrint("❌ Joueur éliminé : $playerToEliminate");
+    debugPrint("❌ Joueur éliminé : $playerToEliminate");
 
-  eliminatedPlayers.add(playerToEliminate);
+    eliminatedPlayers.add(playerToEliminate);
 
-  await _firestore.collection('lobbies').doc(widget.lobbyId).update({
-    'eliminated': playerToEliminate,
-    'votes': {}, 
-    'hasVoted': {}, 
-    'voteMessages': FieldValue.arrayUnion(["💀 $eliminatedName a été éliminé !"]),
-  });
-
-  if (mounted) {
-    setState(() {
-      eliminatedPlayer = playerToEliminate;
-      votingComplete = true;
+    await _firestore.collection('lobbies').doc(widget.lobbyId).update({
+      'eliminated': playerToEliminate,
+      'votes': {},
+      'hasVoted': {},
+      'voteMessages':
+          FieldValue.arrayUnion(["💀 $eliminatedName a été éliminé !"]),
     });
+
+    if (mounted) {
+      setState(() {
+        eliminatedPlayer = playerToEliminate;
+        votingComplete = true;
+      });
+    }
+
+    await Future.delayed(const Duration(seconds: 5));
+
+    if (players[playerToEliminate] == "Imposteur") {
+      _askImpostorGuess(playerToEliminate);
+    } else {
+      _checkGameEnd(playerToEliminate);
+    }
   }
-
-  await Future.delayed(const Duration(seconds: 5));
-
-  if (players[playerToEliminate] == "Imposteur") {
-    _askImpostorGuess(playerToEliminate);
-  } else {
-    _checkGameEnd(playerToEliminate);
-  }
-}
-
 
   void _askImpostorGuess(String impostorId) {
-  if (userId != impostorId) return; // 🔹 Seul l'imposteur voit le pop-up
+    if (userId != impostorId) return; // 🔹 Seul l'imposteur voit le pop-up
 
-  TextEditingController guessController = TextEditingController();
+    TextEditingController guessController = TextEditingController();
 
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => AlertDialog(
-      title: const Text("🔮 Devinez un mot"),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text("L'imposteur a été éliminé !\nIl peut encore gagner en devinant un des mots du débat."),
-          const SizedBox(height: 10),
-          TextField(
-            controller: guessController,
-            decoration: const InputDecoration(hintText: "Entrez un mot"),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: const Text("🔮 Devinez un mot"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+                "L'imposteur a été éliminé !\nIl peut encore gagner en devinant un des mots du débat."),
+            const SizedBox(height: 10),
+            TextField(
+              controller: guessController,
+              decoration: const InputDecoration(hintText: "Entrez un mot"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              String guess = guessController.text
+                  .trim()
+                  .toLowerCase(); // 🔥 Suppression espaces + mise en minuscule
+              String word1 = debateWord1.trim().toLowerCase();
+              String word2 = debateWord2.trim().toLowerCase();
+
+              bool impostorWins = (guess == word1 || guess == word2);
+
+              String gameOverMessage = impostorWins
+                  ? "👿 L'imposteur a gagné en devinant '$guess' !"
+                  : "🎉 Les civils ont gagné !";
+
+              debugPrint(
+                  "🔮 L'imposteur a deviné : $guess, mots : $debateWord1 / $debateWord2");
+
+              Navigator.pop(context); // 🔄 Ferme la boîte de dialogue
+
+              // 🔥 Écrire dans Firestore que la partie est terminée
+              await _firestore
+                  .collection('lobbies')
+                  .doc(widget.lobbyId)
+                  .update({
+                'gameOverMessage': gameOverMessage,
+              });
+            },
+            child: const Text("Valider"),
           ),
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () async {
-            String guess = guessController.text.trim().toLowerCase(); // 🔥 Suppression espaces + mise en minuscule
-            String word1 = debateWord1.trim().toLowerCase();
-            String word2 = debateWord2.trim().toLowerCase();
-
-            bool impostorWins = (guess == word1 || guess == word2);
-
-            String gameOverMessage = impostorWins
-                ? "👿 L'imposteur a gagné en devinant '$guess' !"
-                : "🎉 Les civils ont gagné !";
-
-            debugPrint("🔮 L'imposteur a deviné : $guess, mots : $debateWord1 / $debateWord2");
-
-            Navigator.pop(context); // 🔄 Ferme la boîte de dialogue
-
-            // 🔥 Écrire dans Firestore que la partie est terminée
-            await _firestore.collection('lobbies').doc(widget.lobbyId).update({
-              'gameOverMessage': gameOverMessage,
-            });
-
-          },
-          child: const Text("Valider"),
-        ),
-      ],
-    ),
-  );
-}
-
+    );
+  }
 
   void _listenForGameEnd() {
-    _firestore.collection('lobbies').doc(widget.lobbyId).snapshots().listen((snapshot) {
+    _firestore
+        .collection('lobbies')
+        .doc(widget.lobbyId)
+        .snapshots()
+        .listen((snapshot) {
       if (!snapshot.exists) return;
 
       Map<String, dynamic>? data = snapshot.data();
@@ -401,42 +426,42 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
         debugPrint("🏁 Fin de partie détectée : $message");
 
         if (mounted) {
-          _endGame(message); // 🚀 Affiche le message de fin de partie à tout le monde
+          _endGame(
+              message); // 🚀 Affiche le message de fin de partie à tout le monde
         }
       }
     });
   }
 
-
-
   void _checkGameEnd(String eliminatedPlayer) {
-  debugPrint("🔍 Vérification de la fin de partie...");
+    debugPrint("🔍 Vérification de la fin de partie...");
 
-  // Fin du jeu si l'imposteur est éliminé
-  if (players[eliminatedPlayer] == "Imposteur") {
-    _endGame("🎉 Les civils ont gagné !");
-    return;
+    // Fin du jeu si l'imposteur est éliminé
+    if (players[eliminatedPlayer] == "Imposteur") {
+      _endGame("🎉 Les civils ont gagné !");
+      return;
+    }
+
+    // Vérification du nombre de joueurs restants
+    int remainingPlayers = players.keys
+        .where((playerId) => !eliminatedPlayers.contains(playerId))
+        .length;
+
+    if (remainingPlayers == 1) {
+      _endGame("👿 L'imposteur a gagné !");
+      return;
+    }
+
+    // Relance un nouveau vote avec les joueurs actifs
+    _startNewVote();
   }
-
-  // Vérification du nombre de joueurs restants
-  int remainingPlayers = players.keys.where((playerId) => !eliminatedPlayers.contains(playerId)).length;
-
-  if (remainingPlayers == 1) {
-    _endGame("👿 L'imposteur a gagné !");
-    return;
-  }
-
-  // Relance un nouveau vote avec les joueurs actifs
-  _startNewVote();
-}
-
-
 
   Future<void> _startNewVote() async {
     debugPrint("🔄 Nouveau vote lancé...");
-    
+
     // Sélectionner un nouveau joueur qui commence à parler (parmi ceux non éliminés)
-    List<String> remainingPlayers = players.keys.where((id) => !eliminatedPlayers.contains(id)).toList();
+    List<String> remainingPlayers =
+        players.keys.where((id) => !eliminatedPlayers.contains(id)).toList();
     if (remainingPlayers.isNotEmpty) {
       remainingPlayers.shuffle();
       currentSpeaker = remainingPlayers.first;
@@ -461,8 +486,6 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     }
   }
 
-
-
   void _endGame(String message) {
     debugPrint("🏁 Fin de la partie : $message");
 
@@ -477,7 +500,8 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
             onPressed: () async {
               await _leaveLobby(); // Supprime le joueur du lobby
               if (mounted) {
-                Navigator.pushNamedAndRemoveUntil(context, "/homepage", (route) => false);
+                Navigator.pushNamedAndRemoveUntil(
+                    context, "/homepage", (route) => false);
               }
             },
             child: const Text("🏠 Retourner à l'accueil"),
@@ -487,13 +511,12 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     );
   }
 
-
-
   Future<void> _leaveLobby() async {
     final User? user = _auth.currentUser;
     if (user == null) return;
 
-    DocumentReference lobbyRef = _firestore.collection('lobbies').doc(widget.lobbyId);
+    DocumentReference lobbyRef =
+        _firestore.collection('lobbies').doc(widget.lobbyId);
     DocumentSnapshot lobbyDoc = await lobbyRef.get();
 
     if (!lobbyDoc.exists) return;
@@ -520,8 +543,6 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
@@ -531,7 +552,8 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
       builder: (context, snapshot) {
         if (!snapshot.hasData || !snapshot.data!.exists) {
           return Scaffold(
-            body: Center(child: Text("Lobby introuvable", style: theme.titleLarge)),
+            body: Center(
+                child: Text("Lobby introuvable", style: theme.titleLarge)),
           );
         }
 
@@ -561,7 +583,8 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                 children: [
                   Text(
                     playerNames[userId] ?? "Joueur inconnu",
-                    style: theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
+                    style:
+                        theme.titleLarge.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -574,7 +597,10 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                       child: Text(
                         "🎭 Débat : $civilDebate",
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                        style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue),
                       ),
                     ),
                 ],
@@ -591,12 +617,14 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
             foregroundColor: theme.primary, // ✅ Texte en blanc
             actions: [
               IconButton(
-                icon: Icon(Icons.info_outline, color: theme.primary), // ✅ Icône rouge
+                icon: Icon(Icons.info_outline,
+                    color: theme.primary), // ✅ Icône rouge
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (_) => AlertDialog(
-                      backgroundColor: theme.background, // ✅ Adaptation du thème
+                      backgroundColor:
+                          theme.background, // ✅ Adaptation du thème
                       title: Text("📜 Règles du jeu", style: theme.titleMedium),
                       content: Text(
                         "Les joueurs civils doivent identifier l’imposteur en débattant sur le sujet affiché.\n\n"
@@ -624,8 +652,12 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                 child: ListView(
                   children: players.keys.map((playerId) {
                     bool isEliminated = eliminatedPlayers.contains(playerId);
-                    bool isCurrentUserEliminated = eliminatedPlayers.contains(userId);
-                    bool canVote = !isEliminated && !isCurrentUserEliminated && hasVoted[userId] != true && !votingComplete;
+                    bool isCurrentUserEliminated =
+                        eliminatedPlayers.contains(userId);
+                    bool canVote = !isEliminated &&
+                        !isCurrentUserEliminated &&
+                        hasVoted[userId] != true &&
+                        !votingComplete;
 
                     return ListTile(
                       title: Text(
@@ -642,7 +674,10 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                                   onPressed: () => _votePlayer(playerId),
                                   child: const Text("Voter"),
                                 )
-                              : const Text("✔️ A voté", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                              : const Text("✔️ A voté",
+                                  style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold)),
                     );
                   }).toList(),
                 ),
@@ -653,13 +688,19 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
-                    Text("Tour $_currentTurn", style: theme.titleMedium.copyWith(fontWeight: FontWeight.bold)), // ✅ Affichage du tour
-                    if (currentSpeaker != null && playerNames.containsKey(currentSpeaker))
+                    Text("Tour $_currentTurn",
+                        style: theme.titleMedium.copyWith(
+                            fontWeight:
+                                FontWeight.bold)), // ✅ Affichage du tour
+                    if (currentSpeaker != null &&
+                        playerNames.containsKey(currentSpeaker))
                       Padding(
                         padding: const EdgeInsets.only(top: 5.0),
                         child: Text(
                           "🎙 ${playerNames[currentSpeaker]!} commence ce tour.",
-                          style: theme.bodyMedium.copyWith(color: theme.secondary, fontWeight: FontWeight.bold), // ✅ Rouge + Gras
+                          style: theme.bodyMedium.copyWith(
+                              color: theme.secondary,
+                              fontWeight: FontWeight.bold), // ✅ Rouge + Gras
                         ),
                       ),
                   ],
@@ -672,8 +713,10 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.buttonColor, // ✅ Couleur du bouton
-                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)), // ✅ Arrondi
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 20.0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0)), // ✅ Arrondi
                   ),
                   onPressed: () {
                     showDialog(
@@ -686,7 +729,10 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                           children: [
                             Text(
                               "Vous êtes : $role",
-                              style: theme.bodyLarge.copyWith(fontSize: 20, fontWeight: FontWeight.bold), // ✅ Augmenté à 24px
+                              style: theme.bodyLarge.copyWith(
+                                  fontSize: 20,
+                                  fontWeight:
+                                      FontWeight.bold), // ✅ Augmenté à 24px
                             ),
                             if (role == "Civil")
                               Padding(
@@ -694,7 +740,11 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                                 child: Text(
                                   "🎭 Débat : $civilDebate",
                                   textAlign: TextAlign.center,
-                                  style: theme.bodyMedium.copyWith(fontSize: 18, fontWeight: FontWeight.bold, color: theme.secondary), // ✅ Augmenté à 22px
+                                  style: theme.bodyMedium.copyWith(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color:
+                                          theme.secondary), // ✅ Augmenté à 22px
                                 ),
                               ),
                           ],
@@ -708,7 +758,8 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                       ),
                     );
                   },
-                  child: Text("👀 Voir mon rôle", style: theme.buttonText), // ✅ Texte stylisé
+                  child: Text("👀 Voir mon rôle",
+                      style: theme.buttonText), // ✅ Texte stylisé
                 ),
               ),
 
@@ -716,7 +767,9 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
-                  children: voteMessages.map((message) => Text(message, style: theme.bodyLarge)).toList(),
+                  children: voteMessages
+                      .map((message) => Text(message, style: theme.bodyLarge))
+                      .toList(),
                 ),
               ),
 
@@ -728,12 +781,14 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                     children: [
                       Text(
                         "💀 ${playerNames[eliminatedPlayer] ?? "Joueur inconnu"} a été éliminé !",
-                        style: theme.titleMedium.copyWith(color: theme.secondary), // ✅ Texte rouge
+                        style: theme.titleMedium
+                            .copyWith(color: theme.secondary), // ✅ Texte rouge
                       ),
                       const SizedBox(height: 5),
                       Text(
                         "Son rôle était : ${players[eliminatedPlayer] ?? "Inconnu"}",
-                        style: theme.bodyMedium.copyWith(color: theme.textSecondary), // ✅ Couleur secondaire
+                        style: theme.bodyMedium.copyWith(
+                            color: theme.textSecondary), // ✅ Couleur secondaire
                       ),
                     ],
                   ),
@@ -745,7 +800,8 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
                   padding: const EdgeInsets.all(10.0),
                   child: Text(
                     "🕒 En attente du vote des autres joueurs... $totalVotes/${players.length - eliminatedPlayers.length}",
-                    style: theme.bodyMedium.copyWith(color: Colors.blue, fontWeight: FontWeight.bold),
+                    style: theme.bodyMedium.copyWith(
+                        color: Colors.blue, fontWeight: FontWeight.bold),
                   ),
                 ),
             ],

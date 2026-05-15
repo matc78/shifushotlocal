@@ -14,7 +14,8 @@ class _PartyScreenState extends State<PartyScreen> {
   static const _moods = <_MoodOption>[
     _MoodOption('Hardcore', Icons.local_fire_department_rounded,
         'Ambiance intense, faut suivre'),
-    _MoodOption('Chill', Icons.weekend_rounded, 'Soirée tranquille entre potes'),
+    _MoodOption(
+        'Chill', Icons.weekend_rounded, 'Soirée tranquille entre potes'),
     _MoodOption('Découverte', Icons.explore_rounded,
         'Pour ceux qui connaissent pas encore'),
   ];

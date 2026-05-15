@@ -684,11 +684,12 @@ class _CarouselCard extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: stage.color.withValues(alpha: isClickable
-                              ? 0.65
-                              : isActive
-                                  ? 0.45
-                                  : 0.2),
+                          color: stage.color.withValues(
+                              alpha: isClickable
+                                  ? 0.65
+                                  : isActive
+                                      ? 0.45
+                                      : 0.2),
                           blurRadius: isClickable
                               ? 30
                               : isActive
@@ -722,7 +723,8 @@ class _CarouselCard extends StatelessWidget {
                                       ),
                                     if (isShot && isRevealed)
                                       Container(
-                                        color: Colors.black.withValues(alpha: 0.5),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.5),
                                         alignment: Alignment.center,
                                         child: Text(
                                           "SHOT",
@@ -736,8 +738,8 @@ class _CarouselCard extends StatelessWidget {
                                       IgnorePointer(
                                         child: DecoratedBox(
                                           decoration: BoxDecoration(
-                                            color:
-                                                theme.primary.withValues(alpha: 0.25),
+                                            color: theme.primary
+                                                .withValues(alpha: 0.25),
                                           ),
                                         ),
                                       ),
@@ -759,7 +761,8 @@ class _CarouselCard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(999),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.red.shade700.withValues(alpha: 0.4),
+                                    color: Colors.red.shade700
+                                        .withValues(alpha: 0.4),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),

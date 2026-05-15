@@ -99,7 +99,8 @@ class _FriendsPageState extends State<FriendsPage> {
                 _UserList(
                   uids: pending,
                   emptyTitle: 'Aucune demande en attente',
-                  emptySubtitle: 'On t\'enverra une notif si quelqu\'un t\'ajoute.',
+                  emptySubtitle:
+                      'On t\'enverra une notif si quelqu\'un t\'ajoute.',
                   trailingBuilder: (uid) => Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -235,8 +236,7 @@ class _UserTile extends StatelessWidget {
                 ? user['photoUrl'] as String
                 : _FriendsPageState._defaultAvatar;
         return Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: theme.surface,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),

@@ -56,7 +56,8 @@ class SoundCategorySelectionPage extends StatelessWidget {
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
               leading: ColorFiltered(
-                colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+                colorFilter:
+                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
                 child: CachedNetworkImage(
                   imageUrl:
                       'https://img.icons8.com/?size=100&id=FaFhLHDGUZAA&format=png&color=000000',

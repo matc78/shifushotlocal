@@ -146,7 +146,9 @@ class _ConnexionPageState extends State<ConnexionPage> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Entre un mot de passe';
+                      if (v == null || v.isEmpty) {
+                        return 'Entre un mot de passe';
+                      }
                       if (v.length < 8) return 'Au moins 8 caractères';
                       return null;
                     },

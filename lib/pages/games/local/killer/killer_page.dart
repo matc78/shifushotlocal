@@ -22,36 +22,36 @@ class _KillerPageState extends State<KillerPage> {
   }
 
   Future<void> _fetchUserSurname() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    try {
-      // Récupérer le document utilisateur dans Firestore
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        // Récupérer le document utilisateur dans Firestore
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
 
-      if (userDoc.exists) {
-        // Récupérer le champ 'surname'
-        final surname = userDoc.data()?['surname'] ?? "Moi";
+        if (userDoc.exists) {
+          // Récupérer le champ 'surname'
+          final surname = userDoc.data()?['surname'] ?? "Moi";
 
-        setState(() {
-          players.add(surname); // Ajouter le surname à la liste des joueurs
-        });
-      } else {
-        // Si le document n'existe pas, utilisez une valeur par défaut
+          setState(() {
+            players.add(surname); // Ajouter le surname à la liste des joueurs
+          });
+        } else {
+          // Si le document n'existe pas, utilisez une valeur par défaut
+          setState(() {
+            players.add("Moi");
+          });
+        }
+      } catch (e) {
+        debugPrint('Erreur lors de la récupération du surname : $e');
         setState(() {
           players.add("Moi");
         });
       }
-    } catch (e) {
-      debugPrint('Erreur lors de la récupération du surname : $e');
-      setState(() {
-        players.add("Moi");
-      });
     }
   }
-}
 
   void startGame() {
     if (players.length < 4) {
@@ -124,7 +124,8 @@ class _KillerPageState extends State<KillerPage> {
               child: ListView.builder(
                 itemCount: players.length,
                 itemBuilder: (context, index) {
-                  final isCurrentUser = index == 0; // L'utilisateur connecté est toujours le premier
+                  final isCurrentUser = index ==
+                      0; // L'utilisateur connecté est toujours le premier
 
                   return ListTile(
                     title: Text(players[index], style: theme.bodyLarge),

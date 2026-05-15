@@ -48,8 +48,7 @@ void main() {
     expect(find.text('route:${Routes.selectGame}'), findsOneWidget);
   });
 
-  testWidgets('the "Soon" button is disabled (tap is a no-op)',
-      (tester) async {
+  testWidgets('the "Soon" button is disabled (tap is a no-op)', (tester) async {
     await _pumpHome(tester);
     expect(find.text('Soon — Mode soirée'), findsOneWidget);
     await tester.tap(find.text('Soon — Mode soirée'));
@@ -64,8 +63,7 @@ void main() {
     expect(find.text('route:${Routes.feedback}'), findsOneWidget);
   });
 
-  testWidgets('Soirée bottom action navigates to party_screen',
-      (tester) async {
+  testWidgets('Soirée bottom action navigates to party_screen', (tester) async {
     await _pumpHome(tester);
     await tester.tap(find.text('Soirée'));
     await tester.pumpAndSettle();

@@ -7,7 +7,8 @@ class FollowLinePrecisionEasy extends StatefulWidget {
   const FollowLinePrecisionEasy({super.key});
 
   @override
-  State<FollowLinePrecisionEasy> createState() => _FollowLinePrecisionEasyState();
+  State<FollowLinePrecisionEasy> createState() =>
+      _FollowLinePrecisionEasyState();
 }
 
 class _FollowLinePrecisionEasyState extends State<FollowLinePrecisionEasy> {
@@ -36,7 +37,8 @@ class _FollowLinePrecisionEasyState extends State<FollowLinePrecisionEasy> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
     final data = doc.data();
     if (data != null) {
       final scores = Map<String, dynamic>.from(data['high_scores'] ?? {});
@@ -53,7 +55,8 @@ class _FollowLinePrecisionEasyState extends State<FollowLinePrecisionEasy> {
     if (currentScore > highScore) {
       final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
       final doc = await docRef.get();
-      final scores = Map<String, dynamic>.from(doc.data()?['high_scores'] ?? {});
+      final scores =
+          Map<String, dynamic>.from(doc.data()?['high_scores'] ?? {});
       scores['follow_line_precision_easy'] = currentScore;
       await docRef.update({'high_scores': scores});
       setState(() {
@@ -145,7 +148,8 @@ class _FollowLinePrecisionEasyState extends State<FollowLinePrecisionEasy> {
         children: [
           GestureDetector(
             onPanStart: (details) {
-              final isInStartCircle = (details.localPosition - startCircle).distance <= startRadius;
+              final isInStartCircle =
+                  (details.localPosition - startCircle).distance <= startRadius;
 
               if (isInStartCircle && gameOver) {
                 _restartGame();
@@ -166,13 +170,15 @@ class _FollowLinePrecisionEasyState extends State<FollowLinePrecisionEasy> {
             },
             onPanEnd: (details) {
               if (!hasStarted || gameOver) return;
-              final Offset endPoint = userPath.isNotEmpty ? userPath.last : Offset.zero;
+              final Offset endPoint =
+                  userPath.isNotEmpty ? userPath.last : Offset.zero;
               _endGame(endPoint);
             },
             child: Container(
               color: theme.background,
               child: CustomPaint(
-                painter: _LinePainter(linePath, userPath, startCircle, startRadius, endBox),
+                painter: _LinePainter(
+                    linePath, userPath, startCircle, startRadius, endBox),
                 child: Container(),
               ),
             ),
@@ -191,7 +197,9 @@ class _FollowLinePrecisionEasyState extends State<FollowLinePrecisionEasy> {
                 ),
                 const SizedBox(height: 8),
                 if (gameOver)
-                  Text('🏆 Record personnel : ${highScore.toStringAsFixed(1)} %', style: theme.bodyMedium),
+                  Text(
+                      '🏆 Record personnel : ${highScore.toStringAsFixed(1)} %',
+                      style: theme.bodyMedium),
               ],
             ),
           ),
@@ -203,7 +211,8 @@ class _FollowLinePrecisionEasyState extends State<FollowLinePrecisionEasy> {
                 onPressed: _restartGame,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 ),
                 child: Text("Rejouer", style: theme.buttonText),
               ),
@@ -221,7 +230,8 @@ class _LinePainter extends CustomPainter {
   final double radius;
   final Rect endBox;
 
-  _LinePainter(this.line, this.userPoints, this.start, this.radius, this.endBox);
+  _LinePainter(
+      this.line, this.userPoints, this.start, this.radius, this.endBox);
 
   @override
   void paint(Canvas canvas, Size size) {

@@ -71,9 +71,8 @@ class _TeamGeneratorPageState extends State<TeamGeneratorPage> {
       final shuffled = List<String>.from(_names)..shuffle();
       final totalTeams = (shuffled.length / _peoplePerTeam).ceil();
       for (var i = 0; i < totalTeams; i++) {
-        final size = shuffled.length < _peoplePerTeam
-            ? shuffled.length
-            : _peoplePerTeam;
+        final size =
+            shuffled.length < _peoplePerTeam ? shuffled.length : _peoplePerTeam;
         _teams[i] = shuffled.take(size).toList();
         shuffled.removeRange(0, size);
       }
@@ -185,8 +184,7 @@ class _TeamGeneratorPageState extends State<TeamGeneratorPage> {
                   style: theme.bodyLarge,
                   underline: const SizedBox.shrink(),
                   items: const [1, 2, 3]
-                      .map((v) =>
-                          DropdownMenuItem(value: v, child: Text('$v')))
+                      .map((v) => DropdownMenuItem(value: v, child: Text('$v')))
                       .toList(),
                   onChanged: (v) => setState(() => _peoplePerTeam = v!),
                 ),
@@ -232,8 +230,7 @@ class _TeamGeneratorPageState extends State<TeamGeneratorPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Équipe ${i + 1}',
-                                    style: theme.overline),
+                                Text('Équipe ${i + 1}', style: theme.overline),
                                 const SizedBox(height: 2),
                                 Text(team.join(' & '),
                                     style: theme.bodyLarge.copyWith(

@@ -58,7 +58,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final User? user = _auth.currentUser;
       if (user == null) return;
 
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedFile =
+          await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile == null) return;
 
       File imageFile = File(pickedFile.path);
@@ -94,7 +95,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur lors de l'upload : $e"), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text("Erreur lors de l'upload : $e"),
+            backgroundColor: Colors.red),
       );
     } finally {
       setState(() {
@@ -145,10 +148,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                       ),
                     ),
-
-                    if (_isUploading)
-                      const CircularProgressIndicator(),
-
+                    if (_isUploading) const CircularProgressIndicator(),
                     Positioned(
                       child: Container(
                         decoration: BoxDecoration(
@@ -156,27 +156,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           color: Colors.white.withValues(alpha: 0.8),
                         ),
                         padding: const EdgeInsets.all(10),
-                        child: const Icon(Icons.edit, size: 30, color: Colors.black),
+                        child: const Icon(Icons.edit,
+                            size: 30, color: Colors.black),
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 50),
-
               _buildTextField(theme, 'Pseudo', _pseudoController),
               _buildTextField(theme, 'Nom', _nameController),
               _buildTextField(theme, 'Prénom', _surnameController),
-
-              _buildDropdownField(theme, 'Genre', _gender, ['Homme', 'Femme', 'Autre']),
-
+              _buildDropdownField(
+                  theme, 'Genre', _gender, ['Homme', 'Femme', 'Autre']),
               const SizedBox(height: 100),
-
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.secondary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Text('Enregistrer', style: theme.buttonText),
               ),
@@ -187,7 +186,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildTextField(AppTheme theme, String label, TextEditingController controller) {
+  Widget _buildTextField(
+      AppTheme theme, String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
@@ -200,7 +200,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildDropdownField(AppTheme theme, String label, String? value, List<String> items, {double height = 60.0}) {
+  Widget _buildDropdownField(
+      AppTheme theme, String label, String? value, List<String> items,
+      {double height = 60.0}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: SizedBox(
@@ -209,7 +211,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           decoration: InputDecoration(
             labelText: label,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16), // Ajuste l'intérieur du champ
+            contentPadding: const EdgeInsets.symmetric(
+                vertical: 10, horizontal: 16), // Ajuste l'intérieur du champ
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(

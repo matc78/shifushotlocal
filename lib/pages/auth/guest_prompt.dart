@@ -32,7 +32,8 @@ Future<bool> promptToSignUp(BuildContext context, {String? reason}) async {
   );
   if (accepted == true && context.mounted) {
     GuestSession.instance.exitGuestMode();
-    Navigator.of(context).pushNamedAndRemoveUntil(Routes.debut, (route) => false);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(Routes.debut, (route) => false);
     return true;
   }
   return false;

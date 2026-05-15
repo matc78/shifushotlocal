@@ -54,10 +54,10 @@ void main() {
     });
 
     test('seeded random gives deterministic output', () {
-      final a = KillerAssignment.assign(
-          ['a', 'b', 'c', 'd'], random: Random(7));
-      final b = KillerAssignment.assign(
-          ['a', 'b', 'c', 'd'], random: Random(7));
+      final a =
+          KillerAssignment.assign(['a', 'b', 'c', 'd'], random: Random(7));
+      final b =
+          KillerAssignment.assign(['a', 'b', 'c', 'd'], random: Random(7));
       expect(a, equals(b));
     });
   });

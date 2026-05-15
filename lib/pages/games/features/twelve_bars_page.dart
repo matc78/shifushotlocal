@@ -60,13 +60,15 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
   }
 
   Future<void> _showNotification() async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
       'twelve_bars_channel',
       'Twelve Bars',
       importance: Importance.max,
       priority: Priority.high,
     );
-    const NotificationDetails details = NotificationDetails(android: androidDetails);
+    const NotificationDetails details =
+        NotificationDetails(android: androidDetails);
     await flutterLocalNotificationsPlugin.show(
       0,
       'Temps écoulé !',
@@ -80,13 +82,15 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
       Vibration.vibrate(duration: 1000); // 📳 vibration 1s
     }
 
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
       'twelve_bars_channel_5min',
       'Twelve Bars - 5 minutes',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
     );
-    const NotificationDetails details = NotificationDetails(android: androidDetails);
+    const NotificationDetails details =
+        NotificationDetails(android: androidDetails);
     await flutterLocalNotificationsPlugin.show(
       1,
       '⏳ Plus que 5 minutes !',
@@ -140,7 +144,8 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
   }
 
   String _generateConstraint() {
-    final available = constraints.where((c) => !usedConstraints.contains(c)).toList();
+    final available =
+        constraints.where((c) => !usedConstraints.contains(c)).toList();
     if (available.isEmpty) {
       usedConstraints.clear();
       return _generateConstraint();
@@ -207,7 +212,8 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text("Réinitialiser l'activité ?"),
-        content: const Text("Cela remettra le compteur à zéro et effacera la progression actuelle."),
+        content: const Text(
+            "Cela remettra le compteur à zéro et effacera la progression actuelle."),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -272,8 +278,10 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
                           onPressed: _startNewBar,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: theme.primary,
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                           ),
                           child: Text("C’est parti !", style: theme.buttonText),
                         ),
@@ -282,17 +290,22 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
                   : Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("Bar ${barIndex + 1}/$totalBars", style: theme.titleLarge),
+                        Text("Bar ${barIndex + 1}/$totalBars",
+                            style: theme.titleLarge),
                         const SizedBox(height: 16),
                         LinearProgressIndicator(
-                          value: 1 - (timeLeft.inSeconds / barDuration.inSeconds),
+                          value:
+                              1 - (timeLeft.inSeconds / barDuration.inSeconds),
                           minHeight: 8,
-                          backgroundColor: theme.textSecondary.withValues(alpha: 0.2),
-                          valueColor: AlwaysStoppedAnimation<Color>(theme.secondary),
+                          backgroundColor:
+                              theme.textSecondary.withValues(alpha: 0.2),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(theme.secondary),
                         ),
                         const SizedBox(height: 16),
                         Text("⏳ Temps restant", style: theme.bodyMedium),
-                        Text(_formatDuration(timeLeft), style: theme.titleLarge.copyWith(fontSize: 48)),
+                        Text(_formatDuration(timeLeft),
+                            style: theme.titleLarge.copyWith(fontSize: 48)),
                         const SizedBox(height: 24),
                         Text("🎲 Contrainte", style: theme.bodyMedium),
                         Container(
@@ -301,11 +314,13 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
                           decoration: BoxDecoration(
                             color: theme.secondary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: theme.secondary, width: 1),
+                            border:
+                                Border.all(color: theme.secondary, width: 1),
                           ),
                           child: Text(
                             currentConstraint,
-                            style: theme.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                            style: theme.bodyLarge
+                                .copyWith(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -314,10 +329,13 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
                           onPressed: _goToNextBar,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: theme.primary,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                           ),
-                          child: Text("Passer au bar suivant", style: theme.buttonText),
+                          child: Text("Passer au bar suivant",
+                              style: theme.buttonText),
                         ),
                       ],
                     ),

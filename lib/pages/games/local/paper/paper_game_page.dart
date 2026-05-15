@@ -53,7 +53,9 @@ class _PaperGamePageState extends State<PaperGamePage> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Ajoutez au moins un papier avant de commencer le jeu !")),
+        const SnackBar(
+            content:
+                Text("Ajoutez au moins un papier avant de commencer le jeu !")),
       );
     }
   }
@@ -153,7 +155,8 @@ class _PaperGamePageState extends State<PaperGamePage> {
               onPressed: _addPaper,
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primary,
-                padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 24),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 14.0, horizontal: 24),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

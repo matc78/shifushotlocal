@@ -38,7 +38,7 @@ class _CardDrawerPageState extends State<CardDrawerPage> {
     List<PlayingCard> deck = [];
 
     for (var suit in Suit.values) {
-      if (suit != Suit.joker) { 
+      if (suit != Suit.joker) {
         for (var value in CardValue.values) {
           if (value != CardValue.joker_1 && value != CardValue.joker_2) {
             deck.add(PlayingCard(suit, value));
@@ -86,7 +86,9 @@ class _CardDrawerPageState extends State<CardDrawerPage> {
                   selectedColor: theme.secondary,
                   backgroundColor: Colors.grey[300],
                   labelStyle: TextStyle(
-                    color: numberOfCards == index + 1 ? Colors.white : theme.textPrimary,
+                    color: numberOfCards == index + 1
+                        ? Colors.white
+                        : theme.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                   onSelected: (_) {
@@ -152,7 +154,8 @@ class _CardDrawerPageState extends State<CardDrawerPage> {
               onPressed: _drawCards,
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),

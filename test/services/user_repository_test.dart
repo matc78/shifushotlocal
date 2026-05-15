@@ -52,7 +52,8 @@ void main() {
       fake.addUser('u1', {'pseudo': 'noob1', 'photoUrl': 'a.jpg'});
       fake.addUser('u2', {'pseudo': 'noob2', 'photoUrl': 'b.jpg'});
 
-      expect(await fake.getUser('u1'), {'pseudo': 'noob1', 'photoUrl': 'a.jpg'});
+      expect(
+          await fake.getUser('u1'), {'pseudo': 'noob1', 'photoUrl': 'a.jpg'});
       expect(await fake.getUser('missing'), isNull);
       expect(await fake.isPseudoTaken('noob1'), isTrue);
       expect(await fake.isPseudoTaken('unknown'), isFalse);

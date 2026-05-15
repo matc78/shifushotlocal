@@ -69,7 +69,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
-        final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
         final surname = userDoc.data()?['name'] ?? "Moi";
         if (mounted) setState(() => players.add(surname));
       } catch (_) {
@@ -124,7 +127,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
         context: context,
         builder: (_) => AlertDialog(
           title: const Text("Pas assez de joueurs"),
-          content: Text("Le jeu suivant requiert au moins $minPlayers joueur(s)."),
+          content:
+              Text("Le jeu suivant requiert au moins $minPlayers joueur(s)."),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -175,10 +179,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
               Wrap(
                 spacing: 8,
                 children: remainingGames.map((route) {
-                  final gameName = gameRoutes.entries.firstWhere(
-                    (entry) => entry.value == route,
-                    orElse: () => const MapEntry('Inconnu', ''),
-                  ).key;
+                  final gameName = gameRoutes.entries
+                      .firstWhere(
+                        (entry) => entry.value == route,
+                        orElse: () => const MapEntry('Inconnu', ''),
+                      )
+                      .key;
                   return Chip(label: Text(gameName));
                 }).toList(),
               ),
@@ -200,7 +206,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                       ? null
                       : IconButton(
                           icon: const Icon(Icons.delete),
-                          onPressed: () => setState(() => players.removeAt(index)),
+                          onPressed: () =>
+                              setState(() => players.removeAt(index)),
                         ),
                 ),
               ),
@@ -213,7 +220,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
                   startSingleGame(remainingGames.first, players);
                 }
               },
-              child: Text(mode == 'Soirée' ? "Commencer la soirée" : "Commencer le jeu"),
+              child: Text(mode == 'Soirée'
+                  ? "Commencer la soirée"
+                  : "Commencer le jeu"),
             ),
           ],
         ),

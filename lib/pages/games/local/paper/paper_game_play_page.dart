@@ -82,7 +82,8 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("OK", style: theme.buttonText.copyWith(color: theme.primary)),
+              child: Text("OK",
+                  style: theme.buttonText.copyWith(color: theme.primary)),
             ),
           ],
         );
@@ -117,13 +118,15 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
           builder: (context) => AlertDialog(
             backgroundColor: theme.background,
             title: Text("Fin de la soirée", style: theme.titleMedium),
-            content: Text("Tous les jeux ont été joués.", style: theme.bodyLarge),
+            content:
+                Text("Tous les jeux ont été joués.", style: theme.bodyLarge),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
-                child: Text("Retour à l'accueil", style: theme.buttonText.copyWith(color: theme.primary)),
+                child: Text("Retour à l'accueil",
+                    style: theme.buttonText.copyWith(color: theme.primary)),
               ),
             ],
           ),
@@ -141,7 +144,8 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
       }
     } else {
       // Aucun jeu restant, annonce du vainqueur
-      final winner = shotCounter.entries.reduce((a, b) => a.value < b.value ? a : b).key;
+      final winner =
+          shotCounter.entries.reduce((a, b) => a.value < b.value ? a : b).key;
 
       showDialog(
         context: context,
@@ -161,7 +165,8 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
               onPressed: () {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
-              child: Text("Retour à l'accueil", style: theme.buttonText.copyWith(color: theme.primary)),
+              child: Text("Retour à l'accueil",
+                  style: theme.buttonText.copyWith(color: theme.primary)),
             ),
           ],
         ),
@@ -243,7 +248,8 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
                     children: [
                       Text(
                         "Cible : ${selectedPaper!['player'] == 'Celui qui piochera' ? currentPlayer : selectedPaper!['player']}",
-                        style: theme.bodyLarge.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+                        style: theme.bodyLarge.copyWith(
+                            fontWeight: FontWeight.bold, fontSize: 25),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 10),
@@ -262,12 +268,14 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
                 onPressed: _drawPaper,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 50),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Text("Tirer un papier", style: theme.buttonText.copyWith(fontSize: 18)),
+                child: Text("Tirer un papier",
+                    style: theme.buttonText.copyWith(fontSize: 18)),
               ),
             if (hasDrawn) ...[
               const SizedBox(height: 30),
@@ -278,7 +286,8 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
                     onPressed: _acceptPaper,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 40),
                     ),
                     child: Text("Accepter le défi", style: theme.buttonText),
                   ),
@@ -286,7 +295,8 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
                     onPressed: _refusePaper,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.secondary,
-                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 40),
                     ),
                     child: Text("Refuser", style: theme.buttonText),
                   ),

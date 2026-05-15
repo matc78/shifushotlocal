@@ -37,7 +37,8 @@ class _ReflexGamePageState extends State<ReflexGamePage>
   void initState() {
     super.initState();
     _loadHighScore();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 2));
     _startButtonController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -62,7 +63,8 @@ class _ReflexGamePageState extends State<ReflexGamePage>
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
     final data = doc.data();
     if (data != null) {
       final scores = Map<String, dynamic>.from(data['high_scores'] ?? {});
@@ -80,7 +82,8 @@ class _ReflexGamePageState extends State<ReflexGamePage>
     if (_bestReaction == null || currentReaction < _bestReaction!) {
       final docRef = FirebaseFirestore.instance.collection('users').doc(uid);
       final doc = await docRef.get();
-      final scores = Map<String, dynamic>.from(doc.data()?['high_scores'] ?? {});
+      final scores =
+          Map<String, dynamic>.from(doc.data()?['high_scores'] ?? {});
       scores['reflex_game'] = currentReaction.inMilliseconds;
       await docRef.update({'high_scores': scores});
       setState(() {
@@ -199,7 +202,8 @@ class _ReflexGamePageState extends State<ReflexGamePage>
                     const SizedBox(height: 20),
                     if (!_waiting)
                       ScaleTransition(
-                        scale: _startButtonController.drive(Tween(begin: 0.8, end: 1.0)),
+                        scale: _startButtonController
+                            .drive(Tween(begin: 0.8, end: 1.0)),
                         child: ElevatedButton(
                           onPressed: () {
                             _startGame();

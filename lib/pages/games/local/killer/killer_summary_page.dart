@@ -3,7 +3,6 @@ import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shifushotlocal/routes.dart';
 
-
 class KillerSummaryPage extends StatefulWidget {
   final Map<String, dynamic> playerData;
 
@@ -32,7 +31,8 @@ class _KillerSummaryPageState extends State<KillerSummaryPage> {
 
   void _checkGameOver() {
     setState(() {
-      isGameOver = playerData.values.where((player) => !player['isDead']).length <= 1;
+      isGameOver =
+          playerData.values.where((player) => !player['isDead']).length <= 1;
     });
   }
 
@@ -88,7 +88,8 @@ class _KillerSummaryPageState extends State<KillerSummaryPage> {
     final theme = AppTheme.of(context);
 
     if (isGameOver) {
-      final winner = playerData.keys.firstWhere((name) => !playerData[name]['isDead']);
+      final winner =
+          playerData.keys.firstWhere((name) => !playerData[name]['isDead']);
       return Scaffold(
         appBar: AppBar(
           title: Text('Résumé du jeu', style: theme.titleMedium),
@@ -161,7 +162,9 @@ class _KillerSummaryPageState extends State<KillerSummaryPage> {
                           : theme.bodyLarge,
                     ),
                     subtitle: isDead
-                        ? Text('Éliminé', style: theme.bodyMedium.copyWith(color: Colors.grey))
+                        ? Text('Éliminé',
+                            style:
+                                theme.bodyMedium.copyWith(color: Colors.grey))
                         : null,
                     trailing: isDead
                         ? null
@@ -169,7 +172,8 @@ class _KillerSummaryPageState extends State<KillerSummaryPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.info, color: Colors.blue),
+                                icon:
+                                    const Icon(Icons.info, color: Colors.blue),
                                 onPressed: () => _checkPlayerAction(playerName),
                               ),
                               IconButton(

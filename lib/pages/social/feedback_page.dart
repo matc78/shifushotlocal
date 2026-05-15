@@ -102,7 +102,9 @@ class FeedbackPage extends StatelessWidget {
                   }
 
                   try {
-                    await FirebaseFirestore.instance.collection('feedback').add({
+                    await FirebaseFirestore.instance
+                        .collection('feedback')
+                        .add({
                       'title': title,
                       'feedback': feedback,
                       'uid': uid,
@@ -156,7 +158,8 @@ class FeedbackPage extends StatelessWidget {
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('feedback')
-                      .where('uid', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                      .where('uid',
+                          isEqualTo: FirebaseAuth.instance.currentUser?.uid)
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
                   builder: (context, snapshot) {
@@ -180,17 +183,20 @@ class FeedbackPage extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final feedbackData = feedbackDocs[index];
                         final String title = feedbackData['title'];
-                        final String feedbackId = feedbackData.id; // ID du document Firestore
+                        final String feedbackId =
+                            feedbackData.id; // ID du document Firestore
                         final Timestamp? timestamp = feedbackData['timestamp'];
 
                         // Conversion du timestamp en format d/m/yy h:m
                         final String formattedDate = timestamp != null
-                            ? DateFormat('d/M/yy HH:mm').format(timestamp.toDate())
+                            ? DateFormat('d/M/yy HH:mm')
+                                .format(timestamp.toDate())
                             : 'Date inconnue';
 
                         return Card(
                           elevation: 3.0, // Ombre sous la carte
-                          margin: const EdgeInsets.symmetric(vertical: 8.0), // Espacement vertical
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8.0), // Espacement vertical
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
@@ -204,14 +210,16 @@ class FeedbackPage extends StatelessWidget {
                                 ),
                                 Text(
                                   formattedDate,
-                                  style: theme.bodyMedium.copyWith(color: Colors.grey),
+                                  style: theme.bodyMedium
+                                      .copyWith(color: Colors.grey),
                                 ),
                               ],
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () async {
-                                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                                final scaffoldMessenger =
+                                    ScaffoldMessenger.of(context);
 
                                 // Affiche une boîte de confirmation avant la suppression
                                 final bool? confirm = await showDialog<bool>(
@@ -222,11 +230,13 @@ class FeedbackPage extends StatelessWidget {
                                         'Êtes-vous sûr de vouloir supprimer ce feedback ?'),
                                     actions: [
                                       TextButton(
-                                        onPressed: () => Navigator.pop(context, false),
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
                                         child: const Text('Annuler'),
                                       ),
                                       TextButton(
-                                        onPressed: () => Navigator.pop(context, true),
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
                                         child: const Text('Supprimer'),
                                       ),
                                     ],
@@ -242,15 +252,16 @@ class FeedbackPage extends StatelessWidget {
 
                                     scaffoldMessenger.showSnackBar(
                                       const SnackBar(
-                                        content: Text('Feedback supprimé avec succès.'),
+                                        content: Text(
+                                            'Feedback supprimé avec succès.'),
                                         backgroundColor: Colors.green,
                                       ),
                                     );
                                   } catch (e) {
                                     scaffoldMessenger.showSnackBar(
                                       const SnackBar(
-                                        content:
-                                            Text('Erreur lors de la suppression du feedback.'),
+                                        content: Text(
+                                            'Erreur lors de la suppression du feedback.'),
                                         backgroundColor: Colors.red,
                                       ),
                                     );
@@ -262,8 +273,8 @@ class FeedbackPage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      FeedbackDetailPage(feedback: feedbackData),
+                                  builder: (context) => FeedbackDetailPage(
+                                      feedback: feedbackData),
                                 ),
                               );
                             },

@@ -19,8 +19,7 @@ class TeamPartition {
     final result = <int, List<String>>{};
     final teamCount = (shuffled.length / perTeam).ceil();
     for (var i = 0; i < teamCount; i++) {
-      final size =
-          shuffled.length < perTeam ? shuffled.length : perTeam;
+      final size = shuffled.length < perTeam ? shuffled.length : perTeam;
       result[i] = shuffled.take(size).toList();
       shuffled.removeRange(0, size);
     }

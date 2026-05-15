@@ -115,7 +115,8 @@ void main() {
       expect(find.byType(SkeletonBlock), findsOneWidget);
     });
 
-    testWidgets('SkeletonListTile renders three skeleton blocks (avatar + 2 lines)',
+    testWidgets(
+        'SkeletonListTile renders three skeleton blocks (avatar + 2 lines)',
         (tester) async {
       await tester.pumpWidget(_hosted(
         const Scaffold(body: SkeletonListTile()),

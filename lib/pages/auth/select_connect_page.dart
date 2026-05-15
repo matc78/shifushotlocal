@@ -36,8 +36,8 @@ class SelectConnectPage extends StatelessWidget {
                       theme.brandGradient.createShader(rect),
                   child: Text(
                     'SHIFUSHOT',
-                    style:
-                        theme.displayLarge.copyWith(color: Colors.white, fontSize: 48),
+                    style: theme.displayLarge
+                        .copyWith(color: Colors.white, fontSize: 48),
                   ),
                 ),
                 const SizedBox(height: 24),

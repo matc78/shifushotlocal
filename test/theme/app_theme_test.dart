@@ -55,8 +55,7 @@ void main() {
 
 /// AppTheme.of currently ignores its context argument; passing the bare type
 /// keeps the test pure and avoids needing a real BuildContext.
-BuildContext get _fakeContext =>
-    _FakeBuildContext();
+BuildContext get _fakeContext => _FakeBuildContext();
 
 class _FakeBuildContext implements BuildContext {
   @override

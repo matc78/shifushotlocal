@@ -226,7 +226,8 @@ class _PyramidePageState extends State<PyramidePage> {
                         (_rowIndexMatrix.length +
                             spacingRatio * (_rowIndexMatrix.length - 1));
                     const scaleFactor = 0.75;
-                    final cardWidth = min(widthBound, heightBound) * scaleFactor;
+                    final cardWidth =
+                        min(widthBound, heightBound) * scaleFactor;
                     final cardHeight = cardWidth * 1.4;
                     final rowSpacing = cardHeight * spacingRatio;
 

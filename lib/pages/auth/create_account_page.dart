@@ -56,7 +56,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     final pseudo = _pseudoController.text.trim();
 
     if (!_passwordRegex.hasMatch(password)) {
-      _snack('Mot de passe : 8 caractères min, 1 majuscule, 1 chiffre, 1 spécial.');
+      _snack(
+          'Mot de passe : 8 caractères min, 1 majuscule, 1 chiffre, 1 spécial.');
       return;
     }
     if (password != confirm) {
@@ -195,7 +196,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           style: theme.bodyLarge,
                           decoration: const InputDecoration(hintText: 'Nom'),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
+                            FilteringTextInputFormatter.allow(
+                                RegExp('[a-zA-Z]')),
                           ],
                           validator: (v) =>
                               (v == null || v.isEmpty) ? 'Requis' : null,
@@ -208,7 +210,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           style: theme.bodyLarge,
                           decoration: const InputDecoration(hintText: 'Prénom'),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]')),
+                            FilteringTextInputFormatter.allow(
+                                RegExp('[a-zA-Z]')),
                           ],
                           validator: (v) =>
                               (v == null || v.isEmpty) ? 'Requis' : null,
@@ -255,7 +258,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Entre un mot de passe';
+                      if (v == null || v.isEmpty) {
+                        return 'Entre un mot de passe';
+                      }
                       if (v.length < 8) return 'Au moins 8 caractères';
                       return null;
                     },
@@ -279,8 +284,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 !_isConfirmPasswordVisible),
                       ),
                     ),
-                    validator: (v) =>
-                        (v == null || v.isEmpty) ? 'Confirme le mot de passe' : null,
+                    validator: (v) => (v == null || v.isEmpty)
+                        ? 'Confirme le mot de passe'
+                        : null,
                   ),
                   const SizedBox(height: 24),
                   GradientButton(

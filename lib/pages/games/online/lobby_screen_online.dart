@@ -40,7 +40,8 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
     }
 
     String lobbyId = const Uuid().v4().substring(0, 6).toUpperCase();
-    String gameRoute = gameRoutes[widget.gameName] ?? '/homepage'; // 🔹 Route du jeu
+    String gameRoute =
+        gameRoutes[widget.gameName] ?? '/homepage'; // 🔹 Route du jeu
 
     await _firestore.collection('lobbies').doc(lobbyId).set({
       'hostId': user.uid,
@@ -54,7 +55,8 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LobbyWaitingScreen(lobbyId: lobbyId, isHost: true, gameRoute: gameRoute),
+          builder: (context) => LobbyWaitingScreen(
+              lobbyId: lobbyId, isHost: true, gameRoute: gameRoute),
         ),
       );
     }
@@ -79,7 +81,8 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
       return;
     }
 
-    DocumentSnapshot lobbyDoc = await _firestore.collection('lobbies').doc(lobbyId).get();
+    DocumentSnapshot lobbyDoc =
+        await _firestore.collection('lobbies').doc(lobbyId).get();
     if (!mounted) return;
     if (!lobbyDoc.exists) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -89,7 +92,8 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
       return;
     }
 
-    String gameRoute = lobbyDoc['gameRoute'] ?? '/homepage'; // 🔹 Récupérer la route du jeu
+    String gameRoute =
+        lobbyDoc['gameRoute'] ?? '/homepage'; // 🔹 Récupérer la route du jeu
 
     await _firestore.collection('lobbies').doc(lobbyId).update({
       'players': FieldValue.arrayUnion([user.uid]),
@@ -99,7 +103,8 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LobbyWaitingScreen(lobbyId: lobbyId, isHost: false, gameRoute: gameRoute),
+          builder: (context) => LobbyWaitingScreen(
+              lobbyId: lobbyId, isHost: false, gameRoute: gameRoute),
         ),
       );
     }
@@ -113,7 +118,8 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Jeu en Ligne - ${widget.gameName}", style: theme.titleMedium),
+        title:
+            Text("Jeu en Ligne - ${widget.gameName}", style: theme.titleMedium),
         backgroundColor: theme.background,
         elevation: 0,
         centerTitle: true,
@@ -133,8 +139,10 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
                 onPressed: _isProcessing ? null : _createLobby,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.textPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 30),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 30),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _isProcessing
                     ? const CircularProgressIndicator(color: Colors.white)
@@ -173,8 +181,10 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
                 onPressed: _isProcessing ? null : _joinLobby,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.secondary,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 30),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 30),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _isProcessing
                     ? const CircularProgressIndicator(color: Colors.white)

@@ -17,7 +17,8 @@ class SoundBoardPage extends StatefulWidget {
   State<SoundBoardPage> createState() => _SoundBoardPageState();
 }
 
-class _SoundBoardPageState extends State<SoundBoardPage> with SingleTickerProviderStateMixin {
+class _SoundBoardPageState extends State<SoundBoardPage>
+    with SingleTickerProviderStateMixin {
   final AudioPlayer player = AudioPlayer();
   String? playing;
   bool isLocked = false;

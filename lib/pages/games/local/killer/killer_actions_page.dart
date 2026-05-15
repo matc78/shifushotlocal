@@ -143,7 +143,8 @@ class _KillerActionsPageState extends State<KillerActionsPage> {
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
-                          title: Text('Votre mission', style: theme.titleMedium),
+                          title:
+                              Text('Votre mission', style: theme.titleMedium),
                           content: Text(
                             '${shuffledPlayers[currentPlayerIndex]}, votre action est :\n\n $currentAction\n\nCible : $currentTarget',
                             style: theme.bodyMedium,

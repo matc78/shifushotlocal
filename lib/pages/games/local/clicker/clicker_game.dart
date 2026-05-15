@@ -42,7 +42,7 @@ class _ClickerGameState extends State<ClickerGame> {
         final data = doc.data() ?? {};
         final highScores = Map<String, dynamic>.from(data['high_scores'] ?? {});
         final userName = data['name'] ?? "Moi";
-        
+
         setState(() {
           playerName = userName;
           highScore = (highScores['clicker_game'] ?? 0) as int;
@@ -193,8 +193,10 @@ class _ClickerGameState extends State<ClickerGame> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.primary, // 🎨 couleur du thème
                       foregroundColor: Colors.white,
-                      textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      textStyle: const TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
                     ),
                     child: const Text("Rejouer"),
                   ),
@@ -209,10 +211,13 @@ class _ClickerGameState extends State<ClickerGame> {
                       Navigator.pushReplacementNamed(context, Routes.home);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.secondary, // 🎨 couleur secondaire du thème
+                      backgroundColor:
+                          theme.secondary, // 🎨 couleur secondaire du thème
                       foregroundColor: Colors.white,
-                      textStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      textStyle: const TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
                     ),
                     child: const Text("Accueil"),
                   ),
@@ -289,14 +294,18 @@ class _ClickerGameState extends State<ClickerGame> {
                       onPressed: startClickingPhase,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
                       child: const Text(
                         "C'EST PARTI !",
-                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                     ),
                   if (!showStartButton)
@@ -304,14 +313,18 @@ class _ClickerGameState extends State<ClickerGame> {
                       onPressed: incrementScore,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primary,
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 150),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 150),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
                       child: const Text(
                         "TAPE MOI !!\nMAIS TAPE PLUS VITE !!\nP****N J'ADORE ÇA !!",
-                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                     ),
                 ],

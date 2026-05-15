@@ -21,7 +21,8 @@ class FirebaseMessagingService {
 
     final token = await fcm.getToken();
     if (token != null) {
-      final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final userRef =
+          FirebaseFirestore.instance.collection('users').doc(user.uid);
       final doc = await userRef.get();
       if (!doc.exists) {
         await userRef.set({

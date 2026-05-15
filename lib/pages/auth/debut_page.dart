@@ -26,7 +26,8 @@ class DebutPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 ShaderMask(
-                  shaderCallback: (rect) => theme.brandGradient.createShader(rect),
+                  shaderCallback: (rect) =>
+                      theme.brandGradient.createShader(rect),
                   child: Text(
                     'SHIFUSHOT',
                     style: theme.displayLarge.copyWith(color: Colors.white),

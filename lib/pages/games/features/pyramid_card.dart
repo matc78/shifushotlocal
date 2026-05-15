@@ -73,52 +73,61 @@ class _PyramidCardPageState extends State<PyramidCardPage> {
   }
 
   @override
-Widget build(BuildContext context) {
-  final theme = AppTheme.of(context);
-  double screenHeight = MediaQuery.of(context).size.height;
-  double cardWidth = MediaQuery.of(context).size.width * 0.52; // Ajuster la largeur
-  double cardHeight = cardWidth * 0.7; // Garder le ratio des cartes
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    double screenHeight = MediaQuery.of(context).size.height;
+    double cardWidth =
+        MediaQuery.of(context).size.width * 0.52; // Ajuster la largeur
+    double cardHeight = cardWidth * 0.7; // Garder le ratio des cartes
 
-  return Scaffold(
-    backgroundColor: isCardFlipping ? Colors.redAccent : Colors.lightGreenAccent,
-    appBar: AppBar(
-      title: Text("Cartes pour pyramide", style: theme.titleMedium),
-      centerTitle: true,
-      backgroundColor: isCardFlipping ? Colors.redAccent : Colors.lightGreenAccent,
-      elevation: 0,
-      iconTheme: IconThemeData(color: theme.textPrimary),
-    ),
-    body: Center(
-      child: Stack(
-        children: List.generate(4, (index) {
-          double spacing = cardHeight * 0.15; // Espacement fixe entre les cartes
-          double startPosition = (screenHeight - (4 * cardHeight + 3 * spacing)) /4; // Centrage vertical
-          if (kDebugMode) {
-            debugPrint("start position : $startPosition");
-          }
+    return Scaffold(
+      backgroundColor:
+          isCardFlipping ? Colors.redAccent : Colors.lightGreenAccent,
+      appBar: AppBar(
+        title: Text("Cartes pour pyramide", style: theme.titleMedium),
+        centerTitle: true,
+        backgroundColor:
+            isCardFlipping ? Colors.redAccent : Colors.lightGreenAccent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: theme.textPrimary),
+      ),
+      body: Center(
+        child: Stack(
+          children: List.generate(4, (index) {
+            double spacing =
+                cardHeight * 0.15; // Espacement fixe entre les cartes
+            double startPosition =
+                (screenHeight - (4 * cardHeight + 3 * spacing)) /
+                    4; // Centrage vertical
+            if (kDebugMode) {
+              debugPrint("start position : $startPosition");
+            }
 
-          return Positioned(
-            top: startPosition + index * (cardHeight + spacing), // Positionner chaque carte
-            left: (MediaQuery.of(context).size.width - cardWidth) / 2, // Centrage horizontal
-            child: GestureDetector(
-              onTap: () => _flipCard(index),
-              child: SizedBox(
-                width: cardWidth,
-                height: cardHeight,
-                child: RotatedBox(
-                  quarterTurns: 1, // Rotation de 90° pour afficher horizontalement
-                  child: PlayingCardView(
-                    card: cards[index],
-                    showBack: !cardFlipped[index],
-                    elevation: 3.0,
+            return Positioned(
+              top: startPosition +
+                  index * (cardHeight + spacing), // Positionner chaque carte
+              left: (MediaQuery.of(context).size.width - cardWidth) /
+                  2, // Centrage horizontal
+              child: GestureDetector(
+                onTap: () => _flipCard(index),
+                child: SizedBox(
+                  width: cardWidth,
+                  height: cardHeight,
+                  child: RotatedBox(
+                    quarterTurns:
+                        1, // Rotation de 90° pour afficher horizontalement
+                    child: PlayingCardView(
+                      card: cards[index],
+                      showBack: !cardFlipped[index],
+                      elevation: 3.0,
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

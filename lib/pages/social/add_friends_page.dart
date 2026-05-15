@@ -47,8 +47,9 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
       }
 
       debugPrint("🔹 Token utilisateur : ${user.uid}");
-      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'us-central1')
-          .httpsCallable('sendFriendRequestNotification');
+      HttpsCallable callable =
+          FirebaseFunctions.instanceFor(region: 'us-central1')
+              .httpsCallable('sendFriendRequestNotification');
 
       debugPrint("🔹 Envoi de la notification...");
 
@@ -127,24 +128,31 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
       final notifPrefs = friendData['notifications'] as Map<String, dynamic>?;
 
       // 🔹 Ajouter dans pending et friend_requests
-      await FirebaseFirestore.instance.collection('users').doc(friendUid).update({
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(friendUid)
+          .update({
         'pending_approval': FieldValue.arrayUnion([currentUser.uid]),
       });
 
-      await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).update({
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .update({
         'friend_requests': FieldValue.arrayUnion([friendUid]),
       });
 
       debugPrint("friend token : $friendToken et senderName : $senderName");
 
       // ✅ Vérifier si le destinataire a activé les notifs
-      final wantsFriendRequestNotif =
-          (notifPrefs?['enabled'] ?? false) && (notifPrefs?['friend_requests'] ?? false);
+      final wantsFriendRequestNotif = (notifPrefs?['enabled'] ?? false) &&
+          (notifPrefs?['friend_requests'] ?? false);
 
       if (friendToken != null && wantsFriendRequestNotif) {
         await sendPushNotification(friendToken, senderName);
       } else {
-        debugPrint("🔕 Le destinataire a désactivé les notifications de demandes d'ami.");
+        debugPrint(
+            "🔕 Le destinataire a désactivé les notifications de demandes d'ami.");
       }
 
       if (!mounted) return;
@@ -153,7 +161,8 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
           backgroundColor: Colors.black,
           content: Text(
             'Demande d\'ami envoyée.',
-            style: AppTheme.of(context).bodyMedium.copyWith(color: Colors.white),
+            style:
+                AppTheme.of(context).bodyMedium.copyWith(color: Colors.white),
           ),
         ),
       );
@@ -164,7 +173,8 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
           backgroundColor: Colors.red,
           content: Text(
             'Erreur lors de l\'envoi : $e',
-            style: AppTheme.of(context).bodyMedium.copyWith(color: Colors.white),
+            style:
+                AppTheme.of(context).bodyMedium.copyWith(color: Colors.white),
           ),
         ),
       );
@@ -216,12 +226,15 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
                     }
 
                     if (!snapshot.hasData || !snapshot.data!.exists) {
-                      return const Center(child: Text('Aucun utilisateur trouvé.'));
+                      return const Center(
+                          child: Text('Aucun utilisateur trouvé.'));
                     }
 
-                    final userData = snapshot.data!.data() as Map<String, dynamic>;
+                    final userData =
+                        snapshot.data!.data() as Map<String, dynamic>;
                     final currentUserFriends = userData['friends'] ?? [];
-                    final currentUserFriendRequests = userData['friend_requests'] ?? [];
+                    final currentUserFriendRequests =
+                        userData['friend_requests'] ?? [];
 
                     return ListView.separated(
                       itemCount: searchResults.length,
@@ -230,17 +243,19 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
                         final user = searchResults[index];
                         final friendUid = user['id'];
 
-                        String buttonText = currentUserFriends.contains(friendUid)
-                            ? 'Ami'
-                            : currentUserFriendRequests.contains(friendUid)
-                                ? 'En attente'
-                                : 'Ajouter';
+                        String buttonText =
+                            currentUserFriends.contains(friendUid)
+                                ? 'Ami'
+                                : currentUserFriendRequests.contains(friendUid)
+                                    ? 'En attente'
+                                    : 'Ajouter';
 
                         return ListTile(
                           leading: CircleAvatar(
                             backgroundImage: (user['photoUrl'] != null &&
                                     (user['photoUrl'] as String).isNotEmpty)
-                                ? CachedNetworkImageProvider(user['photoUrl'] as String)
+                                ? CachedNetworkImageProvider(
+                                    user['photoUrl'] as String)
                                 : null,
                           ),
                           title: Text('${user['surname']} ${user['name']}'),
