@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
@@ -22,7 +23,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     'Clicker': Routes.clickerGame,
     'Bizkit !': Routes.diceGame,
     'Jeu des papiers': Routes.paperGame,
-    'L\'horloge': Routes.clockGame,
+    "L'horloge": Routes.clockGame,
   };
 
   final Map<String, int> minPlayersByRoute = {
@@ -36,7 +37,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-
     if (args is String) {
       mode = 'Jeu';
       gameName = args;
@@ -46,10 +46,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
       mode = args['mode'] ?? 'Soirée';
       gameName = args['gameName'] ?? 'Soirée';
       remainingGames = args['remainingGames'] ?? [];
-
       if (remainingGames.isEmpty) {
-        final allGames = gameRoutes.values.toList();
-        allGames.shuffle();
+        final allGames = gameRoutes.values.toList()..shuffle();
         remainingGames = allGames;
       }
     } else {
@@ -65,164 +63,198 @@ class _LobbyScreenState extends State<LobbyScreen> {
     _fetchUserSurname();
   }
 
+  @override
+  void dispose() {
+    _playerController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchUserSurname() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      try {
-        final userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-        final surname = userDoc.data()?['name'] ?? "Moi";
-        if (mounted) setState(() => players.add(surname));
-      } catch (_) {
-        if (mounted) setState(() => players.add("Moi"));
-      }
+    if (user == null) return;
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (!mounted) return;
+      setState(() => players.add(doc.data()?['name'] as String? ?? 'Moi'));
+    } catch (_) {
+      if (mounted) setState(() => players.add('Moi'));
     }
   }
 
-  void addPlayer() {
-    if (_playerController.text.isNotEmpty) {
-      setState(() {
-        players.add(_playerController.text.trim());
-        _playerController.clear();
-      });
-    }
+  void _addPlayer() {
+    final name = _playerController.text.trim();
+    if (name.isEmpty) return;
+    setState(() {
+      players.add(name);
+      _playerController.clear();
+    });
   }
 
-  void startSingleGame(String gameRoute, List<String> players) {
-    final minPlayers = minPlayersByRoute[gameRoute] ?? 1;
-
-    if (players.length < minPlayers) {
+  void _start() {
+    final firstGame =
+        mode == 'Soirée' ? remainingGames.first : remainingGames.first;
+    final min = minPlayersByRoute[firstGame] ?? 1;
+    if (players.length < min) {
       showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Pas assez de joueurs"),
-          content: Text("Ce jeu nécessite au moins $minPlayers joueur(s)."),
+        builder: (ctx) => AlertDialog(
+          title: const Text('Pas assez de joueurs'),
+          content: Text('Il faut au moins $min joueur(s).'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK"),
-            )
+                onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
           ],
         ),
       );
       return;
     }
-
-    Navigator.pushNamed(context, gameRoute, arguments: {
-      'players': players,
-      'remainingGames': [],
-    });
+    Navigator.pushNamed(
+      context,
+      firstGame,
+      arguments: {
+        'players': players,
+        'remainingGames':
+            mode == 'Soirée' ? remainingGames.sublist(1) : <String>[],
+      },
+    );
   }
 
-  void startSoiree(List<String> players, List<String> games) {
-    if (games.isEmpty) return;
-
-    final firstGame = games.first;
-    final minPlayers = minPlayersByRoute[firstGame] ?? 1;
-
-    if (players.length < minPlayers) {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Pas assez de joueurs"),
-          content:
-              Text("Le jeu suivant requiert au moins $minPlayers joueur(s)."),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK"),
-            )
-          ],
-        ),
-      );
-      return;
+  String? _routeToGameName(String route) {
+    for (final entry in gameRoutes.entries) {
+      if (entry.value == route) return entry.key;
     }
-
-    Navigator.pushNamed(context, firstGame, arguments: {
-      'players': players,
-      'remainingGames': games.sublist(1),
-    });
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        title: Text(
-          mode == 'Soirée' ? "Lobby - Soirée" : "Lobby - $gameName",
-          style: theme.titleMedium,
-        ),
-        backgroundColor: theme.background,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.textPrimary),
-          onPressed: () {
-            if (mode == 'Soirée') {
-              Navigator.pushReplacementNamed(context, Routes.home);
-            } else {
-              Navigator.pushReplacementNamed(context, Routes.selectGame);
-            }
-          },
-        ),
+    final isParty = mode == 'Soirée';
+    return AppShell(
+      title: isParty ? 'Lobby — Soirée' : 'Lobby — $gameName',
+      onBack: () => Navigator.pushReplacementNamed(
+        context,
+        isParty ? Routes.home : Routes.selectGame,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (mode == 'Soirée')
+            if (isParty) ...[
+              Text('AU PROGRAMME',
+                  style: theme.overline
+                      .copyWith(color: theme.textPrimary, letterSpacing: 2)),
+              const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
+                runSpacing: 8,
                 children: remainingGames.map((route) {
-                  final gameName = gameRoutes.entries
-                      .firstWhere(
-                        (entry) => entry.value == route,
-                        orElse: () => const MapEntry('Inconnu', ''),
-                      )
-                      .key;
-                  return Chip(label: Text(gameName));
+                  final name = _routeToGameName(route) ?? 'Jeu';
+                  return Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: theme.surface,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                      border: Border.all(color: theme.border),
+                    ),
+                    child: Text(name,
+                        style: theme.bodyMedium
+                            .copyWith(color: theme.textPrimary)),
+                  );
                 }).toList(),
               ),
-            TextField(
-              controller: _playerController,
-              decoration: const InputDecoration(labelText: "Nom du joueur"),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: addPlayer,
-              child: const Text("Ajouter un joueur"),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: players.length,
-                itemBuilder: (context, index) => ListTile(
-                  title: Text(players[index]),
-                  trailing: index == 0
-                      ? null
-                      : IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () =>
-                              setState(() => players.removeAt(index)),
-                        ),
+              const SizedBox(height: 20),
+            ],
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _playerController,
+                    style: theme.bodyLarge,
+                    decoration:
+                        const InputDecoration(hintText: 'Nom du joueur'),
+                    onSubmitted: (_) => _addPlayer(),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 10),
+                SizedBox(
+                  height: 52,
+                  child: GradientButton(
+                    label: 'Ajouter',
+                    onPressed: _addPlayer,
+                    expanded: false,
+                    height: 52,
+                  ),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                if (mode == 'Soirée') {
-                  startSoiree(players, remainingGames);
-                } else {
-                  startSingleGame(remainingGames.first, players);
-                }
-              },
-              child: Text(mode == 'Soirée'
-                  ? "Commencer la soirée"
-                  : "Commencer le jeu"),
+            const SizedBox(height: 16),
+            Expanded(
+              child: players.isEmpty
+                  ? const EmptyState(
+                      icon: Icons.group_outlined,
+                      title: 'Aucun joueur',
+                      subtitle: 'Ajoute des prénoms pour démarrer.',
+                    )
+                  : ListView.separated(
+                      itemCount: players.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 6),
+                      itemBuilder: (_, i) {
+                        final name = players[i];
+                        final isMe = i == 0;
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: theme.surface,
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMd),
+                            border: Border.all(color: theme.border),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 32,
+                                height: 32,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  gradient: theme.brandGradient,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                  style: theme.bodyLarge.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                  child: Text(name, style: theme.bodyLarge)),
+                              if (!isMe)
+                                IconButton(
+                                  icon: Icon(Icons.delete_outline_rounded,
+                                      color: theme.textMuted),
+                                  onPressed: () =>
+                                      setState(() => players.removeAt(i)),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+            const SizedBox(height: 12),
+            GradientButton(
+              label: isParty ? 'Commencer la soirée' : 'Commencer le jeu',
+              icon: Icons.play_arrow_rounded,
+              onPressed: _start,
             ),
           ],
         ),

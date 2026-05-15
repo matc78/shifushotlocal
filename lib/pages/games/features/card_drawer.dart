@@ -1,7 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:playing_cards/playing_cards.dart';
-import 'dart:math';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class CardDrawerPage extends StatefulWidget {
   const CardDrawerPage({super.key});
@@ -12,155 +14,137 @@ class CardDrawerPage extends StatefulWidget {
 
 class _CardDrawerPageState extends State<CardDrawerPage> {
   final Random _random = Random();
-  bool includeJokers = false;
-  int numberOfCards = 1;
-  List<PlayingCard> drawnCards = [];
+  bool _includeJokers = false;
+  int _numberOfCards = 1;
+  List<PlayingCard> _drawn = [];
 
   @override
   void initState() {
     super.initState();
-    _drawCards();
+    _draw();
   }
 
-  void _drawCards() {
-    setState(() {
-      drawnCards = _generateRandomCards(numberOfCards, includeJokers);
-    });
+  void _draw() {
+    setState(() => _drawn = _generate(_numberOfCards, _includeJokers));
   }
 
-  List<PlayingCard> _generateRandomCards(int count, bool includeJokers) {
-    List<PlayingCard> deck = _createDeck(includeJokers);
-    deck.shuffle(_random);
-    return deck.take(count).toList();
-  }
-
-  List<PlayingCard> _createDeck(bool includeJokers) {
-    List<PlayingCard> deck = [];
-
-    for (var suit in Suit.values) {
-      if (suit != Suit.joker) {
-        for (var value in CardValue.values) {
-          if (value != CardValue.joker_1 && value != CardValue.joker_2) {
-            deck.add(PlayingCard(suit, value));
-          }
-        }
+  List<PlayingCard> _generate(int count, bool jokers) {
+    final deck = <PlayingCard>[];
+    for (final suit in Suit.values) {
+      if (suit == Suit.joker) continue;
+      for (final value in CardValue.values) {
+        if (value == CardValue.joker_1 || value == CardValue.joker_2) continue;
+        deck.add(PlayingCard(suit, value));
       }
     }
-
-    if (includeJokers) {
+    if (jokers) {
       deck.add(PlayingCard(Suit.joker, CardValue.joker_1));
       deck.add(PlayingCard(Suit.joker, CardValue.joker_2));
     }
-
-    return deck;
+    deck.shuffle(_random);
+    return deck.take(count).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        title: Text("Tireur de cartes", style: theme.titleMedium),
-        centerTitle: true,
-        backgroundColor: theme.background,
-        elevation: 0,
-        iconTheme: IconThemeData(color: theme.textPrimary),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+    return AppShell(
+      title: 'Tireur de cartes',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Number of cards selection
-            Text("Nombre de cartes à tirer :", style: theme.bodyMedium),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              alignment: WrapAlignment.center,
-              children: List.generate(4, (index) {
-                return ChoiceChip(
-                  label: Text("${index + 1}"),
-                  selected: numberOfCards == index + 1,
-                  selectedColor: theme.secondary,
-                  backgroundColor: Colors.grey[300],
-                  labelStyle: TextStyle(
-                    color: numberOfCards == index + 1
-                        ? Colors.white
-                        : theme.textPrimary,
-                    fontWeight: FontWeight.bold,
+            Text('NOMBRE DE CARTES',
+                style: theme.overline
+                    .copyWith(color: theme.textMuted, letterSpacing: 2)),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(4, (i) {
+                final n = i + 1;
+                final selected = _numberOfCards == n;
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: i == 3 ? 0 : 8),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() => _numberOfCards = n);
+                        _draw();
+                      },
+                      child: Container(
+                        height: 52,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          gradient: selected ? theme.brandGradient : null,
+                          color: selected ? null : theme.surface,
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusMd),
+                          border: Border.all(
+                              color: selected ? theme.primary : theme.border),
+                        ),
+                        child: Text('$n',
+                            style: theme.titleMedium.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                            )),
+                      ),
+                    ),
                   ),
-                  onSelected: (_) {
-                    setState(() {
-                      numberOfCards = index + 1;
-                    });
-                    _drawCards();
-                  },
                 );
               }),
             ),
-            const SizedBox(height: 20),
-
-            // Include Jokers toggle
-            SwitchListTile(
-              title: Text("Inclure les Jokers", style: theme.bodyMedium),
-              value: includeJokers,
-              activeThumbColor: theme.secondary,
-              onChanged: (bool value) {
-                setState(() {
-                  includeJokers = value;
-                });
-                _drawCards();
-              },
-            ),
-            const SizedBox(height: 20),
-
-            // Display drawn cards
-            SizedBox(
-              height: 350, // Ajustement pour plus d'espace
-              child: drawnCards.isEmpty
-                  ? Text("Aucune carte tirée", style: theme.bodyLarge)
-                  : numberOfCards == 4
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: drawnCards.sublist(0, 2).map((card) {
-                                return _buildPlayingCard(card);
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: drawnCards.sublist(2, 4).map((card) {
-                                return _buildPlayingCard(card);
-                              }).toList(),
-                            ),
-                          ],
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: drawnCards.map((card) {
-                            return _buildPlayingCard(card);
-                          }).toList(),
-                        ),
-            ),
-            const SizedBox(height: 70),
-
-            // Draw new cards button
-            ElevatedButton(
-              onPressed: _drawCards,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primary,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
+            const SizedBox(height: 14),
+            SectionCard(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: SwitchListTile(
+                title: Text('Inclure les Jokers', style: theme.bodyLarge),
+                value: _includeJokers,
+                activeThumbColor: theme.primary,
+                contentPadding: EdgeInsets.zero,
+                onChanged: (v) {
+                  setState(() => _includeJokers = v);
+                  _draw();
+                },
               ),
-              child: Text("Tirer de nouvelles cartes", style: theme.buttonText),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: Center(
+                child: _drawn.isEmpty
+                    ? Text('Aucune carte tirée', style: theme.bodyLarge)
+                    : _numberOfCards == 4
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: _drawn
+                                    .sublist(0, 2)
+                                    .map(_buildCard)
+                                    .toList(),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: _drawn
+                                    .sublist(2, 4)
+                                    .map(_buildCard)
+                                    .toList(),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: _drawn.map(_buildCard).toList(),
+                          ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            GradientButton(
+              label: 'Tirer de nouvelles cartes',
+              icon: Icons.refresh_rounded,
+              onPressed: _draw,
             ),
           ],
         ),
@@ -168,13 +152,12 @@ class _CardDrawerPageState extends State<CardDrawerPage> {
     );
   }
 
-  // Widget pour afficher les cartes avec une taille plus grande
-  Widget _buildPlayingCard(PlayingCard card) {
+  Widget _buildCard(PlayingCard card) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: SizedBox(
-        width: 100, // Agrandissement des cartes
-        height: 140, // Agrandissement des cartes
+        width: 90,
+        height: 130,
         child: PlayingCardView(card: card),
       ),
     );

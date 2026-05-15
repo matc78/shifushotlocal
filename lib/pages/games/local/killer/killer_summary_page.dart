@@ -1,84 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class KillerSummaryPage extends StatefulWidget {
-  final Map<String, dynamic> playerData;
-
   const KillerSummaryPage({super.key, required this.playerData});
+  final Map<String, dynamic> playerData;
 
   @override
   State<KillerSummaryPage> createState() => _KillerSummaryPageState();
 }
 
 class _KillerSummaryPageState extends State<KillerSummaryPage> {
-  late Map<String, dynamic> playerData;
-  late List<String> sortedPlayers;
-  bool isGameOver = false;
+  late Map<String, dynamic> _playerData;
+  late List<String> _sorted;
+  bool _isGameOver = false;
 
   @override
   void initState() {
     super.initState();
-    playerData = Map<String, dynamic>.from(widget.playerData);
+    _playerData = Map<String, dynamic>.from(widget.playerData);
     _sortPlayers();
     _checkGameOver();
   }
 
-  void _sortPlayers() {
-    sortedPlayers = playerData.keys.toList()..sort();
-  }
+  void _sortPlayers() => _sorted = _playerData.keys.toList()..sort();
 
   void _checkGameOver() {
     setState(() {
-      isGameOver =
-          playerData.values.where((player) => !player['isDead']).length <= 1;
+      _isGameOver = _playerData.values.where((p) => !p['isDead']).length <= 1;
     });
   }
 
-  void _restartGame() {
-    Navigator.pushReplacementNamed(context, Routes.killer);
-  }
+  void _restart() => Navigator.pushReplacementNamed(context, Routes.killer);
 
-  void _checkPlayerAction(String playerName) {
+  void _showAction(String player) {
     final theme = AppTheme.of(context);
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Détails de l\'action', style: theme.titleMedium),
+      builder: (ctx) => AlertDialog(
+        title: Text("Détails de l'action", style: theme.titleMedium),
         content: Text(
-          '$playerName doit faire :\n\nAction : ${playerData[playerName]['action']}\nCible : ${playerData[playerName]['target']}',
+          '$player doit :\n\nAction : ${_playerData[player]['action']}\nCible : ${_playerData[player]['target']}',
           style: theme.bodyMedium,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Fermer', style: theme.bodyMedium),
-          ),
+              onPressed: () => Navigator.pop(ctx), child: const Text('Fermer')),
         ],
       ),
     );
   }
 
-  void _markPlayerAsDead(String playerName) {
+  void _markDead(String player) {
     setState(() {
-      // Trouver le joueur qui cible la personne éliminée
-      final killer = playerData.keys.firstWhere(
-        (name) => playerData[name]['target'] == playerName,
+      final killer = _playerData.keys.firstWhere(
+        (n) => _playerData[n]['target'] == player,
         orElse: () => '',
       );
-
-      // Transférer la cible et l'action du joueur éliminé au joueur qui l'a tué
-      playerData[killer]['target'] = playerData[playerName]['target'];
-      playerData[killer]['action'] = playerData[playerName]['action'];
-
-      // Marquer le joueur comme éliminé
-      playerData[playerName]['isDead'] = true;
-
-      // Vérifier si le jeu est terminé
+      _playerData[killer]['target'] = _playerData[player]['target'];
+      _playerData[killer]['action'] = _playerData[player]['action'];
+      _playerData[player]['isDead'] = true;
       _checkGameOver();
-
-      // Réordonner les joueurs en ordre alphabétique
       _sortPlayers();
     });
   }
@@ -87,41 +71,33 @@ class _KillerSummaryPageState extends State<KillerSummaryPage> {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    if (isGameOver) {
-      final winner =
-          playerData.keys.firstWhere((name) => !playerData[name]['isDead']);
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Résumé du jeu', style: theme.titleMedium),
-          backgroundColor: theme.background,
-          centerTitle: true,
-        ),
-        backgroundColor: theme.background,
-        body: Center(
+    if (_isGameOver) {
+      final winner = _playerData.keys
+          .firstWhere((n) => !_playerData[n]['isDead'], orElse: () => '—');
+      return AppShell(
+        title: 'Fin de partie',
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Le jeu est terminé !',
-                style: theme.titleLarge,
-                textAlign: TextAlign.center,
+              const Spacer(),
+              Text('🏆', style: theme.displayLarge.copyWith(fontSize: 96)),
+              const SizedBox(height: 12),
+              Text('GAGNANT',
+                  style: theme.overline.copyWith(color: theme.textMuted)),
+              const SizedBox(height: 6),
+              ShaderMask(
+                shaderCallback: (rect) =>
+                    theme.brandGradient.createShader(rect),
+                child: Text(winner,
+                    style: theme.displayLarge
+                        .copyWith(color: Colors.white, fontSize: 48)),
               ),
-              const SizedBox(height: 20),
-              Text(
-                'Le gagnant est : $winner',
-                style: theme.bodyLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _restartGame,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text('Recommencer', style: theme.buttonText),
+              const Spacer(),
+              GradientButton(
+                label: 'Recommencer',
+                icon: Icons.refresh_rounded,
+                onPressed: _restart,
               ),
             ],
           ),
@@ -129,76 +105,94 @@ class _KillerSummaryPageState extends State<KillerSummaryPage> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Résumé du jeu', style: theme.titleMedium),
-        backgroundColor: theme.background,
-        centerTitle: true,
-      ),
-      backgroundColor: theme.background,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return AppShell(
+      title: 'Résumé du jeu',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Résumé des joueurs',
-              style: theme.titleMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
             Expanded(
-              child: ListView.builder(
-                itemCount: sortedPlayers.length,
-                itemBuilder: (context, index) {
-                  final playerName = sortedPlayers[index];
-                  final player = playerData[playerName];
-                  final isDead = player['isDead'];
-
-                  return ListTile(
-                    title: Text(
-                      playerName,
-                      style: isDead
-                          ? theme.bodyMedium.copyWith(color: Colors.grey)
-                          : theme.bodyLarge,
-                    ),
-                    subtitle: isDead
-                        ? Text('Éliminé',
-                            style:
-                                theme.bodyMedium.copyWith(color: Colors.grey))
-                        : null,
-                    trailing: isDead
-                        ? null
-                        : Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.info, color: Colors.blue),
-                                onPressed: () => _checkPlayerAction(playerName),
+              child: ListView.separated(
+                itemCount: _sorted.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemBuilder: (_, i) {
+                  final name = _sorted[i];
+                  final player = _playerData[name];
+                  final dead = player['isDead'] as bool;
+                  return Opacity(
+                    opacity: dead ? 0.5 : 1,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: theme.surface,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                        border: Border.all(color: theme.border),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              gradient: dead ? null : theme.brandGradient,
+                              color: dead ? theme.surfaceAlt : null,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              name.isNotEmpty ? name[0].toUpperCase() : '?',
+                              style: theme.bodyLarge.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
                               ),
-                              IconButton(
-                                icon: const FaIcon(
-                                  FontAwesomeIcons.skullCrossbones,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () => _markPlayerAsDead(playerName),
-                              ),
-                            ],
+                            ),
                           ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(name,
+                                    style: theme.bodyLarge.copyWith(
+                                      decoration: dead
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                    )),
+                                if (dead)
+                                  Text('Éliminé', style: theme.bodyMedium),
+                              ],
+                            ),
+                          ),
+                          if (!dead) ...[
+                            IconButton(
+                              icon: Icon(Icons.info_outline_rounded,
+                                  color: theme.textMuted),
+                              onPressed: () => _showAction(name),
+                            ),
+                            IconButton(
+                              icon: const FaIcon(
+                                FontAwesomeIcons.skullCrossbones,
+                                color: Colors.red,
+                                size: 18,
+                              ),
+                              onPressed: () => _markDead(name),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _restartGame,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.secondary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Text('Recommencer la partie', style: theme.buttonText),
+            const SizedBox(height: 12),
+            GhostButton(
+              label: 'Recommencer la partie',
+              icon: Icons.refresh_rounded,
+              onPressed: _restart,
             ),
           ],
         ),
