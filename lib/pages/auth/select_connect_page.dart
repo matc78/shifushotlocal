@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'connexion_page.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class SelectConnectPage extends StatelessWidget {
   const SelectConnectPage({super.key});
@@ -73,7 +74,7 @@ class SelectConnectPage extends StatelessWidget {
                   label: 'Créer un compte',
                   icon: Icons.person_add_alt_rounded,
                   onPressed: () =>
-                      Navigator.pushNamed(context, '/createAccount'),
+                      Navigator.pushNamed(context, Routes.createAccount),
                 ),
                 const Spacer(flex: 2),
               ],

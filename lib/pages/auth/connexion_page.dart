@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class ConnexionPage extends StatefulWidget {
   const ConnexionPage({super.key});
@@ -47,7 +48,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
         return;
       }
       _snack('Connexion réussie !');
-      Navigator.pushNamedAndRemoveUntil(context, '/homepage', (_) => false);
+      Navigator.pushNamedAndRemoveUntil(context, Routes.home, (_) => false);
     } on FirebaseAuthException catch (e) {
       _snack(switch (e.code) {
         'user-not-found' => 'Utilisateur introuvable.',
@@ -108,7 +109,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
       }
 
       if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, '/homepage', (_) => false);
+      Navigator.pushNamedAndRemoveUntil(context, Routes.home, (_) => false);
     } catch (error) {
       _snack('Erreur Google : $error');
     } finally {
@@ -214,7 +215,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
                   const SizedBox(height: 24),
                   TextButton(
                     onPressed: () =>
-                        Navigator.pushReplacementNamed(context, '/createAccount'),
+                        Navigator.pushReplacementNamed(context, Routes.createAccount),
                     child: Text(
                       "Pas de compte ? Crées-en un",
                       style: theme.bodyMedium.copyWith(

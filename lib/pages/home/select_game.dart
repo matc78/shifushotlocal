@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shifushotlocal/pages/auth/guest_prompt.dart';
 import 'package:shifushotlocal/state/guest_session.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class _GameEntry {
   const _GameEntry({
@@ -23,28 +24,28 @@ class SelectGamePage extends StatelessWidget {
   const SelectGamePage({super.key});
 
   static const _localGames = <_GameEntry>[
-    _GameEntry(name: 'Killer', description: 'Assassin mystérieux', emoji: '🔪', route: '/killer'),
-    _GameEntry(name: 'Clicker', description: 'Compétition de clique', emoji: '👆', route: '/clicker_game'),
-    _GameEntry(name: 'Bizkit !', description: 'Lance les dés', emoji: '🎲', route: '/dice_game'),
-    _GameEntry(name: 'Jeu des papiers', description: 'Devine les phrases', emoji: '📜', route: '/lobby_screen'),
-    _GameEntry(name: "L'horloge", description: 'Mise sur la chance', emoji: '⏰', route: '/lobby_screen'),
-    _GameEntry(name: 'Réflexes', description: 'Le plus rapide gagne', emoji: '⚡', route: '/reflex_game'),
-    _GameEntry(name: 'Suis la ligne', description: 'Précision & vitesse', emoji: '🎯', route: '/follow_line'),
-    _GameEntry(name: 'Pyramide', description: 'Retourne par la base', emoji: '🃏', route: '/pyramid'),
-    _GameEntry(name: 'Pyramide moderne', description: 'Carrousel de cartes', emoji: '🎴', route: '/pyramid_modern'),
+    _GameEntry(name: 'Killer', description: 'Assassin mystérieux', emoji: '🔪', route: Routes.killer),
+    _GameEntry(name: 'Clicker', description: 'Compétition de clique', emoji: '👆', route: Routes.clickerGame),
+    _GameEntry(name: 'Bizkit !', description: 'Lance les dés', emoji: '🎲', route: Routes.diceGame),
+    _GameEntry(name: 'Jeu des papiers', description: 'Devine les phrases', emoji: '📜', route: Routes.lobbyScreen),
+    _GameEntry(name: "L'horloge", description: 'Mise sur la chance', emoji: '⏰', route: Routes.lobbyScreen),
+    _GameEntry(name: 'Réflexes', description: 'Le plus rapide gagne', emoji: '⚡', route: Routes.reflexGame),
+    _GameEntry(name: 'Suis la ligne', description: 'Précision & vitesse', emoji: '🎯', route: Routes.followLine),
+    _GameEntry(name: 'Pyramide', description: 'Retourne par la base', emoji: '🃏', route: Routes.pyramid),
+    _GameEntry(name: 'Pyramide moderne', description: 'Carrousel de cartes', emoji: '🎴', route: Routes.pyramidModern),
   ];
 
   static const _onlineGames = <_GameEntry>[
-    _GameEntry(name: 'Jeu du débat', description: 'Bluff & stratégie', emoji: '🎙️', route: '/online_lobby', requiresAccount: true),
+    _GameEntry(name: 'Jeu du débat', description: 'Bluff & stratégie', emoji: '🎙️', route: Routes.onlineLobby, requiresAccount: true),
   ];
 
   static const _features = <_GameEntry>[
-    _GameEntry(name: "Créateur d'équipes", description: 'Équipes aléatoires', emoji: '👥', route: '/teamGenerator'),
-    _GameEntry(name: 'Tireur de cartes', description: 'Cartes au hasard', emoji: '🎴', route: '/cardDrawer'),
-    _GameEntry(name: 'Cartes pyramide', description: '4 cartes magiques', emoji: '🔺', route: '/pyramid_card'),
-    _GameEntry(name: 'ShifuShot ?', description: 'Notif à tes amis', emoji: '✊', route: '/shifushot_request', requiresAccount: true),
-    _GameEntry(name: 'Sonothèque', description: 'Banque de sons', emoji: '🔊', route: '/select_sound'),
-    _GameEntry(name: 'Les 12 bars', description: 'Relèves le défi', emoji: '🍻', route: '/twelve_bars'),
+    _GameEntry(name: "Créateur d'équipes", description: 'Équipes aléatoires', emoji: '👥', route: Routes.teamGenerator),
+    _GameEntry(name: 'Tireur de cartes', description: 'Cartes au hasard', emoji: '🎴', route: Routes.cardDrawer),
+    _GameEntry(name: 'Cartes pyramide', description: '4 cartes magiques', emoji: '🔺', route: Routes.pyramidCard),
+    _GameEntry(name: 'ShifuShot ?', description: 'Notif à tes amis', emoji: '✊', route: Routes.shifushotRequest, requiresAccount: true),
+    _GameEntry(name: 'Sonothèque', description: 'Banque de sons', emoji: '🔊', route: Routes.selectSound),
+    _GameEntry(name: 'Les 12 bars', description: 'Relèves le défi', emoji: '🍻', route: Routes.twelveBars),
   ];
 
   @override
@@ -66,7 +67,7 @@ class SelectGamePage extends StatelessWidget {
                 color: theme.textPrimary,
                 onPressed: () => Navigator.pushNamedAndRemoveUntil(
                   context,
-                  '/homepage',
+                  Routes.home,
                   (route) => false,
                 ),
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shifushotlocal/state/guest_session.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'select_connect_page.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class DebutPage extends StatelessWidget {
   const DebutPage({super.key});
@@ -75,7 +76,7 @@ class DebutPage extends StatelessWidget {
                     GuestSession.instance.enterGuestMode();
                     Navigator.pushNamedAndRemoveUntil(
                       context,
-                      '/homepage',
+                      Routes.home,
                       (route) => false,
                     );
                   },

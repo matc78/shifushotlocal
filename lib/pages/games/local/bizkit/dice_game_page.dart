@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:dice_icons/dice_icons.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class DiceGamePage extends StatefulWidget {
   final List<String> players;
@@ -604,7 +605,7 @@ class _DiceGamePageState extends State<DiceGamePage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: widget.remainingGames.isEmpty ||
-                        widget.remainingGames.first == '/homepage'
+                        widget.remainingGames.first == Routes.home
                     ? () {
                         // Retour à l'accueil
                         Navigator.popUntil(context, (route) => route.isFirst);
@@ -630,7 +631,7 @@ class _DiceGamePageState extends State<DiceGamePage> {
                 ),
                 child: Text(
                   widget.remainingGames.isEmpty ||
-                          widget.remainingGames.first == '/homepage'
+                          widget.remainingGames.first == Routes.home
                       ? 'Retour à l\'accueil'
                       : 'Passer au jeu suivant',
                   style: theme.buttonText.copyWith(fontSize: 16),

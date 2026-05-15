@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shifushotlocal/pages/auth/guest_prompt.dart';
 import 'package:shifushotlocal/state/guest_session.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -64,7 +65,7 @@ class HomePage extends StatelessWidget {
                   label: 'Lancer une partie',
                   icon: Icons.sports_esports_rounded,
                   onPressed: () =>
-                      Navigator.pushNamed(context, '/select_game'),
+                      Navigator.pushNamed(context, Routes.selectGame),
                 ),
                 const SizedBox(height: 12),
                 const GhostButton(
@@ -101,7 +102,7 @@ class _TopBar extends StatelessWidget {
           children: [
             _IconChip(
               icon: Icons.notifications_none_rounded,
-              onTap: () => Navigator.pushNamed(context, '/feedback_page'),
+              onTap: () => Navigator.pushNamed(context, Routes.feedback),
             ),
             const SizedBox(width: 10),
             _IconChip(
@@ -115,7 +116,7 @@ class _TopBar extends StatelessWidget {
                         'Crée un compte pour personnaliser ton profil et garder tes stats.',
                   );
                 } else {
-                  Navigator.pushNamed(context, '/user_profile_page');
+                  Navigator.pushNamed(context, Routes.userProfile);
                 }
               },
             ),
@@ -172,7 +173,7 @@ class _BottomActions extends StatelessWidget {
         _BottomAction(
           icon: Icons.feedback_outlined,
           label: 'Feedback',
-          onTap: () => Navigator.pushNamed(context, '/feedback_page'),
+          onTap: () => Navigator.pushNamed(context, Routes.feedback),
         ),
         _BottomAction(
           icon: Icons.group_rounded,
@@ -187,13 +188,13 @@ class _BottomActions extends StatelessWidget {
               );
               return;
             }
-            Navigator.pushNamed(context, '/friends');
+            Navigator.pushNamed(context, Routes.friends);
           },
         ),
         _BottomAction(
           icon: Icons.celebration_rounded,
           label: 'Soirée',
-          onTap: () => Navigator.pushNamed(context, '/party_screen'),
+          onTap: () => Navigator.pushNamed(context, Routes.partyScreen),
         ),
       ],
     );

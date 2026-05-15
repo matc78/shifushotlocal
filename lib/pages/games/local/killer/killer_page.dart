@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class KillerPage extends StatefulWidget {
   const KillerPage({super.key});
@@ -60,7 +61,7 @@ class _KillerPageState extends State<KillerPage> {
       return;
     }
 
-    Navigator.pushNamed(context, '/killerActions', arguments: players);
+    Navigator.pushNamed(context, Routes.killerActions, arguments: players);
   }
 
   @override

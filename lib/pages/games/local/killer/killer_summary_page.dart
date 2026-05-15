@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shifushotlocal/routes.dart';
 
 
 class KillerSummaryPage extends StatefulWidget {
@@ -36,7 +37,7 @@ class _KillerSummaryPageState extends State<KillerSummaryPage> {
   }
 
   void _restartGame() {
-    Navigator.pushReplacementNamed(context, '/killer');
+    Navigator.pushReplacementNamed(context, Routes.killer);
   }
 
   void _checkPlayerAction(String playerName) {

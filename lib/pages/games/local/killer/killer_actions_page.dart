@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class KillerActionsPage extends StatefulWidget {
   final List<String> players;
@@ -98,7 +99,7 @@ class _KillerActionsPageState extends State<KillerActionsPage> {
 
       Navigator.pushReplacementNamed(
         context,
-        '/killerSummary',
+        Routes.killerSummary,
         arguments: playerData,
       );
       return;

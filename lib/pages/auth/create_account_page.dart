@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -106,7 +107,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
       _snack('Compte créé ! Un email de vérification a été envoyé.');
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/connexion');
+      Navigator.pushReplacementNamed(context, Routes.connexion);
     } on FirebaseAuthException catch (e) {
       _snack(switch (e.code) {
         'email-already-in-use' => 'Cet email est déjà utilisé.',
@@ -167,7 +168,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       }
 
       if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, '/homepage', (_) => false);
+      Navigator.pushNamedAndRemoveUntil(context, Routes.home, (_) => false);
     } catch (e) {
       _snack('Erreur Google : $e');
     } finally {
@@ -352,7 +353,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () => Navigator.pushReplacementNamed(
-                        context, '/connexion'),
+                        context, Routes.connexion),
                     child: Text(
                       'Déjà un compte ? Connecte-toi',
                       style: theme.bodyMedium.copyWith(

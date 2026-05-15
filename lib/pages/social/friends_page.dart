@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({super.key});
@@ -50,7 +51,7 @@ class _FriendsPageState extends State<FriendsPage> {
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/addFriend');
+                      Navigator.pushNamed(context, Routes.addFriend);
                     },
                     icon: const Icon(Icons.favorite_border, color: Colors.white),
                     label: Text('Ajouter Khoya', style: theme.buttonText),

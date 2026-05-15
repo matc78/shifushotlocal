@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:playing_cards/playing_cards.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class ClockGameScreen extends StatefulWidget {
   const ClockGameScreen({super.key});
@@ -217,7 +218,7 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
       );
     } else {
       // Si plus de jeux restants, revenir à la page d'accueil
-      Navigator.pushReplacementNamed(context, '/homepage');
+      Navigator.pushReplacementNamed(context, Routes.home);
     }
   }
 

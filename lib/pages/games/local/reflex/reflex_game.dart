@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:confetti/confetti.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class ReflexGamePage extends StatefulWidget {
   const ReflexGamePage({super.key});
@@ -153,7 +154,7 @@ class _ReflexGamePageState extends State<ReflexGamePage>
         leading: BackButton(
           color: theme.textPrimary,
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/select_game');
+            Navigator.pushReplacementNamed(context, Routes.selectGame);
           },
         ),
         title: Text("Réflexe Challenge", style: theme.titleMedium),

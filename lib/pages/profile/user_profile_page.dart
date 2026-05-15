@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:shifushotlocal/pages/profile/edit_profile_page.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -215,7 +216,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         await GoogleSignIn().signOut();
       } catch (_) {}
 
-      navigator.pushNamedAndRemoveUntil('/debutpage', (route) => false);
+      navigator.pushNamedAndRemoveUntil(Routes.debut, (route) => false);
     } catch (e) {
       messenger.showSnackBar(SnackBar(
         content: Text('Erreur lors de la suppression du compte : $e'),

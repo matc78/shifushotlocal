@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shifushotlocal/routes.dart';
 import 'package:shifushotlocal/state/guest_session.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 
@@ -31,7 +32,7 @@ Future<bool> promptToSignUp(BuildContext context, {String? reason}) async {
   );
   if (accepted == true && context.mounted) {
     GuestSession.instance.exitGuestMode();
-    Navigator.of(context).pushNamedAndRemoveUntil('/debutpage', (route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil(Routes.debut, (route) => false);
     return true;
   }
   return false;

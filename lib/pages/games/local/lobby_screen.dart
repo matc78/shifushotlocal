@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
@@ -18,17 +19,17 @@ class _LobbyScreenState extends State<LobbyScreen> {
   List<String> remainingGames = [];
 
   final Map<String, String> gameRoutes = {
-    'Clicker': '/clicker_game',
-    'Bizkit !': '/dice_game',
-    'Jeu des papiers': '/paper_game',
-    'L\'horloge': '/clock_game',
+    'Clicker': Routes.clickerGame,
+    'Bizkit !': Routes.diceGame,
+    'Jeu des papiers': Routes.paperGame,
+    'L\'horloge': Routes.clockGame,
   };
 
   final Map<String, int> minPlayersByRoute = {
-    '/clicker_game': 1,
-    '/dice_game': 1,
-    '/paper_game': 3,
-    '/clock_game': 2,
+    Routes.clickerGame: 1,
+    Routes.diceGame: 1,
+    Routes.paperGame: 3,
+    Routes.clockGame: 2,
   };
 
   @override
@@ -40,7 +41,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
       mode = 'Jeu';
       gameName = args;
       final route = gameRoutes[gameName];
-      remainingGames = route != null ? [route, '/homepage'] : ['/homepage'];
+      remainingGames = route != null ? [route, Routes.home] : [Routes.home];
     } else if (args is Map<String, dynamic>) {
       mode = args['mode'] ?? 'Soirée';
       gameName = args['gameName'] ?? 'Soirée';
@@ -54,7 +55,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     } else {
       mode = 'Jeu';
       gameName = 'Jeu';
-      remainingGames = ['/homepage'];
+      remainingGames = [Routes.home];
     }
   }
 
@@ -159,9 +160,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
           icon: Icon(Icons.arrow_back, color: theme.textPrimary),
           onPressed: () {
             if (mode == 'Soirée') {
-              Navigator.pushReplacementNamed(context, '/homepage');
+              Navigator.pushReplacementNamed(context, Routes.home);
             } else {
-              Navigator.pushReplacementNamed(context, '/select_game');
+              Navigator.pushReplacementNamed(context, Routes.selectGame);
             }
           },
         ),

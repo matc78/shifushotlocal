@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart'; // Pour restreindre les entrées du code lobby
+import 'package:shifushotlocal/routes.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:uuid/uuid.dart';
 import 'lobby_waiting_screen.dart'; // Page d'attente du lobby
@@ -24,7 +25,7 @@ class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {
 
   // 🔹 Table de correspondance entre les noms des jeux et leurs routes
   final Map<String, String> gameRoutes = {
-    'Jeu du débat': '/debate_game',
+    'Jeu du débat': Routes.debateGame,
   };
 
   /// 🔹 **Créer un lobby et générer un code**

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class PartyScreen extends StatefulWidget {
   const PartyScreen({super.key});
@@ -11,13 +12,13 @@ class PartyScreen extends StatefulWidget {
 class _PartyScreenState extends State<PartyScreen> {
   final List<String> moods = ['Hardcore', 'Chill', 'Découverte'];
   String selectedMood = 'Chill';
-  final List<String> games = ['/paper_game', '/jeu1', '/dice_game', '/clock-game'];
+  final List<String> games = [Routes.paperGame, Routes.diceGame, Routes.clockGame];
 
   void startParty() {
     games.shuffle(); // Shuffle the games randomly
     Navigator.pushNamed(
       context,
-      '/lobby_screen',
+      Routes.lobbyScreen,
       arguments: {
         'mode': 'Soirée',
         'selectedGames': games, // Pass the shuffled list of games

@@ -37,6 +37,7 @@ import 'package:shifushotlocal/pages/profile/user_profile_page.dart';
 import 'package:shifushotlocal/pages/social/add_friends_page.dart';
 import 'package:shifushotlocal/pages/social/feedback_page.dart';
 import 'package:shifushotlocal/pages/social/friends_page.dart';
+import 'package:shifushotlocal/routes.dart';
 import 'package:shifushotlocal/services/firebase_messaging_service.dart';
 import 'package:shifushotlocal/state/guest_session.dart';
 import 'firebase_options.dart';
@@ -71,29 +72,29 @@ class MainApp extends StatelessWidget {
       theme: AppTheme.materialTheme(),
       home: const AuthWrapper(),
       routes: {
-        '/debutpage': (_) => const DebutPage(),
-        '/connexion': (_) => const ConnexionPage(),
-        '/createAccount': (_) => const CreateAccountPage(),
-        '/homepage': (_) => const HomePage(),
-        '/user_profile_page': (_) => const UserProfilePage(),
-        '/lobby_screen': (_) => const LobbyScreen(),
-        '/friends': (_) => const FriendsPage(),
-        '/addFriend': (_) => const AddFriendsPage(),
-        '/editProfile': (_) => const EditProfilePage(),
-        '/teamGenerator': (_) => const TeamGeneratorPage(),
-        '/select_game': (_) => const SelectGamePage(),
-        '/killer': (_) => const KillerPage(),
-        '/killerActions': (context) => KillerActionsPage(
+        Routes.debut: (_) => const DebutPage(),
+        Routes.connexion: (_) => const ConnexionPage(),
+        Routes.createAccount: (_) => const CreateAccountPage(),
+        Routes.home: (_) => const HomePage(),
+        Routes.userProfile: (_) => const UserProfilePage(),
+        Routes.lobbyScreen: (_) => const LobbyScreen(),
+        Routes.friends: (_) => const FriendsPage(),
+        Routes.addFriend: (_) => const AddFriendsPage(),
+        Routes.editProfile: (_) => const EditProfilePage(),
+        Routes.teamGenerator: (_) => const TeamGeneratorPage(),
+        Routes.selectGame: (_) => const SelectGamePage(),
+        Routes.killer: (_) => const KillerPage(),
+        Routes.killerActions: (context) => KillerActionsPage(
               players: ModalRoute.of(context)!.settings.arguments as List<String>,
             ),
-        '/killerSummary': (context) => KillerSummaryPage(
+        Routes.killerSummary: (context) => KillerSummaryPage(
               playerData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>,
             ),
-        '/clicker_game': (_) => const ClickerGame(),
-        '/dice_game': (context) {
+        Routes.clickerGame: (_) => const ClickerGame(),
+        Routes.diceGame: (context) {
           final args = ModalRoute.of(context)!.settings.arguments;
           if (args is String) {
-            return DiceGamePage(players: [args], remainingGames: const ['/homepage']);
+            return DiceGamePage(players: [args], remainingGames: const [Routes.home]);
           } else if (args is Map<String, dynamic>) {
             return DiceGamePage(
               players: List<String>.from(args['players']),
@@ -102,22 +103,22 @@ class MainApp extends StatelessWidget {
           }
           return const Scaffold(body: Center(child: Text('Erreur : Arguments invalides.')));
         },
-        '/paper_game': (context) {
+        Routes.paperGame: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return PaperGamePage(
             players: List<String>.from(args['players']),
             remainingGames: List<String>.from(args['remainingGames']),
           );
         },
-        '/party_screen': (_) => const PartyScreen(),
-        '/feedback_page': (_) => const FeedbackPage(),
-        '/clock_game': (_) => const ClockGameScreen(),
-        '/cardDrawer': (_) => const CardDrawerPage(),
-        '/online_lobby': (context) {
+        Routes.partyScreen: (_) => const PartyScreen(),
+        Routes.feedback: (_) => const FeedbackPage(),
+        Routes.clockGame: (_) => const ClockGameScreen(),
+        Routes.cardDrawer: (_) => const CardDrawerPage(),
+        Routes.onlineLobby: (context) {
           final gameName = ModalRoute.of(context)!.settings.arguments as String?;
           return OnlineLobbyScreen(gameName: gameName ?? 'Jeu inconnu');
         },
-        '/lobby_waiting': (context) {
+        Routes.lobbyWaiting: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return LobbyWaitingScreen(
             lobbyId: args['lobbyId'] as String,
@@ -125,23 +126,23 @@ class MainApp extends StatelessWidget {
             gameRoute: args['gameRoute'] as String,
           );
         },
-        '/debate_game': (context) {
+        Routes.debateGame: (context) {
           final args = ModalRoute.of(context)!.settings.arguments;
           if (args is Map<String, dynamic> && args.containsKey('lobbyId')) {
             return DebateGameScreen(lobbyId: args['lobbyId'] as String);
           }
           return const Scaffold(body: Center(child: Text('Erreur : Aucun lobbyId fourni')));
         },
-        '/pyramid_card': (_) => const PyramidCardPage(),
-        '/pyramid': (_) => const PyramidePage(),
-        '/pyramid_modern': (_) => const PyramideModernePage(),
-        '/shifushot_request': (_) => const ShifushotRequestPage(),
-        '/select_sound': (_) => SoundCategorySelectionPage(),
-        '/twelve_bars': (_) => const TwelveBarsPage(),
-        '/reflex_game': (_) => const ReflexGamePage(),
-        '/follow_line': (_) => const FollowLineModeSelector(),
-        '/follow_line_speed_easy': (_) => const FollowLineSpeedEasy(),
-        '/follow_line_precision_easy': (_) => const FollowLinePrecisionEasy(),
+        Routes.pyramidCard: (_) => const PyramidCardPage(),
+        Routes.pyramid: (_) => const PyramidePage(),
+        Routes.pyramidModern: (_) => const PyramideModernePage(),
+        Routes.shifushotRequest: (_) => const ShifushotRequestPage(),
+        Routes.selectSound: (_) => SoundCategorySelectionPage(),
+        Routes.twelveBars: (_) => const TwelveBarsPage(),
+        Routes.reflexGame: (_) => const ReflexGamePage(),
+        Routes.followLine: (_) => const FollowLineModeSelector(),
+        Routes.followLineSpeedEasy: (_) => const FollowLineSpeedEasy(),
+        Routes.followLinePrecisionEasy: (_) => const FollowLinePrecisionEasy(),
       },
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class FollowLineModeSelector extends StatelessWidget {
   const FollowLineModeSelector({super.key});
@@ -24,7 +25,7 @@ class FollowLineModeSelector extends StatelessWidget {
             Text('Mode Rapidité', style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, '/follow_line_speed_easy'),
+              onPressed: () => Navigator.pushNamed(context, Routes.followLineSpeedEasy),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.buttonColor,
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -53,7 +54,7 @@ class FollowLineModeSelector extends StatelessWidget {
             Text('Mode Précision', style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, '/follow_line_precision_easy'),
+              onPressed: () => Navigator.pushNamed(context, Routes.followLinePrecisionEasy),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.buttonColor,
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),

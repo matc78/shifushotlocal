@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:playing_cards/playing_cards.dart';
 
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class PyramidePage extends StatefulWidget {
   const PyramidePage({super.key});
@@ -185,7 +186,7 @@ class _PyramidePageState extends State<PyramidePage> {
     if (!mounted) return;
 
     if (choice == 'home') {
-      Navigator.pushNamedAndRemoveUntil(context, '/homepage', (route) => false);
+      Navigator.pushNamedAndRemoveUntil(context, Routes.home, (route) => false);
     } else if (choice == 'replay') {
       _resetGame();
     }

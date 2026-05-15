@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class ClickerGame extends StatefulWidget {
   const ClickerGame({super.key});
@@ -205,7 +206,7 @@ class _ClickerGameState extends State<ClickerGame> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      Navigator.pushReplacementNamed(context, '/homepage');
+                      Navigator.pushReplacementNamed(context, Routes.home);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.secondary, // 🎨 couleur secondaire du thème

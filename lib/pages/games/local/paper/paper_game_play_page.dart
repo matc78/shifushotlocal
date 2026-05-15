@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/routes.dart';
 
 class PaperGamePlayPage extends StatefulWidget {
   final List<Map<String, dynamic>> papers;
@@ -109,7 +110,7 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
     if (widget.remainingGames.isNotEmpty) {
       final nextRoute = widget.remainingGames.first;
 
-      if (nextRoute == '/homepage') {
+      if (nextRoute == Routes.home) {
         // Fin de la partie : retour à la page d'accueil
         showDialog(
           context: context,
