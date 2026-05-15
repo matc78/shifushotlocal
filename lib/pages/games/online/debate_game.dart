@@ -1,11 +1,13 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
-import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class DebateGameScreen extends StatefulWidget {
   final String lobbyId;
@@ -609,45 +611,44 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
           );
         }
 
-        return Scaffold(
-          backgroundColor: theme.background, // ✅ Fond de l'application
-          appBar: AppBar(
-            title: const Text("Jeu du débat"),
-            backgroundColor: theme.background, // ✅ Couleur de l'AppBar
-            foregroundColor: theme.primary, // ✅ Texte en blanc
-            actions: [
-              IconButton(
-                icon: Icon(Icons.info_outline,
-                    color: theme.primary), // ✅ Icône rouge
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      backgroundColor:
-                          theme.background, // ✅ Adaptation du thème
-                      title: Text("📜 Règles du jeu", style: theme.titleMedium),
-                      content: Text(
-                        "Les joueurs civils doivent identifier l’imposteur en débattant sur le sujet affiché.\n\n"
-                        "L’imposteur doit essayer de semer le doute sans se faire découvrir.\n\n"
-                        "À chaque tour, les joueurs votent pour éliminer un suspect. La partie se termine lorsque l’imposteur est découvert ou qu’il reste seul.",
-                        textAlign: TextAlign.justify,
-                        style: theme.bodyMedium,
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text("OK", style: theme.bodyLarge),
-                        ),
-                      ],
+        return AppShell(
+          title: 'Jeu du débat',
+          actions: [
+            IconButton(
+              icon: Icon(Icons.info_outline_rounded, color: theme.textPrimary),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text('Règles du jeu', style: theme.titleMedium),
+                    content: Text(
+                      "Les civils doivent identifier l'imposteur en débattant sur le sujet affiché. L'imposteur essaie de semer le doute sans se faire découvrir.\n\n"
+                      "À chaque tour, on vote pour éliminer un suspect. La partie se termine quand l'imposteur est trouvé ou qu'il reste seul.",
+                      textAlign: TextAlign.justify,
+                      style: theme.bodyMedium,
                     ),
-                  );
-                },
-              ),
-            ],
-          ),
-          body: Column(
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+          child: Column(
             children: [
-              Text("Joueurs :", style: theme.titleMedium),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("JOUEURS",
+                      style: theme.overline.copyWith(
+                          color: theme.textPrimary, letterSpacing: 2)),
+                ),
+              ),
               Expanded(
                 child: ListView(
                   children: players.keys.map((playerId) {
