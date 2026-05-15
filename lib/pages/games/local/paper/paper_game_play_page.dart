@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 import 'dart:math';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/routes.dart';
@@ -207,31 +208,31 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
     final theme = AppTheme.of(context);
     final currentPlayer = widget.players[currentPlayerIndex];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Jeu des Papiers", style: theme.titleMedium),
-        backgroundColor: theme.background,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: theme.textPrimary),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.help_outline, color: theme.primary),
-            onPressed: _showRulesExplanation,
-          ),
-        ],
-      ),
-      backgroundColor: theme.background,
-      body: Center(
+    return AppShell(
+      title: 'Jeu des Papiers',
+      actions: [
+        IconButton(
+          icon: Icon(Icons.help_outline_rounded, color: theme.textPrimary),
+          onPressed: _showRulesExplanation,
+        ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Tour de $currentPlayer",
-              style: theme.titleMedium,
-              textAlign: TextAlign.center,
+            const SizedBox(height: 8),
+            Text('AU TOUR DE',
+                style: theme.overline.copyWith(color: theme.textMuted)),
+            const SizedBox(height: 6),
+            ShaderMask(
+              shaderCallback: (rect) => theme.brandGradient.createShader(rect),
+              child: Text(
+                currentPlayer,
+                style: theme.displayLarge
+                    .copyWith(color: Colors.white, fontSize: 40),
+              ),
             ),
-            const SizedBox(height: 50),
+            const Spacer(),
             if (hasDrawn)
               Stack(
                 alignment: Alignment.center,
@@ -244,63 +245,63 @@ class _PaperGamePlayPageState extends State<PaperGamePlayPage> {
                       width: MediaQuery.of(context).size.width * 0.6,
                     ),
                   ),
-                  Column(
-                    children: [
-                      Text(
-                        "Cible : ${selectedPaper!['player'] == 'Celui qui piochera' ? currentPlayer : selectedPaper!['player']}",
-                        style: theme.bodyLarge.copyWith(
-                            fontWeight: FontWeight.bold, fontSize: 25),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        displayedText,
-                        style: theme.bodyLarge.copyWith(fontSize: 22),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Cible : ${selectedPaper!['player'] == 'Celui qui piochera' ? currentPlayer : selectedPaper!['player']}",
+                          style: theme.bodyLarge.copyWith(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 18,
+                              color: Colors.black),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          displayedText,
+                          style: theme.bodyLarge
+                              .copyWith(fontSize: 16, color: Colors.black87),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
-              ),
-            const SizedBox(height: 30),
-            if (!hasDrawn)
-              ElevatedButton(
-                onPressed: _drawPaper,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.primary,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              )
+            else
+              Container(
+                width: 220,
+                height: 220,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: theme.brandGradient,
+                  boxShadow: theme.glowShadow,
                 ),
-                child: Text("Tirer un papier",
-                    style: theme.buttonText.copyWith(fontSize: 18)),
+                child: Text('🎲',
+                    style: theme.displayLarge.copyWith(fontSize: 80)),
+              ),
+            const Spacer(),
+            if (!hasDrawn)
+              GradientButton(
+                label: 'Tirer un papier',
+                icon: Icons.shuffle_rounded,
+                onPressed: _drawPaper,
+                height: 64,
               ),
             if (hasDrawn) ...[
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: _acceptPaper,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primary,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 40),
-                    ),
-                    child: Text("Accepter le défi", style: theme.buttonText),
-                  ),
-                  ElevatedButton(
-                    onPressed: _refusePaper,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.secondary,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 40),
-                    ),
-                    child: Text("Refuser", style: theme.buttonText),
-                  ),
-                ],
+              GradientButton(
+                label: 'Accepter le défi',
+                icon: Icons.check_rounded,
+                onPressed: _acceptPaper,
+              ),
+              const SizedBox(height: 10),
+              GhostButton(
+                label: 'Refuser (1 FU)',
+                icon: Icons.close_rounded,
+                onPressed: _refusePaper,
               ),
             ],
           ],
