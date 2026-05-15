@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({super.key});
@@ -104,8 +105,9 @@ class _FriendsPageState extends State<FriendsPage> {
                       style: theme.bodyMedium.copyWith(color: theme.textSecondary),
                     ),
                     const SizedBox(height: 10),
-                    Image.network(
-                      'https://mathsamoi.com/wp-content/uploads/2019/10/061-image-entrc3a9e-1.png?w=640',
+                    CachedNetworkImage(
+                      imageUrl:
+                          'https://mathsamoi.com/wp-content/uploads/2019/10/061-image-entrc3a9e-1.png?w=640',
                       width: 200,
                       height: 200,
                     ),
@@ -131,7 +133,7 @@ class _FriendsPageState extends State<FriendsPage> {
 
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundImage: NetworkImage(
+                          backgroundImage: CachedNetworkImageProvider(
                             user['photoUrl'] ??
                                 'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
                           ),

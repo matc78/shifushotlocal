@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class AddFriendsPage extends StatefulWidget {
   const AddFriendsPage({super.key});
@@ -237,7 +238,10 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
 
                         return ListTile(
                           leading: CircleAvatar(
-                            backgroundImage: NetworkImage(user['photoUrl'] ?? ''),
+                            backgroundImage: (user['photoUrl'] != null &&
+                                    (user['photoUrl'] as String).isNotEmpty)
+                                ? CachedNetworkImageProvider(user['photoUrl'] as String)
+                                : null,
                           ),
                           title: Text('${user['surname']} ${user['name']}'),
                           subtitle: Text(user['pseudo'] ?? ''),

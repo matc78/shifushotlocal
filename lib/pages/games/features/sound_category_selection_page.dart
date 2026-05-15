@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'sound_board_page.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class SoundCategorySelectionPage extends StatelessWidget {
   SoundCategorySelectionPage({super.key});
@@ -54,12 +55,16 @@ class SoundCategorySelectionPage extends StatelessWidget {
             color: Colors.white,
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
-              leading: Image.network(
-                'https://img.icons8.com/?size=100&id=FaFhLHDGUZAA&format=png&color=000000',
-                width: 32,
-                height: 32,
-                color: theme.textSecondary, // facultatif si tu veux le teinter
-                errorBuilder: (context, error, stackTrace) => Icon(Icons.error, color: theme.textSecondary),
+              leading: ColorFiltered(
+                colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+                child: CachedNetworkImage(
+                  imageUrl:
+                      'https://img.icons8.com/?size=100&id=FaFhLHDGUZAA&format=png&color=000000',
+                  width: 32,
+                  height: 32,
+                  errorWidget: (context, url, error) =>
+                      Icon(Icons.error, color: theme.textSecondary),
+                ),
               ),
               title: Text(category, style: theme.titleMedium),
               trailing: const Icon(Icons.chevron_right),

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shifushotlocal/pages/profile/edit_profile_page.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -72,7 +73,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void _logout() async {
     await _auth.signOut();
     if (!mounted) return;
-    Navigator.pushReplacementNamed(context, '/');
+    Navigator.pushReplacementNamed(context, Routes.root);
   }
 
   Future<bool> _reauthenticate(User user) async {
@@ -258,7 +259,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   children: [
                     CircleAvatar(
                       radius: 60,
-                      backgroundImage: NetworkImage(
+                      backgroundImage: CachedNetworkImageProvider(
                         userData!['photoUrl'] ??
                             'https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg',
                       ),

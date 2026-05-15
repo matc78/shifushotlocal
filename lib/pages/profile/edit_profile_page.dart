@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -135,8 +136,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           Colors.black.withValues(alpha: 0.3),
                           BlendMode.darken,
                         ),
-                        child: Image.network(
-                          _photoUrl ??
+                        child: CachedNetworkImage(
+                          imageUrl: _photoUrl ??
                               "https://img.freepik.com/vecteurs-premium/vecteur-conception-logo-mascotte-sanglier_497517-52.jpg",
                           width: 120,
                           height: 120,
