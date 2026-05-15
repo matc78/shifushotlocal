@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:vibration/vibration.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
+import 'package:vibration/vibration.dart';
 
 class TwelveBarsPage extends StatefulWidget {
   const TwelveBarsPage({super.key});
@@ -248,98 +250,134 @@ class _TwelveBarsPageState extends State<TwelveBarsPage> {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        backgroundColor: theme.background,
-        elevation: 0,
-        iconTheme: IconThemeData(color: theme.textPrimary),
-        centerTitle: true,
-        title: Text("Les 12 Bars", style: theme.titleMedium),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showResetConfirmationDialog(context),
-        tooltip: "Réinitialiser l’activité",
-        backgroundColor: Colors.white,
-        child: const Icon(Icons.restart_alt),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: barIndex >= totalBars
-              ? Text("🎉 Activité terminée ! Bravo !", style: theme.titleLarge)
-              : !started
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Prêt à commencer ?", style: theme.titleLarge),
-                        const SizedBox(height: 30),
-                        ElevatedButton(
-                          onPressed: _startNewBar,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.primary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 32, vertical: 16),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
-                          ),
-                          child: Text("C’est parti !", style: theme.buttonText),
-                        ),
-                      ],
-                    )
-                  : Column(
+    return AppShell(
+      title: 'Les 12 Bars',
+      actions: started
+          ? [
+              IconButton(
+                icon: Icon(Icons.restart_alt_rounded, color: theme.textPrimary),
+                tooltip: 'Réinitialiser',
+                onPressed: () => _showResetConfirmationDialog(context),
+              ),
+            ]
+          : null,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        child: barIndex >= totalBars
+            ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('🎉',
+                        style: theme.displayLarge.copyWith(fontSize: 80)),
+                    const SizedBox(height: 16),
+                    Text('Activité terminée !',
+                        style: theme.titleLarge, textAlign: TextAlign.center),
+                    const SizedBox(height: 8),
+                    Text('Bravo aux survivants.', style: theme.bodyMedium),
+                  ],
+                ),
+              )
+            : !started
+                ? Center(
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("Bar ${barIndex + 1}/$totalBars",
-                            style: theme.titleLarge),
-                        const SizedBox(height: 16),
-                        LinearProgressIndicator(
-                          value:
-                              1 - (timeLeft.inSeconds / barDuration.inSeconds),
-                          minHeight: 8,
-                          backgroundColor:
-                              theme.textSecondary.withValues(alpha: 0.2),
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(theme.secondary),
+                        Text('LES 12 BARS',
+                            style: theme.overline
+                                .copyWith(color: theme.textMuted)),
+                        const SizedBox(height: 8),
+                        ShaderMask(
+                          shaderCallback: (rect) =>
+                              theme.brandGradient.createShader(rect),
+                          child: Text('Prêt ?',
+                              style: theme.displayLarge
+                                  .copyWith(color: Colors.white, fontSize: 56)),
                         ),
-                        const SizedBox(height: 16),
-                        Text("⏳ Temps restant", style: theme.bodyMedium),
-                        Text(_formatDuration(timeLeft),
-                            style: theme.titleLarge.copyWith(fontSize: 48)),
-                        const SizedBox(height: 24),
-                        Text("🎲 Contrainte", style: theme.bodyMedium),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 12),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.secondary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border:
-                                Border.all(color: theme.secondary, width: 1),
-                          ),
-                          child: Text(
-                            currentConstraint,
-                            style: theme.bodyLarge
-                                .copyWith(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '12 bars × 30 minutes. Une contrainte tirée au sort à chaque bar.',
+                          textAlign: TextAlign.center,
+                          style: theme.bodyMedium,
                         ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _goToNextBar,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.primary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 16),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
-                          ),
-                          child: Text("Passer au bar suivant",
-                              style: theme.buttonText),
+                        const SizedBox(height: 32),
+                        GradientButton(
+                          label: "C'est parti !",
+                          icon: Icons.sports_bar_rounded,
+                          onPressed: _startNewBar,
                         ),
                       ],
                     ),
-        ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 8),
+                      SectionCard(
+                        child: Column(
+                          children: [
+                            Text('BAR ${barIndex + 1} / $totalBars',
+                                style: theme.overline.copyWith(
+                                  color: theme.textMuted,
+                                  letterSpacing: 2,
+                                )),
+                            const SizedBox(height: 12),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: LinearProgressIndicator(
+                                value: 1 -
+                                    (timeLeft.inSeconds /
+                                        barDuration.inSeconds),
+                                minHeight: 10,
+                                backgroundColor: theme.surfaceAlt,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    theme.primary),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ShaderMask(
+                              shaderCallback: (rect) =>
+                                  theme.brandGradient.createShader(rect),
+                              child: Text(_formatDuration(timeLeft),
+                                  style: theme.displayLarge.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 56,
+                                  )),
+                            ),
+                            Text('TEMPS RESTANT',
+                                style: theme.overline
+                                    .copyWith(color: theme.textMuted)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SectionCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('CONTRAINTE',
+                                style: theme.overline.copyWith(
+                                  color: theme.textMuted,
+                                  letterSpacing: 2,
+                                )),
+                            const SizedBox(height: 8),
+                            Text(currentConstraint,
+                                style: theme.bodyLarge.copyWith(
+                                  color: theme.textPrimary,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.3,
+                                )),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      GradientButton(
+                        label: 'Passer au bar suivant',
+                        icon: Icons.arrow_forward_rounded,
+                        onPressed: _goToNextBar,
+                      ),
+                    ],
+                  ),
       ),
     );
   }

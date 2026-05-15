@@ -598,7 +598,6 @@ class _DiceGamePageState extends State<DiceGamePage> {
       ),
     );
   }
-
 }
 
 class _DiceFace extends StatelessWidget {

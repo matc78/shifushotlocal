@@ -1,345 +1,328 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
-class FeedbackPage extends StatelessWidget {
+class FeedbackPage extends StatefulWidget {
   const FeedbackPage({super.key});
+
+  @override
+  State<FeedbackPage> createState() => _FeedbackPageState();
+}
+
+class _FeedbackPageState extends State<FeedbackPage> {
+  final _titleController = TextEditingController();
+  final _feedbackController = TextEditingController();
+  bool _sending = false;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _feedbackController.dispose();
+    super.dispose();
+  }
+
+  void _snack(String msg, {bool error = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(msg),
+        backgroundColor: error ? Colors.red : null,
+      ));
+  }
+
+  Future<void> _submit() async {
+    final title = _titleController.text.trim();
+    final feedback = _feedbackController.text.trim();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    if (title.isEmpty || feedback.isEmpty) {
+      _snack('Remplis tous les champs.', error: true);
+      return;
+    }
+    if (uid == null) {
+      _snack('Utilisateur non authentifié.', error: true);
+      return;
+    }
+
+    setState(() => _sending = true);
+    try {
+      await FirebaseFirestore.instance.collection('feedback').add({
+        'title': title,
+        'feedback': feedback,
+        'uid': uid,
+        'response': '',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      if (!mounted) return;
+      _titleController.clear();
+      _feedbackController.clear();
+      _snack('Merci pour ton retour !');
+    } catch (e) {
+      _snack('Erreur, réessaie.', error: true);
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final TextEditingController feedbackController = TextEditingController();
-    final TextEditingController titleController = TextEditingController();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Feedback',
-          style: theme.titleMedium.copyWith(color: theme.textPrimary),
-        ),
-        backgroundColor: theme.background,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.textPrimary),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      backgroundColor: theme.background,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Nous apprécions vos retours !',
-                style: theme.titleLarge,
+    return AppShell(
+      title: 'Feedback',
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'On lit tout. Promis.',
+              style: theme.titleLarge.copyWith(fontSize: 24),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Bug, suggestion, coup de gueule — balance.',
+              style: theme.bodyMedium,
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _titleController,
+              maxLength: 20,
+              style: theme.bodyLarge,
+              decoration: const InputDecoration(
+                hintText: 'Titre',
+                counterText: '',
               ),
-              const SizedBox(height: 16.0),
-              Text(
-                'Veuillez écrire un titre et vos remarques ci-dessous :',
-                style: theme.bodyMedium,
-              ),
-              const SizedBox(height: 16.0),
-              TextField(
-                controller: titleController,
-                maxLength: 20,
-                decoration: InputDecoration(
-                  hintText: 'Titre (max 20 caractères)',
-                  hintStyle: theme.bodyMedium,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  counterText: '',
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              TextField(
-                controller: feedbackController,
-                maxLines: 6,
-                decoration: InputDecoration(
-                  hintText: 'Écrivez ici...',
-                  hintStyle: theme.bodyMedium,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _feedbackController,
+              maxLines: 6,
+              style: theme.bodyLarge,
+              decoration: const InputDecoration(hintText: 'Ton message…'),
+            ),
+            const SizedBox(height: 16),
+            GradientButton(
+              label: _sending ? 'Envoi…' : 'Envoyer',
+              icon: Icons.send_rounded,
+              onPressed: _sending ? null : _submit,
+            ),
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    gradient: theme.brandGradient,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () async {
-                  final String title = titleController.text.trim();
-                  final String feedback = feedbackController.text.trim();
-                  final String? uid = FirebaseAuth.instance.currentUser?.uid;
-
-                  if (title.isEmpty || feedback.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Veuillez remplir tous les champs.',
-                          style: theme.bodyMedium.copyWith(color: Colors.white),
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                    return;
-                  }
-
-                  if (uid == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Utilisateur non authentifié.',
-                          style: theme.bodyMedium.copyWith(color: Colors.white),
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                    return;
-                  }
-
-                  try {
-                    await FirebaseFirestore.instance
-                        .collection('feedback')
-                        .add({
-                      'title': title,
-                      'feedback': feedback,
-                      'uid': uid,
-                      'response': '', // Par défaut, aucun retour de l'équipe
-                      'timestamp': FieldValue.serverTimestamp(),
-                    });
-
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Merci pour votre retour !',
-                          style: theme.bodyMedium.copyWith(color: Colors.white),
-                        ),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-
-                    titleController.clear();
-                    feedbackController.clear();
-                  } catch (e) {
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Erreur lors de l\'envoi du feedback. Veuillez réessayer.',
-                          style: theme.bodyMedium.copyWith(color: Colors.white),
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                ),
-                child: Text(
-                  'Envoyer',
-                  style: theme.titleMedium.copyWith(color: Colors.white),
-                ),
-              ),
-              const SizedBox(height: 35),
-              Text(
-                'Vos retours :',
-                style: theme.titleMedium,
-              ),
-              const SizedBox(height: 8.0),
-              SizedBox(
-                height: 300, // Limite la hauteur de la liste
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('feedback')
-                      .where('uid',
-                          isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-                      .orderBy('timestamp', descending: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    final feedbackDocs = snapshot.data!.docs;
-
-                    if (feedbackDocs.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'Hésite SURTOUT pas hein',
-                          style: theme.bodyMedium,
-                        ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      itemCount: feedbackDocs.length,
-                      itemBuilder: (context, index) {
-                        final feedbackData = feedbackDocs[index];
-                        final String title = feedbackData['title'];
-                        final String feedbackId =
-                            feedbackData.id; // ID du document Firestore
-                        final Timestamp? timestamp = feedbackData['timestamp'];
-
-                        // Conversion du timestamp en format d/m/yy h:m
-                        final String formattedDate = timestamp != null
-                            ? DateFormat('d/M/yy HH:mm')
-                                .format(timestamp.toDate())
-                            : 'Date inconnue';
-
-                        return Card(
-                          elevation: 3.0, // Ombre sous la carte
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8.0), // Espacement vertical
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: ListTile(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  title,
-                                  style: theme.bodyMedium,
-                                ),
-                                Text(
-                                  formattedDate,
-                                  style: theme.bodyMedium
-                                      .copyWith(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () async {
-                                final scaffoldMessenger =
-                                    ScaffoldMessenger.of(context);
-
-                                // Affiche une boîte de confirmation avant la suppression
-                                final bool? confirm = await showDialog<bool>(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Supprimer ce feedback'),
-                                    content: const Text(
-                                        'Êtes-vous sûr de vouloir supprimer ce feedback ?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, false),
-                                        child: const Text('Annuler'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, true),
-                                        child: const Text('Supprimer'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-
-                                if (confirm == true) {
-                                  try {
-                                    await FirebaseFirestore.instance
-                                        .collection('feedback')
-                                        .doc(feedbackId)
-                                        .delete();
-
-                                    scaffoldMessenger.showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            'Feedback supprimé avec succès.'),
-                                        backgroundColor: Colors.green,
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    scaffoldMessenger.showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            'Erreur lors de la suppression du feedback.'),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  }
-                                }
-                              },
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => FeedbackDetailPage(
-                                      feedback: feedbackData),
-                                ),
-                              );
-                            },
-                          ),
+                const SizedBox(width: 10),
+                Text('MES RETOURS',
+                    style: theme.overline.copyWith(
+                      color: theme.textPrimary,
+                      fontSize: 13,
+                      letterSpacing: 2,
+                    )),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 280,
+              child: uid == null
+                  ? const EmptyState(
+                      icon: Icons.account_circle_outlined,
+                      title: 'Compte requis',
+                      subtitle: 'Connecte-toi pour suivre tes feedbacks.',
+                    )
+                  : StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('feedback')
+                          .where('uid', isEqualTo: uid)
+                          .orderBy('timestamp', descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return ListView.separated(
+                            itemCount: 3,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 8),
+                            itemBuilder: (_, __) => const SkeletonListTile(),
+                          );
+                        }
+                        final docs = snapshot.data!.docs;
+                        if (docs.isEmpty) {
+                          return const EmptyState(
+                            icon: Icons.chat_bubble_outline_rounded,
+                            title: 'Aucun feedback envoyé',
+                            subtitle: "Hésite SURTOUT pas hein.",
+                          );
+                        }
+                        return ListView.separated(
+                          itemCount: docs.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 8),
+                          itemBuilder: (_, i) =>
+                              _FeedbackRow(doc: docs[i], theme: theme),
                         );
                       },
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
+                    ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class FeedbackDetailPage extends StatelessWidget {
-  final QueryDocumentSnapshot feedback;
+class _FeedbackRow extends StatelessWidget {
+  const _FeedbackRow({required this.doc, required this.theme});
+  final QueryDocumentSnapshot doc;
+  final AppTheme theme;
 
+  @override
+  Widget build(BuildContext context) {
+    final title = doc['title'] as String;
+    final Timestamp? ts = doc['timestamp'] as Timestamp?;
+    final formatted = ts != null
+        ? DateFormat('d/M/yy HH:mm').format(ts.toDate())
+        : 'Date inconnue';
+
+    return Material(
+      color: theme.surface,
+      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => FeedbackDetailPage(feedback: doc)),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(color: theme.border),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(title,
+                        style: theme.bodyLarge.copyWith(
+                          color: theme.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        )),
+                    const SizedBox(height: 2),
+                    Text(formatted, style: theme.bodyMedium),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon:
+                    Icon(Icons.delete_outline_rounded, color: theme.textMuted),
+                onPressed: () => _confirmDelete(context),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Supprimer ce feedback ?'),
+        content: const Text('Tu ne pourras pas le récupérer.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Annuler')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Supprimer')),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    try {
+      await FirebaseFirestore.instance
+          .collection('feedback')
+          .doc(doc.id)
+          .delete();
+      messenger.showSnackBar(const SnackBar(
+        content: Text('Feedback supprimé.'),
+        backgroundColor: Colors.green,
+      ));
+    } catch (_) {
+      messenger.showSnackBar(const SnackBar(
+        content: Text('Erreur lors de la suppression.'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+}
+
+class FeedbackDetailPage extends StatelessWidget {
   const FeedbackDetailPage({super.key, required this.feedback});
+  final QueryDocumentSnapshot feedback;
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final String title = feedback['title'];
-    final String feedbackText = feedback['feedback'];
-    final String response = feedback['response'];
+    final title = feedback['title'] as String;
+    final body = feedback['feedback'] as String;
+    final response = feedback['response'] as String;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Détail du Feedback',
-          style: theme.titleMedium.copyWith(color: theme.textPrimary),
-        ),
-        backgroundColor: theme.background,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.textPrimary),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      backgroundColor: theme.background,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return AppShell(
+      title: 'Détail',
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: theme.titleLarge,
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              feedbackText,
-              style: theme.bodyMedium,
+            Text(title, style: theme.titleLarge.copyWith(fontSize: 24)),
+            const SizedBox(height: 12),
+            SectionCard(
+              child: Text(body,
+                  style: theme.bodyLarge.copyWith(color: theme.textPrimary)),
             ),
             const Spacer(),
-            Text(
-              response.isEmpty
-                  ? 'En attente du retour de l\'équipe Shifushot.'
-                  : 'Retour de l\'équipe : $response',
-              style: theme.bodyMedium.copyWith(color: Colors.grey),
+            SectionCard(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  Icon(
+                    response.isEmpty
+                        ? Icons.hourglass_top_rounded
+                        : Icons.mail_rounded,
+                    color: theme.textMuted,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      response.isEmpty
+                          ? "En attente du retour de l'équipe Shifushot."
+                          : response,
+                      style: theme.bodyMedium,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

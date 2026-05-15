@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class FollowLineModeSelector extends StatelessWidget {
   const FollowLineModeSelector({super.key});
@@ -8,94 +9,107 @@ class FollowLineModeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        title: Text('Suivre la ligne', style: theme.titleMedium),
-        backgroundColor: theme.background,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: theme.textPrimary),
-      ),
-      body: Center(
+    return AppShell(
+      title: 'Suis la ligne',
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Mode Rapidité',
-                style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            ElevatedButton(
+            _ModeSection(
+              title: 'MODE RAPIDITÉ',
+              subtitle: 'Le plus rapide gagne',
+              theme: theme,
+            ),
+            const SizedBox(height: 12),
+            GradientButton(
+              label: 'Facile',
+              icon: Icons.bolt_rounded,
               onPressed: () =>
                   Navigator.pushNamed(context, Routes.followLineSpeedEasy),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.buttonColor,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-              child: Text('Facile', style: theme.buttonText),
             ),
             const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: null, // pas encore implémenté
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade400,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-              child: Text('Compliqué (bientôt)',
-                  style: theme.bodyMedium.copyWith(color: Colors.red)),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
+            const GhostButton(
+              label: 'Compliqué — bientôt',
+              icon: Icons.lock_outline_rounded,
               onPressed: null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade400,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-              child: Text('Très dur (bientôt)',
-                  style: theme.bodyMedium.copyWith(color: Colors.red)),
             ),
-            const SizedBox(height: 40),
-            Text('Mode Précision',
-                style: theme.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            ElevatedButton(
+            const GhostButton(
+              label: 'Très dur — bientôt',
+              icon: Icons.lock_outline_rounded,
+              onPressed: null,
+            ),
+            const SizedBox(height: 32),
+            _ModeSection(
+              title: 'MODE PRÉCISION',
+              subtitle: 'La main la plus stable',
+              theme: theme,
+            ),
+            const SizedBox(height: 12),
+            GradientButton(
+              label: 'Facile',
+              icon: Icons.gps_fixed_rounded,
               onPressed: () =>
                   Navigator.pushNamed(context, Routes.followLinePrecisionEasy),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.buttonColor,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-              child: Text('Facile', style: theme.buttonText),
             ),
             const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: null, // pas encore implémenté
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade400,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-              child: Text('Compliqué (bientôt)',
-                  style: theme.bodyMedium.copyWith(color: Colors.red)),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
+            const GhostButton(
+              label: 'Compliqué — bientôt',
+              icon: Icons.lock_outline_rounded,
               onPressed: null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade400,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-              child: Text('Très dur (bientôt)',
-                  style: theme.bodyMedium.copyWith(color: Colors.red)),
+            ),
+            const SizedBox(height: 10),
+            const GhostButton(
+              label: 'Très dur — bientôt',
+              icon: Icons.lock_outline_rounded,
+              onPressed: null,
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ModeSection extends StatelessWidget {
+  const _ModeSection({
+    required this.title,
+    required this.subtitle,
+    required this.theme,
+  });
+  final String title;
+  final String subtitle;
+  final AppTheme theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 18,
+          decoration: BoxDecoration(
+            gradient: theme.brandGradient,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(title,
+                style: theme.overline.copyWith(
+                  color: theme.textPrimary,
+                  fontSize: 13,
+                  letterSpacing: 2,
+                )),
+            const SizedBox(height: 2),
+            Text(subtitle, style: theme.bodyMedium),
+          ],
+        ),
+      ],
     );
   }
 }
