@@ -1,8 +1,10 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class FollowLineSpeedEasy extends StatefulWidget {
   const FollowLineSpeedEasy({super.key});
@@ -265,16 +267,9 @@ class _FollowLineSpeedEasyState extends State<FollowLineSpeedEasy> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        title: Text('Mode Rapidité - Facile', style: theme.titleMedium),
-        backgroundColor: theme.background,
-        elevation: 0,
-        iconTheme: IconThemeData(color: theme.textPrimary),
-      ),
-      body: Stack(
+    return AppShell(
+      title: 'Rapidité — Facile',
+      child: Stack(
         children: [
           GestureDetector(
             onPanStart: (details) {

@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shifushotlocal/theme/app_theme.dart';
 import 'package:shifushotlocal/routes.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class KillerActionsPage extends StatefulWidget {
   final List<String> players;
@@ -115,60 +117,58 @@ class _KillerActionsPageState extends State<KillerActionsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Killer Actions', style: theme.titleMedium),
-        backgroundColor: theme.background,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      backgroundColor: theme.background,
-      body: currentAction == null || currentTarget == null
+    return AppShell(
+      title: 'Killer',
+      child: currentAction == null || currentTarget == null
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const Spacer(),
+                  Text('AU TOUR DE',
+                      style: theme.overline.copyWith(color: theme.textMuted)),
+                  const SizedBox(height: 8),
+                  ShaderMask(
+                    shaderCallback: (rect) =>
+                        theme.brandGradient.createShader(rect),
+                    child: Text(
+                      shuffledPlayers[currentPlayerIndex],
+                      textAlign: TextAlign.center,
+                      style: theme.displayLarge
+                          .copyWith(color: Colors.white, fontSize: 44),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   Text(
-                    'Confirmez que ${shuffledPlayers[currentPlayerIndex]} tient bien le téléphone à l\'abri des regards',
+                    "Assure-toi que c'est bien lui/elle qui tient le téléphone, à l'abri des autres regards.",
                     style: theme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title:
-                              Text('Votre mission', style: theme.titleMedium),
-                          content: Text(
-                            '${shuffledPlayers[currentPlayerIndex]}, votre action est :\n\n $currentAction\n\nCible : $currentTarget',
-                            style: theme.bodyMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                _nextPlayer();
-                              },
-                              child: const Text('Suivant'),
-                            ),
-                          ],
+                  const Spacer(),
+                  GradientButton(
+                    label: 'Voir ma mission',
+                    icon: Icons.visibility_rounded,
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text('Ta mission', style: theme.titleMedium),
+                        content: Text(
+                          '$currentAction\n\nCible : $currentTarget',
+                          style: theme.bodyMedium,
+                          textAlign: TextAlign.center,
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                              _nextPlayer();
+                            },
+                            child: const Text('Suivant'),
+                          ),
+                        ],
                       ),
                     ),
-                    child: Text('Confirmer', style: theme.buttonText),
                   ),
                 ],
               ),

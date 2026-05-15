@@ -1,7 +1,8 @@
-import 'package:shifushotlocal/theme/app_theme.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class FollowLinePrecisionEasy extends StatefulWidget {
   const FollowLinePrecisionEasy({super.key});
@@ -135,16 +136,9 @@ class _FollowLinePrecisionEasyState extends State<FollowLinePrecisionEasy> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      backgroundColor: theme.background,
-      appBar: AppBar(
-        title: Text('Mode Précision - Facile', style: theme.titleMedium),
-        backgroundColor: theme.background,
-        elevation: 0,
-        iconTheme: IconThemeData(color: theme.textPrimary),
-      ),
-      body: Stack(
+    return AppShell(
+      title: 'Précision — Facile',
+      child: Stack(
         children: [
           GestureDetector(
             onPanStart: (details) {
