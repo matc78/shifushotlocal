@@ -6,13 +6,10 @@ import 'package:shifushotlocal/services/auth_service.dart';
 /// from the service-layer refactor: callers (pages) only depend on
 /// AuthService, so a fake like this swaps in via AuthServiceLocator.override.
 class _FakeAuthService implements AuthService {
-  _FakeAuthService({
-    this.signInResult,
-    this.createAccountResult,
-    this.googleResult,
-  });
+  _FakeAuthService({this.signInResult});
 
   AuthResult? signInResult;
+  // Fields below are configurable in future tests — kept simple here.
   AuthResult? createAccountResult;
   AuthResult? googleResult;
 

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
+import 'package:shifushotlocal/widgets/app_shell.dart';
 
 class TeamGeneratorPage extends StatefulWidget {
   const TeamGeneratorPage({super.key});
@@ -11,11 +12,11 @@ class TeamGeneratorPage extends StatefulWidget {
 }
 
 class _TeamGeneratorPageState extends State<TeamGeneratorPage> {
-  final List<String> names = [];
-  final TextEditingController nameController = TextEditingController();
-  int peoplePerTeam = 2;
-  Map<int, List<String>> teams = {};
-  String? warningMessage;
+  final List<String> _names = [];
+  final TextEditingController _nameController = TextEditingController();
+  int _peoplePerTeam = 2;
+  final Map<int, List<String>> _teams = {};
+  String? _warning;
 
   @override
   void initState() {
@@ -23,55 +24,58 @@ class _TeamGeneratorPageState extends State<TeamGeneratorPage> {
     _fetchUserSurname();
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchUserSurname() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      try {
-        final userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-
-        if (userDoc.exists) {
-          final surname = userDoc.data()?['surname'] ?? "Moi";
-          setState(() {
-            names.add(surname);
-          });
-        } else {
-          setState(() {
-            names.add("Moi");
-          });
-        }
-      } catch (e) {
-        debugPrint('Erreur lors de la récupération du surname : $e');
-      }
+    if (user == null) {
+      setState(() => _names.add('Moi'));
+      return;
+    }
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (!mounted) return;
+      final surname = userDoc.data()?['surname'] as String? ?? 'Moi';
+      setState(() => _names.add(surname));
+    } catch (e) {
+      debugPrint('TeamGenerator: surname fetch failed — $e');
+      if (mounted) setState(() => _names.add('Moi'));
     }
   }
 
-  void generateTeams() {
-    if (names.length < peoplePerTeam) {
-      setState(() {
-        warningMessage =
-            "Ajoutez plus de personnes pour créer des équipes de $peoplePerTeam.";
-      });
+  void _addName() {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) return;
+    setState(() {
+      _names.add(name);
+      _nameController.clear();
+    });
+  }
+
+  void _generateTeams() {
+    if (_names.length < _peoplePerTeam) {
+      setState(() => _warning =
+          'Ajoute plus de personnes pour des équipes de $_peoplePerTeam.');
       return;
     }
-
     setState(() {
-      warningMessage = null;
-      teams.clear();
-      final shuffledNames = List<String>.from(names)..shuffle();
-      final int totalTeams = (shuffledNames.length / peoplePerTeam).ceil();
-
-      for (int i = 0; i < totalTeams; i++) {
-        int teamSize = peoplePerTeam;
-
-        if (shuffledNames.length < teamSize) {
-          teamSize = shuffledNames.length;
-        }
-
-        teams[i] = shuffledNames.take(teamSize).toList();
-        shuffledNames.removeRange(0, teamSize);
+      _warning = null;
+      _teams.clear();
+      final shuffled = List<String>.from(_names)..shuffle();
+      final totalTeams = (shuffled.length / _peoplePerTeam).ceil();
+      for (var i = 0; i < totalTeams; i++) {
+        final size = shuffled.length < _peoplePerTeam
+            ? shuffled.length
+            : _peoplePerTeam;
+        _teams[i] = shuffled.take(size).toList();
+        shuffled.removeRange(0, size);
       }
     });
   }
@@ -79,162 +83,173 @@ class _TeamGeneratorPageState extends State<TeamGeneratorPage> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Créateur d\'équipes',
-          style: theme.titleMedium,
-        ),
-        backgroundColor: theme.background,
-        centerTitle: true,
-        iconTheme: IconThemeData(
-          color: theme.textPrimary,
-        ),
-        elevation: 0,
-      ),
-      backgroundColor: theme.background,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return AppShell(
+      title: "Créateur d'équipes",
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
               children: [
                 Expanded(
                   child: TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Ajouter un prénom',
-                      labelStyle: theme.bodyMedium,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.textSecondary,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.primary,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: theme.background,
-                    ),
+                    controller: _nameController,
                     style: theme.bodyLarge,
+                    decoration: const InputDecoration(hintText: 'Prénom'),
+                    onSubmitted: (_) => _addName(),
                   ),
                 ),
                 const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    if (nameController.text.isNotEmpty) {
-                      setState(() {
-                        names.add(nameController.text.trim());
-                        nameController.clear();
-                      });
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                  ),
-                  child: Text(
-                    'Ajouter',
-                    style: theme.buttonText,
+                SizedBox(
+                  height: 52,
+                  child: GradientButton(
+                    label: 'Ajouter',
+                    onPressed: _addName,
+                    expanded: false,
+                    height: 52,
                   ),
                 ),
               ],
             ),
-            if (warningMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Text(
-                  warningMessage!,
-                  style: theme.bodyMedium.copyWith(color: theme.secondary),
-                ),
-              ),
-            const SizedBox(height: 20),
+            if (_warning != null) ...[
+              const SizedBox(height: 10),
+              Text(_warning!,
+                  style: theme.bodyMedium.copyWith(color: theme.primary)),
+            ],
+            const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: names.length,
-                itemBuilder: (context, index) {
-                  final name = names[index];
-                  final isCurrentUser = index == 0;
-
-                  return ListTile(
-                    title: Text(name),
-                    trailing: isCurrentUser
-                        ? null
-                        : IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              setState(() {
-                                names.removeAt(index);
-                              });
-                            },
+              child: _names.isEmpty
+                  ? const EmptyState(
+                      icon: Icons.group_outlined,
+                      title: 'Personne pour l\'instant',
+                      subtitle: 'Ajoute des prénoms pour générer des équipes.',
+                    )
+                  : ListView.separated(
+                      itemCount: _names.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 6),
+                      itemBuilder: (_, i) {
+                        final name = _names[i];
+                        final isCurrentUser = i == 0;
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: theme.surface,
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMd),
+                            border: Border.all(color: theme.border),
                           ),
-                  );
-                },
-              ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 32,
+                                height: 32,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  gradient: theme.brandGradient,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                  style: theme.bodyLarge.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(name, style: theme.bodyLarge),
+                              ),
+                              if (!isCurrentUser)
+                                IconButton(
+                                  icon: Icon(Icons.delete_outline_rounded,
+                                      color: theme.textMuted),
+                                  onPressed: () =>
+                                      setState(() => _names.removeAt(i)),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
             ),
             Row(
               children: [
-                Text(
-                  'Personnes par équipe :',
-                  style: theme.bodyMedium,
-                ),
+                Text('Par équipe :', style: theme.bodyMedium),
                 const SizedBox(width: 10),
                 DropdownButton<int>(
-                  value: peoplePerTeam,
-                  items: List.generate(3, (index) => index + 1)
-                      .map((value) => DropdownMenuItem<int>(
-                            value: value,
-                            child: Text('$value'),
-                          ))
+                  value: _peoplePerTeam,
+                  dropdownColor: theme.surface,
+                  style: theme.bodyLarge,
+                  underline: const SizedBox.shrink(),
+                  items: const [1, 2, 3]
+                      .map((v) =>
+                          DropdownMenuItem(value: v, child: Text('$v')))
                       .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      peoplePerTeam = value!;
-                    });
-                  },
+                  onChanged: (v) => setState(() => _peoplePerTeam = v!),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: generateTeams,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Text(
-                'Générer les équipes',
-                style: theme.buttonText,
-              ),
+            const SizedBox(height: 12),
+            GradientButton(
+              label: 'Générer les équipes',
+              icon: Icons.shuffle_rounded,
+              onPressed: _generateTeams,
             ),
-            const SizedBox(height: 20),
-            if (teams.isNotEmpty)
+            if (_teams.isNotEmpty) ...[
+              const SizedBox(height: 16),
               Expanded(
-                child: ListView.builder(
-                  itemCount: teams.length,
-                  itemBuilder: (context, index) {
-                    final team = teams[index]!;
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        title: Text(team.join(' & ')),
-                        subtitle: Text('Équipe ${index + 1}'),
+                child: ListView.separated(
+                  itemCount: _teams.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (_, i) {
+                    final team = _teams[i]!;
+                    return SectionCard(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              gradient: theme.brandGradient,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '${i + 1}',
+                              style: theme.bodyLarge.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Équipe ${i + 1}',
+                                    style: theme.overline),
+                                const SizedBox(height: 2),
+                                Text(team.join(' & '),
+                                    style: theme.bodyLarge.copyWith(
+                                      color: theme.textPrimary,
+                                      fontWeight: FontWeight.w700,
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   },
                 ),
               ),
+            ],
           ],
         ),
       ),
