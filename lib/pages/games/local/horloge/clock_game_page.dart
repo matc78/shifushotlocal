@@ -126,7 +126,9 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
           context: context,
           builder: (context) => Theme(
             data: Theme.of(context).copyWith(
-              dialogBackgroundColor: Colors.white.withValues(alpha: 0.85), // Fond semi-transparent
+              dialogTheme: DialogThemeData(
+                backgroundColor: Colors.white.withValues(alpha: 0.85),
+              ),
             ),
             child: AlertDialog(
               title: const Text("Tour terminé"),
@@ -274,9 +276,9 @@ class _ClockGameScreenState extends State<ClockGameScreen> {
               child: Transform(
                 alignment: Alignment.center,
                 transform: Matrix4.identity()
-                  ..scale(1.7)
+                  ..scaleByDouble(1.7, 1.7, 1.0, 1.0)
                   ..rotateZ(pi / 2)
-                  ..translate(screenWidth * 0.02, screenWidth * 0.005),
+                  ..translateByDouble(screenWidth * 0.02, screenWidth * 0.005, 0.0, 1.0),
                 child: Image.asset(
                   "assets/images/tapis_de_jeu.png",
                   fit: BoxFit.contain,

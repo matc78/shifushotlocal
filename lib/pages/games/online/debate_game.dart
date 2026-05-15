@@ -14,7 +14,7 @@ class DebateGameScreen extends StatefulWidget {
   const DebateGameScreen({super.key, required this.lobbyId});
 
   @override
-  _DebateGameScreenState createState() => _DebateGameScreenState();
+  State<DebateGameScreen> createState() => _DebateGameScreenState();
 }
 
 class _DebateGameScreenState extends State<DebateGameScreen> {
@@ -261,7 +261,7 @@ class _DebateGameScreenState extends State<DebateGameScreen> {
           currentSpeaker = updatedSpeaker;
           
           // 🔹 On ne compte que les votes des joueurs NON éliminés
-          totalVotes = updatedVotes.values.fold(0, (sum, val) => sum + val);
+          totalVotes = updatedVotes.values.fold(0, (acc, val) => acc + val);
           int remainingPlayers = players.isNotEmpty 
               ? players.keys.where((id) => !eliminatedPlayers.contains(id)).length
               : 0;

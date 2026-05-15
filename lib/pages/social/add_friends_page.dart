@@ -215,7 +215,7 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
                     }
 
                     if (!snapshot.hasData || !snapshot.data!.exists) {
-                      return Center(child: Text('Aucun utilisateur trouvé.'));
+                      return const Center(child: Text('Aucun utilisateur trouvé.'));
                     }
 
                     final userData = snapshot.data!.data() as Map<String, dynamic>;

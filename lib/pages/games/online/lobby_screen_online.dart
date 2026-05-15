@@ -12,7 +12,7 @@ class OnlineLobbyScreen extends StatefulWidget {
   const OnlineLobbyScreen({super.key, required this.gameName});
 
   @override
-  _OnlineLobbyScreenState createState() => _OnlineLobbyScreenState();
+  State<OnlineLobbyScreen> createState() => _OnlineLobbyScreenState();
 }
 
 class _OnlineLobbyScreenState extends State<OnlineLobbyScreen> {

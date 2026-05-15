@@ -7,7 +7,7 @@ class CardDrawerPage extends StatefulWidget {
   const CardDrawerPage({super.key});
 
   @override
-  _CardDrawerPageState createState() => _CardDrawerPageState();
+  State<CardDrawerPage> createState() => _CardDrawerPageState();
 }
 
 class _CardDrawerPageState extends State<CardDrawerPage> {
@@ -104,7 +104,7 @@ class _CardDrawerPageState extends State<CardDrawerPage> {
             SwitchListTile(
               title: Text("Inclure les Jokers", style: theme.bodyMedium),
               value: includeJokers,
-              activeColor: theme.secondary,
+              activeThumbColor: theme.secondary,
               onChanged: (bool value) {
                 setState(() {
                   includeJokers = value;

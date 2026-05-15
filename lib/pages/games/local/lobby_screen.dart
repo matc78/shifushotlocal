@@ -7,7 +7,7 @@ class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
 
   @override
-  _LobbyScreenState createState() => _LobbyScreenState();
+  State<LobbyScreen> createState() => _LobbyScreenState();
 }
 
 class _LobbyScreenState extends State<LobbyScreen> {

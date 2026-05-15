@@ -9,7 +9,7 @@ class PyramidCardPage extends StatefulWidget {
   const PyramidCardPage({super.key});
 
   @override
-  _PyramidCardPageState createState() => _PyramidCardPageState();
+  State<PyramidCardPage> createState() => _PyramidCardPageState();
 }
 
 class _PyramidCardPageState extends State<PyramidCardPage> {

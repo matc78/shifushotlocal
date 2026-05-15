@@ -376,10 +376,10 @@ class _PyramideModernePageState extends State<PyramideModernePage>
     final Color appBarForeground =
         isShotMoment ? Colors.white : theme.textPrimary;
 
-    return WillPopScope(
-      onWillPop: () async {
-        _saveCurrentState();
-        return true;
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _saveCurrentState();
       },
       child: Scaffold(
         backgroundColor: theme.background,
@@ -683,7 +683,7 @@ class _CarouselCard extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: stage.color.withOpacity(isClickable
+                          color: stage.color.withValues(alpha: isClickable
                               ? 0.65
                               : isActive
                                   ? 0.45
@@ -716,8 +716,8 @@ class _CarouselCard extends StatelessWidget {
                                     ),
                                     if (!isRevealed)
                                       Container(
-                                        color: Colors.black.withOpacity(
-                                            isClickable ? 0.12 : 0.35),
+                                        color: Colors.black.withValues(
+                                            alpha: isClickable ? 0.12 : 0.35),
                                       ),
                                     if (isShot && isRevealed)
                                       Container(

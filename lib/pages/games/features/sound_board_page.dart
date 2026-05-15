@@ -10,11 +10,11 @@ class SoundBoardPage extends StatefulWidget {
   const SoundBoardPage({
     required this.categoryName,
     required this.sounds,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
-  _SoundBoardPageState createState() => _SoundBoardPageState();
+  State<SoundBoardPage> createState() => _SoundBoardPageState();
 }
 
 class _SoundBoardPageState extends State<SoundBoardPage> with SingleTickerProviderStateMixin {

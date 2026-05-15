@@ -15,7 +15,7 @@ class DiceGamePage extends StatefulWidget {
   });
 
   @override
-  _DiceGamePageState createState() => _DiceGamePageState();
+  State<DiceGamePage> createState() => _DiceGamePageState();
 }
 
 class _DiceGamePageState extends State<DiceGamePage> {

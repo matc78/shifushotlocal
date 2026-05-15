@@ -166,7 +166,6 @@ class _BottomActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -207,19 +206,17 @@ class _BottomAction extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.locked = false,
-    this.accent,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final bool locked;
-  final Color? accent;
 
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    final color = accent ?? theme.textPrimary;
+    final color = theme.textPrimary;
     return InkWell(
       borderRadius: BorderRadius.circular(AppTheme.radiusMd),
       onTap: onTap,

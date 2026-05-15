@@ -128,7 +128,7 @@ class _ShifushotRequestPageState extends State<ShifushotRequestPage> {
         child: Column(
           children: [
             DropdownButtonFormField<String>(
-              value: selectedFriendId,
+              initialValue: selectedFriendId,
               decoration: const InputDecoration(labelText: "Choisir un ami"),
               items: friends.map((friend) {
                 return DropdownMenuItem<String>(

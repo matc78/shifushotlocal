@@ -13,7 +13,7 @@ class PaperGamePage extends StatefulWidget {
   });
 
   @override
-  _PaperGamePageState createState() => _PaperGamePageState();
+  State<PaperGamePage> createState() => _PaperGamePageState();
 }
 
 class _PaperGamePageState extends State<PaperGamePage> {
@@ -110,7 +110,7 @@ class _PaperGamePageState extends State<PaperGamePage> {
         child: Column(
           children: [
             DropdownButtonFormField<String>(
-              value: selectedPlayer,
+              initialValue: selectedPlayer,
               decoration: InputDecoration(
                 labelText: 'Choisir la cible du défi',
                 labelStyle: TextStyle(color: theme.textPrimary),

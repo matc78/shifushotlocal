@@ -8,7 +8,7 @@ class ClickerGame extends StatefulWidget {
   const ClickerGame({super.key});
 
   @override
-  _ClickerGameState createState() => _ClickerGameState();
+  State<ClickerGame> createState() => _ClickerGameState();
 }
 
 class _ClickerGameState extends State<ClickerGame> {

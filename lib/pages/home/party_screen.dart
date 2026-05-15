@@ -5,7 +5,7 @@ class PartyScreen extends StatefulWidget {
   const PartyScreen({super.key});
 
   @override
-  _PartyScreenState createState() => _PartyScreenState();
+  State<PartyScreen> createState() => _PartyScreenState();
 }
 
 class _PartyScreenState extends State<PartyScreen> {
@@ -42,7 +42,7 @@ class _PartyScreenState extends State<PartyScreen> {
         child: Column(
           children: [
             DropdownButtonFormField<String>(
-              value: selectedMood,
+              initialValue: selectedMood,
               decoration: InputDecoration(
                 labelText: 'Choisissez le mood de la soirée',
                 labelStyle: TextStyle(color: theme.textPrimary),

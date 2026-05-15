@@ -13,7 +13,7 @@ class LobbyWaitingScreen extends StatefulWidget {
   const LobbyWaitingScreen({super.key, required this.lobbyId, required this.isHost, required this.gameRoute});
 
   @override
-  _LobbyWaitingScreenState createState() => _LobbyWaitingScreenState();
+  State<LobbyWaitingScreen> createState() => _LobbyWaitingScreenState();
 }
 
 class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
@@ -109,7 +109,7 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Il faut au moins 2 joueurs pour commencer la partie !", style: theme.bodyLarge),
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           backgroundColor: theme.secondary,
         ),
       );
@@ -193,10 +193,10 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
-    return WillPopScope(
-      onWillPop: () async {
-        await _leaveLobby(); // Supprime le joueur du lobby en cas de retour arrière
-        return true;
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) await _leaveLobby();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -253,7 +253,7 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
                       style: theme.bodyLarge.copyWith(fontSize: 35),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(width: 10), // 🔹 Espacement entre le texte et le bouton
+                    const SizedBox(width: 10),
 
                     // 🔹 Bouton de copie
                     IconButton(
@@ -263,8 +263,8 @@ class _LobbyWaitingScreenState extends State<LobbyWaitingScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             backgroundColor: theme.background,
-                            content: Text("Code copié !", style: theme.bodyLarge), // ✅ Confirmation
-                            duration: Duration(seconds: 2),
+                            content: Text("Code copié !", style: theme.bodyLarge),
+                            duration: const Duration(seconds: 2),
                           ),
                         );
                       },

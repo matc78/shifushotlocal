@@ -15,7 +15,7 @@ class PaperGamePlayPage extends StatefulWidget {
   });
 
   @override
-  _PaperGamePlayPageState createState() => _PaperGamePlayPageState();
+  State<PaperGamePlayPage> createState() => _PaperGamePlayPageState();
 }
 
 class _PaperGamePlayPageState extends State<PaperGamePlayPage> {

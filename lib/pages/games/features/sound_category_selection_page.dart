@@ -3,6 +3,8 @@ import 'sound_board_page.dart';
 import 'package:shifushotlocal/theme/app_theme.dart';
 
 class SoundCategorySelectionPage extends StatelessWidget {
+  SoundCategorySelectionPage({super.key});
+
   final Map<String, List<String>> categories = {
     'Pet': [
       'assets/audios/pet/pet1.mp3',
